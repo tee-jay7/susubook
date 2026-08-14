@@ -8,10 +8,45 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+LOCAL_DATABASE_URL = (
+    "postgresql+psycopg://susubook:susubook_dev@localhost:5434/susubook"
+)
+
+
+def resolve_database_url() -> str:
+    """Build the connection URL, preferring composed parts over a whole URL.
+
+    In production only the password is a secret; host, port, database and role
+    are ordinary configuration. Keeping them separate means Secret Manager holds
+    exactly one value that needs protecting, and the rest stays readable in the
+    service definition where an operator can see it.
+
+    The password is percent-encoded: an unescaped `@`, `:`, `/` or `#` in a
+    generated password would otherwise corrupt the URL and produce a parse
+    error that looks nothing like a credentials problem.
+    """
+    explicit = os.environ.get("DATABASE_URL")
+    if explicit:
+        return explicit
+
+    password = os.environ.get("DB_PASSWORD")
+    if not password:
+        return LOCAL_DATABASE_URL
+
+    user = os.environ.get("DB_USER", "susu_app")
+    host = os.environ.get("DB_HOST", "127.0.0.1")
+    port = os.environ.get("DB_PORT", "5432")
+    name = os.environ.get("DB_NAME", "susu_book")
+    return (
+        f"postgresql+psycopg://{quote_plus(user)}:{quote_plus(password)}"
+        f"@{host}:{port}/{name}"
+    )
 
 
 @dataclass
@@ -19,12 +54,7 @@ class Config:
     SECRET_KEY: str = field(
         default_factory=lambda: os.environ.get("SECRET_KEY", "dev-only-not-for-production")
     )
-    DATABASE_URL: str = field(
-        default_factory=lambda: os.environ.get(
-            "DATABASE_URL",
-            "postgresql+psycopg://susubook:susubook_dev@localhost:5434/susubook",
-        )
-    )
+    DATABASE_URL: str = field(default_factory=resolve_database_url)
     # Optional. When unset, the request's own origin is used (see
     # app/web/collector.py::_base_url). That avoids a chicken-and-egg on first
     # deploy — a Cloud Run URL is not known until the service exists — and means

@@ -5,21 +5,36 @@
 # Prerequisites (see deploy/README.md):
 #   - gcloud CLI authenticated:  gcloud auth login
 #   - PostgreSQL running on a Compute Engine VM in the default VPC
-#   - Secrets created:  susubook-database-url, susubook-secret-key
+#   - Secret holding the database password (default name: susu-db-password)
+#
+# The project defaults to the gcloud CLI's configured project; override with
+# PROJECT_ID=... if needed.
 #
 # Usage:
-#   PROJECT_ID=your-project ./deploy/deploy.sh            # build and deploy
-#   PROJECT_ID=your-project ./deploy/deploy.sh setup      # one-time setup
-#   PROJECT_ID=your-project ./deploy/deploy.sh db-init    # create schema
-#   PROJECT_ID=your-project ./deploy/deploy.sh seed       # load demo data
+#   ./deploy/deploy.sh setup      # one-time: APIs, registry, signing key, IAM
+#   ./deploy/deploy.sh deploy     # build image and deploy the service
+#   ./deploy/deploy.sh db-init    # create the schema
+#   ./deploy/deploy.sh seed       # load demo accounts and data
+#   ./deploy/deploy.sh url        # print the live URL
 
 set -euo pipefail
 
-: "${PROJECT_ID:?Set PROJECT_ID, e.g. PROJECT_ID=my-project ./deploy/deploy.sh}"
+# Defaults to the gcloud CLI's configured project.
+PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project 2>/dev/null)}"
+: "${PROJECT_ID:?No project set. Run: gcloud config set project YOUR_PROJECT}"
 
 REGION="${REGION:-us-central1}"      # must match the VM's region so Cloud Run
 SERVICE="${SERVICE:-susubook}"       # draws addresses from the same subnet as
 REPO="${REPO:-susubook}"             # the firewall rule allows (10.128.0.0/20)
+
+# Database connection. Only the password is a secret; the rest is ordinary
+# configuration and stays legible in the service definition.
+DB_SECRET="${DB_SECRET:-susu-db-password}"
+DB_HOST="${DB_HOST:-10.128.0.6}"
+DB_PORT="${DB_PORT:-5432}"
+DB_NAME="${DB_NAME:-susu_book}"
+DB_USER="${DB_USER:-susu_app}"
+KEY_SECRET="${KEY_SECRET:-susubook-secret-key}"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${SERVICE}"
 TAG="$(git rev-parse --short HEAD 2>/dev/null || date +%s)"
 
@@ -33,7 +48,11 @@ VPC_FLAGS=(
 )
 
 SECRET_FLAGS=(
-  --set-secrets "DATABASE_URL=susubook-database-url:latest,SECRET_KEY=susubook-secret-key:latest"
+  --set-secrets "DB_PASSWORD=${DB_SECRET}:latest,SECRET_KEY=${KEY_SECRET}:latest"
+)
+
+ENV_FLAGS=(
+  --set-env-vars "FLASK_ENV=production,FLASK_APP=app,DB_HOST=${DB_HOST},DB_PORT=${DB_PORT},DB_NAME=${DB_NAME},DB_USER=${DB_USER}"
 )
 
 green() { printf '\033[0;32m%s\033[0m\n' "$*"; }
@@ -55,11 +74,20 @@ setup() {
     --description="SusuBook container images" \
     --project "$PROJECT_ID" 2>/dev/null || green "  already exists"
 
+  step "Creating the session signing key if it does not exist"
+  if gcloud secrets describe "$KEY_SECRET" --project "$PROJECT_ID" >/dev/null 2>&1; then
+    green "  ${KEY_SECRET} already exists"
+  else
+    python3 -c "import secrets; print(secrets.token_hex(32))" | \
+      gcloud secrets create "$KEY_SECRET" --data-file=- --project "$PROJECT_ID" >/dev/null
+    green "  created ${KEY_SECRET}"
+  fi
+
   step "Granting the runtime service account access to the secrets"
   local project_number sa
   project_number="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
   sa="${project_number}-compute@developer.gserviceaccount.com"
-  for secret in susubook-database-url susubook-secret-key; do
+  for secret in "$DB_SECRET" "$KEY_SECRET"; do
     gcloud secrets add-iam-policy-binding "$secret" \
       --member="serviceAccount:${sa}" \
       --role=roles/secretmanager.secretAccessor \
@@ -93,7 +121,7 @@ deploy_service() {
     --allow-unauthenticated \
     "${VPC_FLAGS[@]}" \
     "${SECRET_FLAGS[@]}" \
-    --set-env-vars "FLASK_ENV=production" \
+    "${ENV_FLAGS[@]}" \
     --memory 512Mi \
     --cpu 1 \
     --timeout 60 \
@@ -115,7 +143,8 @@ deploy_service() {
 # an SSH tunnel and without the password ever leaving Secret Manager.
 upsert_job() {
   local name="$1"; shift
-  local verb="create"
+  local verb="create" args_csv
+  args_csv="$(IFS=,; echo "$*")"   # gcloud --args wants a comma-separated list
   gcloud run jobs describe "$name" --region "$REGION" --project "$PROJECT_ID" \
     >/dev/null 2>&1 && verb="update"
 
@@ -124,9 +153,9 @@ upsert_job() {
     --region "$REGION" \
     "${VPC_FLAGS[@]}" \
     "${SECRET_FLAGS[@]}" \
-    --set-env-vars "FLASK_ENV=production" \
+    "${ENV_FLAGS[@]}" \
     --command flask \
-    --args "$*" \
+    --args "$args_csv" \
     --max-retries 1 \
     --task-timeout 300 \
     --project "$PROJECT_ID" >/dev/null
@@ -143,8 +172,8 @@ case "${1:-deploy}" in
   setup)   setup ;;
   build)   build ;;
   deploy)  build; deploy_service ;;
-  db-init) run_job susubook-db-init --app app db-init ;;
-  seed)    run_job susubook-seed --app app seed ;;
+  db-init) run_job susubook-db-init db-init ;;
+  seed)    run_job susubook-seed seed ;;
   url)     gcloud run services describe "$SERVICE" --region "$REGION" \
              --project "$PROJECT_ID" --format='value(status.url)' ;;
   logs)    gcloud run services logs read "$SERVICE" --region "$REGION" \
