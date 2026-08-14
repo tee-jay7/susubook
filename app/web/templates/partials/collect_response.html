@@ -1,0 +1,9 @@
+{#
+  Response to an HTMX collect.
+
+  Two elements: the swapped route row, and the running total updated out of
+  band. HTMX applies the first to hx-target and the second to whatever element
+  already carries id="recorded-today".
+#}
+{% include "partials/route_row.html" %}
+{% with oob = true %}{% include "partials/recorded_total.html" %}{% endwith %}

@@ -4,9 +4,9 @@
 {% block content %}
 <div class="flex items-baseline justify-between mb-4">
   <h1 class="text-xl font-semibold">Today &middot; {{ today.strftime('%a %d %b') }}</h1>
-  <span class="text-sm text-slate-600 tabular-nums">
-    Recorded {{ position.total_recorded }}
-  </span>
+  {# id is the out-of-band swap target: recording a contribution updates this
+     total in the same response that swaps the row (see partials/collect_response.html). #}
+  {% include "partials/recorded_total.html" %}
 </div>
 
 {#

@@ -164,6 +164,32 @@ class TestCollectionFlow:
         assert b"<html" not in response.data.lower()
         assert b"Not recorded" in response.data
 
+    def test_htmx_collect_updates_the_running_total_out_of_band(self, client, world):
+        """DEF-06 regression.
+
+        Swapping only the route row left the day's total stale until a manual
+        refresh, so a row marked Paid sat above a total reading GHS 0.00. Two
+        figures disagreeing on one screen is worse than a figure that does not
+        update, because it makes the collector distrust both.
+        """
+        login(client, "0244000101")
+        response = client.post(
+            f"/collector/collect/{world['public_ref']}",
+            headers={"HX-Request": "true"},
+        )
+        assert response.status_code == 200
+        body = response.data.decode()
+
+        assert 'id="recorded-today"' in body, "total must be in the response"
+        assert 'hx-swap-oob="true"' in body, "and marked for an out-of-band swap"
+        assert "Recorded GHS 10.00" in body, "and carry the new total, not the old"
+
+    def test_route_sheet_total_reflects_recorded_contributions(self, client, world):
+        login(client, "0244000101")
+        assert b"Recorded GHS 0.00" in client.get("/collector/").data
+        client.post(f"/collector/collect/{world['public_ref']}")
+        assert b"Recorded GHS 10.00" in client.get("/collector/").data
+
     def test_amount_must_be_a_multiple_of_the_rate(self, client, world):
         login(client, "0244000101")
         response = client.post(
@@ -542,11 +568,27 @@ class TestSecurityControls:
         assert PASSWORD not in stored.password_hash
 
     def test_urls_expose_opaque_references_not_sequential_ids(self, client, world):
-        """BR-R14 — no enumerable identifier reaches the client."""
+        """BR-R14 — no enumerable identifier reaches the client.
+
+        The negative assertion matches a *complete* path segment of digits.
+        Substring matching was wrong here: `/collector/client/1` is a substring
+        of `/collector/client/1a2b3c…`, so the test failed whenever a randomly
+        generated UUID happened to start with the digit 1 — roughly one run in
+        sixteen, and only ever in a full-suite run. A flaky security test is
+        worse than none, because it trains you to ignore it.
+        """
+        import re
+
         login(client, "0244000101")
         page = client.get("/collector/").data.decode()
+
         assert f"/collector/client/{world['public_ref']}" in page
-        assert "/collector/client/1" not in page
+
+        numeric_links = re.findall(r"/collector/client/(\d+)(?=[\"'/?\s>])", page)
+        assert numeric_links == [], (
+            f"sequential ids leaked into URLs: {numeric_links} — these are "
+            f"enumerable and violate BR-R14"
+        )
 
     def test_unknown_page_returns_404(self, client, world):
         login(client, "0244000101")

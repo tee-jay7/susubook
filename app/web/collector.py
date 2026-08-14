@@ -104,18 +104,25 @@ def collect(public_ref: UUID):
     if request.headers.get("HX-Request"):
         # HTMX: swap the row in place so the collector keeps their position
         # on the route sheet (TD-06 — applied here, not everywhere).
+        #
+        # The response also carries the day's running total as an out-of-band
+        # swap. Swapping only the row leaves the total stale until a manual
+        # refresh, which is worse than not updating it at all: the collector
+        # sees a row marked Paid above a total that disagrees with it (DEF-06).
+        user = current_user()
         entry = next(
             (
                 e
-                for e in g.services.collection.route_sheet(
-                    collector_id=current_user().id
-                )
+                for e in g.services.collection.route_sheet(collector_id=user.id)
                 if e.client.public_ref == public_ref
             ),
             None,
         )
         return render_template(
-            "partials/route_row.html", entry=entry, just_recorded=contribution
+            "partials/collect_response.html",
+            entry=entry,
+            just_recorded=contribution,
+            position=g.services.reconciliation.my_position(actor=user),
         )
 
     flash(

@@ -1,0 +1,13 @@
+{#
+  Running total of what this collector has recorded today.
+
+  Carries `hx-swap-oob` so it can be returned alongside a swapped route row and
+  update itself out of band. Without this the row flips to "Paid" while the
+  total above it stays stale until a manual refresh — which is worse than not
+  updating at all, because two figures on the same screen disagree.
+#}
+<span id="recorded-today"
+      {% if oob %}hx-swap-oob="true"{% endif %}
+      class="text-sm text-slate-600 tabular-nums">
+  Recorded {{ position.total_recorded }}
+</span>

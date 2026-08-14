@@ -22,8 +22,8 @@ Three levels, each covering what the level below cannot:
 |---|---|---|---|---|
 | **Unit** | 116 | 0.32 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
 | **Integration** | 42 | 3.3 s | Repositories, entity/record mapping, and above all the **database-enforced invariants** | HTTP, sessions, templates |
-| **System** | 51 | 10.0 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
-| **Total** | **209** | **13.7 s** | | |
+| **System** | 53 | 10.3 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
+| **Total** | **211** | **14.1 s** | | |
 
 **Why the integration level exists at all.** The design claims three business
 invariants are enforced *twice* — in the domain layer and again by PostgreSQL
@@ -119,6 +119,8 @@ suite; no result is stated from memory.
 | TC-COL-09 | Future-dated contribution (BR-R4) | Refused | `ContributionDateInFuture` raised | **P** |
 | TC-COL-10 | Contribution outside cycle dates (BR-R3) | Refused | `ContributionDateOutsideCycle` raised | **P** |
 | TC-COL-11 | Contribution into a closed cycle (BR-R6) | Refused | `CycleClosed` raised | **P** |
+| TC-COL-12 | **HTMX collect updates the running total out of band** (DEF-06) | Response carries the day's total marked for out-of-band swap, with the new value | `id="recorded-today"`, `hx-swap-oob="true"`, "Recorded GHS 10.00" | **P** |
+| TC-COL-13 | Route sheet total after a collection | GHS 0.00 before, GHS 10.00 after | As expected | **P** |
 
 ### TC-ENR — Enrolment (UC-02)
 
@@ -342,6 +344,8 @@ Defects found during development, with corrective action. All are closed.
 | **DEF-03** | `Flask(__name__)` looked for templates at the package root; every page returned 500. | Smoke test after first run | High | Pointed `template_folder` at `app/web/templates` to match the layering. | Closed |
 | **DEF-04** | `cycle_days` was registered as a context processor, but Jinja macros do not receive the template context. Every susu card view raised `UndefinedError` — the client card, the collector's client detail, both broken. | Manual page walk | High | Moved to `app.jinja_env.globals`. | Closed |
 | **DEF-05** | `_assert_on_route` in the web layer raised `NotAuthorised` **without auditing**, while the service-layer path did audit. A collector presenting a client reference they should not hold was recorded only if they attempted a *write*; a denied GET on a scanned card left no trace. | System suite (TC-AUTHZ-07) | Medium–High | Audit on both paths. The denial arrives on the GET, before any write is attempted, and is exactly the signal a supervisor needs. | Closed |
+| **DEF-06** | On the route sheet, recording a contribution over HTMX swapped the client's row to "Paid" but left the day's running total unchanged until a manual refresh. The row and the total disagreed on the same screen. | **Manual exploratory testing by the project owner** | Medium | `hx-target` swapped only the row; the total sat outside it. Returned the total in the same response as an **out-of-band swap** (`hx-swap-oob`), so one request updates both. Two regression tests added. | Closed |
+| **DEF-07** | The security test asserting that URLs expose opaque references, not sequential ids, was **flaky**: it passed alone and failed roughly one full-suite run in sixteen. | Full-suite run after fixing DEF-06 | Medium | The negative assertion used substring matching — `/collector/client/1` is a substring of `/collector/client/1a2b3c…`, so it failed whenever a random UUID began with the digit 1. Rewritten to match a complete numeric path segment by regex. Verified stable over five consecutive full runs. | Closed |
 
 **Two of my own test assumptions were also wrong** and were corrected rather than
 worked around, which is worth recording because the temptation was to adjust the
@@ -352,9 +356,25 @@ assertion until it passed:
 | 1 | Setting `status = 'MATURED'` makes a cycle due for payout | `list_due_for_payout` filters on `end_date < today`, which is what BR-R12 actually describes | Tests now move the cycle genuinely into the past |
 | 2 | `list_for_target(type, None)` returns nothing, since `= NULL` never matches | SQLAlchemy renders `column == None` as `IS NULL`, so it does match | Test rewritten to assert what it actually claimed — that an anonymous actor can be stored |
 
-**Defect density:** 5 defects across roughly 1,090 statements. Three (DEF-01,
-DEF-02, DEF-05) were found by tests or by probing rather than by a user, which is
-the outcome the test strategy was designed to produce.
+**Defect density:** 7 defects across roughly 1,090 statements. Five (DEF-01,
+DEF-02, DEF-05, DEF-07, and the two corrected assumptions) were found by tests or
+by probing rather than by a user, which is the outcome the test strategy was
+designed to produce.
+
+**DEF-06 is the exception, and the instructive one.** It was found by a person
+clicking through the interface, not by any of the 209 automated tests — and it
+could not have been found by them, because every test asserted the *response* to
+a collect request and none asserted the *state of the page afterwards*. The
+suite verified that the right row came back; only a human noticed that the total
+above it now disagreed. It is the clearest argument in this project for the
+user acceptance testing recorded as outstanding in §9.9: automated tests confirm
+what you thought to check, and a user finds what you did not.
+
+**DEF-07 is worth recording for the opposite reason.** A test that fails
+intermittently is worse than no test, because it teaches you to disregard a red
+result — and this one guarded a security property (BR-R14). It was fixed rather
+than retried, and stability was then demonstrated over five consecutive full
+runs rather than assumed.
 
 ## 9.9 User acceptance testing — status
 
