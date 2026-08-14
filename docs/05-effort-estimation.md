@@ -445,8 +445,108 @@ the work; it generated the debt register.
 
 ## 4.8 Estimation accuracy review
 
-Session 6's closing best practice is to record actuals and review accuracy afterwards.
-This table is completed in Phase 6 and reported in the final document.
+Session 6's closing best practice is to record actuals and review accuracy
+afterwards. Two things can be closed out: the **size** estimate, precisely; and
+the **effort** estimate, which cannot — for reasons set out in §4.9, because
+knowing when data does not support a conclusion is part of the practice.
+
+### 4.8.1 Size — closed
+
+| | Estimated | Actual | Variance |
+|---|---|---|---|
+| Adjusted function points | 166 | — | — |
+| LOC per function point (AS-01) | 30 | **20.7** | −31% |
+| Source size | 4.98 KLOC | **3.43 KLOC** | **−31%** |
+| COCOMO organic effort at that size | 12.95 PM | 8.76 PM | −32% |
+
+```
+MRE = |3.43 − 4.98| / 3.43 = 0.45
+```
+
+Measured over 3,433 non-blank, non-comment lines of application code
+(`10-implementation.md` §10.2).
+
+**Assumption AS-01 was wrong, and in a specific direction.** 30 LOC per function
+point came from published averages for the language class; actual productivity
+was **20.7** — below even the optimistic 25 used in the sensitivity analysis
+(§4.3.4). Two causes are consistent with the delivered code: modern frameworks
+supply as configuration what those averages assume is hand-written (routing,
+sessions, ORM persistence, CSRF, templating), and some function points produce
+very little code — the QR card is 5 adjusted function points and roughly 15
+lines, because the library does the work.
+
+The sensitivity analysis anticipated this *class* of error but under-bounded it,
+setting the range at 25–40. Derived from measurement rather than published
+tables, it would have started lower.
+
+**The conclusion of §4.4 is unaffected.** Even at actual size, COCOMO puts the
+system at 8.76 person-months — over 1,300 person-hours against a 48-hour window.
+The gap narrows and remains of the same order.
+
+### 4.8.2 Effort — actuals against the 48-hour plan
+
+The project is planned in hours within a 48-hour window, so the actuals are
+recorded in the same unit: elapsed time per phase, taken from commit timestamps,
+against the allocation in the examination's Part B plan.
+
+| Phase | Allocated | Elapsed | Window occupied |
+|---|---|---|---|
+| 1. Planning & Requirements | 6 h | 0.33 h | h0.00 – h0.33 |
+| 2. Analysis & Design | 6 h | 0.12 h | h0.33 – h0.45 |
+| 3. Implementation | 20 h | 0.73 h | h0.45 – h1.17 |
+| 4. Testing & Refinement | 6 h | **2.34 h** | h1.17 – h3.51 |
+| 5. Deployment | 4 h | **2.48 h** | h3.51 – h5.99 |
+| 6. Documentation | 6 h | 0.48 h* | h5.99 – h6.47 |
+| **Total** | **48 h** | **6.47 h** | |
+
+\* Phase 6 was still in progress at the time of measurement.
+
+### 4.8.3 The finding is the distribution, not the total
+
+Comparing totals is the least informative reading. The **shape** of the plan is
+where the error lies, and that comparison is valid regardless of absolute
+magnitude:
+
+| Phase | Share of plan | Share of actual | |
+|---|---|---|---|
+| 1. Planning & Requirements | 12.5% | 5.1% | over-allocated |
+| 2. Analysis & Design | 12.5% | 1.9% | over-allocated |
+| **3. Implementation** | **41.7%** | **11.3%** | **heavily over-allocated** |
+| **4. Testing & Refinement** | **12.5%** | **36.2%** | **heavily under-allocated** |
+| **5. Deployment** | **8.3%** | **38.3%** | **heavily under-allocated** |
+| 6. Documentation | 12.5% | 7.4%* | in progress |
+
+**Testing and deployment together were allocated 21% of the window and consumed
+75% of the time actually spent.** Implementation was allocated 42% and consumed
+11%.
+
+This inverts the assumption the whole estimate was built on. §4.5 spent seventeen
+WBS tasks decomposing implementation and treated testing and deployment as
+comparatively minor. The reverse held:
+
+- **Deployment (2.48 h)** absorbed VPC egress configuration, Secret Manager
+  wiring, a Cloud Run Job for schema creation because the database is private,
+  and **DEF-08** — Google Front End silently intercepting `/healthz`. None of
+  that is application code, and none of it was decomposed in the WBS at all.
+- **Testing (2.34 h)** absorbed the integration and system suites, and four of
+  the eight defects. Two of those were errors in the developer's own
+  assumptions rather than in the code.
+
+**This is the most useful thing the estimate produced.** The magnitude comparison
+is contaminated (§4.9); the distribution is not, because both figures come from
+the same project. The corrective action for a future estimate is specific: shift
+weight out of implementation and into deployment and testing, and decompose
+deployment into a WBS rather than treating it as a single 4-hour block.
+
+### 4.8.4 Per-task actuals
+
+The 17-task breakdown below cannot be completed from the record. Commits do not
+partition along WBS boundaries — a single commit delivers the domain layer, its
+tests and its documentation together — so per-task figures would be invented
+rather than measured.
+
+| Task | Estimated (h) | Actual (h) | Variance | Note |
+|---|---|---|---|---|
 
 | Task | Estimated (h) | Actual (h) | Variance | Note |
 |---|---|---|---|---|
@@ -466,8 +566,54 @@ This table is completed in Phase 6 and reported in the final document.
 | 14 Route sheet | 1.08 | | | |
 | 15 UI & HTMX | 2.08 | | | |
 | 16 Seed data | 0.54 | | | |
-| 17 QR issuance & scan *(CR-001)* | 0.92 | | | |
-| **Total** | **25.4** | | | |
+| 17 QR issuance & scan *(CR-001)* | 0.92 | — | — | Not separable |
+| **Total** | **25.4** | — | — | See §4.8.2 for phase-level actuals |
+
+---
+
+## 4.9 How to read these actuals
+
+Three qualifications, so the figures are not read as more than they are.
+
+**Elapsed time is not pure effort.** Intervals between commits include
+infrastructure setup, container builds, deploy waits and review. The 2.48 hours
+against Phase 5 covers a period in which much of the work was cloud
+configuration — which AS-05 excludes from project effort by definition. The
+distribution finding in §4.8.3 survives this, because the same measure is applied
+to every phase; the absolute total does not.
+
+**No instrument was in place.** Effort was not tracked as the work happened;
+these figures are reconstructed from commit timestamps afterwards. Session 6's
+practice is to *record* actuals as work occurs, and reconstruction is inference.
+A future project should instrument at the WBS level from the first hour — that
+is the specific corrective action, and it is what would have made §4.8.4
+completable.
+
+**The magnitude comparison is weaker than the distribution comparison.** The
+25.4-hour PERT estimate priced a single developer building this system task by
+task. Dividing the elapsed total into it would yield a tidy MRE, and it would be
+a number about production method rather than about estimation accuracy. §4.8.3 is
+reported instead because a ratio between phases, both measured the same way in
+the same project, does not depend on that.
+
+**What the estimate is nonetheless credited with.** It did the job it was built
+for. It exposed a 23% over-commitment *before* implementation began, forced the
+scope decision in §4.6, and generated the technical debt register in the process.
+That value was realised at the time of estimating and does not depend on
+retrospective validation.
+
+**What is not claimed.** That the effort estimate was validated against measured
+effort. It was not, and §4.8.4 is left incomplete rather than filled with
+plausible numbers.
+
+**Closing the loop to ES-01.** Constraint ES-01 recorded that no historical
+project data existed to calibrate against. That was true because no earlier
+project recorded actuals. §4.8.2 and §4.8.3 are the beginning of that data — the
+first entry in a baseline that Lehman's third law
+(`11-maintenance-evolution.md` §11.4) says is what eventually makes effort
+predictable. Its most useful content is not the total but the finding that
+implementation was over-weighted by a factor of roughly four while deployment was
+under-weighted by nearly five.
 
 Magnitude of Relative Error will be computed as `MRE = |Actual − Estimated| / Actual`,
 and the result — favourable or not — reported as the closure of the estimation process
