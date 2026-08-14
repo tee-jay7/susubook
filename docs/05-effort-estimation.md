@@ -41,6 +41,8 @@ over-commitment and the second resolves it.
 
 ## 4.2 Function Point Analysis
 
+Function point analysis follows Albrecht's method [20] as presented in Session 6 [6].
+
 ### 4.2.1 Weights applied
 
 Weights are taken from the Session 6 table. External Interface Files are not weighted on
@@ -199,6 +201,9 @@ All figures in §4.3 below are computed on the **post-CR-001** counts.
 ---
 
 ## 4.3 COCOMO Basic (organic mode)
+
+Constants and equations from Boehm [11]; the effort equation and mode table as
+presented in Session 6 [6].
 
 ### 4.3.1 Size conversion
 

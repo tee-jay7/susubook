@@ -15,7 +15,7 @@ across four roles, with 226 automated tests at 97% coverage.
 | **Live** | https://susubook-fdtbppd7sq-uc.a.run.app |
 | **Source** | https://github.com/tee-jay7/susubook |
 | **Stack** | Python 3.12 · Flask 3 · SQLAlchemy 2 · PostgreSQL 16 · Jinja2 · HTMX · segno |
-| **Tests** | 226 (116 unit, 42 integration, 53 system + 15 config/ops) |
+| **Tests** | 226 (129 unit, 42 integration, 55 system) |
 | **Coverage** | 97% overall; 99–100% on the domain layer |
 
 ## 10.2 Structure as built
@@ -43,7 +43,7 @@ consequence of the architectural decision described below.
 This looks like architectural purity. It was a scheduling decision.
 
 Business rules expressed as pure functions can be tested with no database, no
-fixtures and no HTTP client. The 116 unit tests run in **0.32 seconds**. Under an
+fixtures and no HTTP client. The 129 unit tests run in **0.34 seconds**. Under an
 implementation budget of roughly 20 hours, an Active-Record design — rules living
 on ORM models — would have required a live database for every rule test, and
 those tests would not have been written at all. Testing carries 5 marks and had

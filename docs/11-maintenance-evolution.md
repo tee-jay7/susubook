@@ -90,7 +90,8 @@ system holds real client money.
 
 ## 11.4 Lehman's Laws applied to SusuBook
 
-Session 4's laws describe how systems behave over time. Each is taken in turn,
+Session 4's laws [4], formulated by Lehman [19] and developed with Belady [14],
+describe how systems behave over time. Each is taken in turn,
 with what it predicts *for this system* and what has been done — or must be done —
 in response.
 
@@ -151,8 +152,8 @@ than merely descriptive.
 The debt repayment plan totals 19–24 hours (§11.6). The temptation, facing a
 deadline, is to assume two developers would halve it.
 
-**Response.** The law says otherwise, and the plan is not built on that
-assumption. Items 1–4 are sequenced by dependency — TD-01 gates TD-09 — not by
+**Response.** The law says otherwise — as does Brooks [13] — and the plan is not
+built on that assumption. Items 1–4 are sequenced by dependency — TD-01 gates TD-09 — not by
 what could be parallelised. Adding people to a system with one person's worth of
 context in it would, in the short term, slow it down.
 

@@ -543,7 +543,8 @@ accidentally.
 
 ## 7.12 Application of SOLID principles
 
-Session 5's five principles, each with the concrete place it applies. Session 5 also notes
+Session 5's five principles [5], originally set out by Martin [15], each with
+the concrete place it applies. Session 5 also notes
 that SOLID compliance *reduces technical debt* — the connection to §8 is direct.
 
 **S — Single Responsibility.**
@@ -581,10 +582,10 @@ architecture rests on.
 |---|---|---|
 | **Layered architecture** | Whole application | Separation of concerns, testability (Session 5) |
 | **MVC** | `web/` — blueprints, Jinja templates, models | Session 5's canonical web pattern |
-| **Repository** | `infrastructure/repositories.py` | Decouples the business layer from the persistence technology |
+| **Repository** | `infrastructure/repositories.py` | Decouples the business layer from the persistence technology [16][17] |
 | **Service Layer** | `services/` | One place per use case for orchestration, transactions and audit |
-| **Value Object** | `domain/money.py` | Money is compared and combined by value; immutability prevents a whole defect class |
-| **Strategy** | `CommissionPolicy` | Open/closed extension point for FR-36 |
+| **Value Object** | `domain/money.py` | Money is compared and combined by value; immutability prevents a whole defect class [17] |
+| **Strategy** | `CommissionPolicy` | Open/closed extension point for FR-36 [18] |
 | **Application Factory** | `app/__init__.py` | Different wiring for production and tests — enables dependency injection |
 | **Dependency Injection** | Factory-wired repositories | Session 5 names DI as the practical form of the D in SOLID |
 
@@ -679,6 +680,9 @@ paper card cannot provide.
 ```
 
 ### Accessibility (NFR-08)
+
+Interface work follows the user-centred design activities of ISO 9241-210 [28]
+as presented in Session 5 [5].
 
 WCAG 2.1 AA contrast; touch targets ≥ 44×44 px; the susu card grid uses **shape and text,
 not colour alone**, to distinguish paid from missed — colour-blind users and a sun-washed

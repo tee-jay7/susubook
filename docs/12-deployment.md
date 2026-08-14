@@ -74,7 +74,8 @@ tunnel, no temporary public IP, and the password never leaves Secret Manager.
 
 ## 12.4 Secrets
 
-Only the database **password** is secret. Host, port, database name and role are
+Configuration is supplied through the environment, following the twelve-factor
+approach [25]. Only the database **password** is secret. Host, port, database name and role are
 ordinary configuration passed as environment variables, so Secret Manager holds
 exactly one value that needs protecting and everything else stays legible in the
 service definition where an operator can read it.

@@ -11,8 +11,8 @@
 Testing was shaped by one architectural decision made in Phase 2: **the domain
 layer imports neither Flask nor SQLAlchemy**. That is what made a real test
 suite affordable inside the examination window — business rules can be tested
-with no database, no fixtures and no HTTP client, so the 116 unit tests run in
-**0.32 seconds**. An Active-Record design would have required a live database
+with no database, no fixtures and no HTTP client, so the 129 unit tests run in
+**0.34 seconds**. An Active-Record design would have required a live database
 for every rule test, and under a 20-hour implementation budget those tests would
 simply not have been written.
 
@@ -20,10 +20,10 @@ Three levels, each covering what the level below cannot:
 
 | Level | Count | Runtime | Covers | Deliberately excludes |
 |---|---|---|---|---|
-| **Unit** | 116 | 0.32 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
+| **Unit** | 129 | 0.34 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
 | **Integration** | 42 | 3.3 s | Repositories, entity/record mapping, and above all the **database-enforced invariants** | HTTP, sessions, templates |
-| **System** | 53 | 10.3 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
-| **Total** | **211** | **14.1 s** | | |
+| **System** | 55 | 10.4 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
+| **Total** | **226** | **14.3 s** | | |
 
 **Why the integration level exists at all.** The design claims three business
 invariants are enforced *twice* — in the domain layer and again by PostgreSQL
@@ -399,8 +399,10 @@ The prepared UAT protocol, for execution with a participant:
 | UAT-08 | Release a matured payout | Supervisor | Understands the settlement before confirming |
 | UAT-09 | Reverse a wrongly recorded contribution | Supervisor | Confirms the original remains visible |
 
-**Usability measures to be captured alongside** (Session 5): task completion
-rate, time on task, error rate, and a 10-item System Usability Scale score.
+**Usability measures to be captured alongside** (Session 5 [5]): task completion
+rate, time on task, error rate, and a 10-item System Usability Scale score
+[22]. The nine-scenario protocol uses a small participant group on Nielsen's
+finding that five users surface the large majority of usability problems [24].
 NFR-02's claim that a routine collection takes ≤3 interactions is currently
 established **by design inspection only** — scan plus confirm is two — and needs
 a measured value from a real participant to be reported as verified.

@@ -9,7 +9,10 @@
 
 ## 8.1 Definition and framing
 
-Session 3 defines technical debt as *the long-term cost incurred when developers
+The metaphor originates with Cunningham [21]; the four-way classification used
+throughout this section is Fowler's quadrant [23].
+
+Session 3 [3] defines technical debt as *the long-term cost incurred when developers
 take shortcuts or implement suboptimal solutions in order to achieve short-term
 goals such as faster delivery*, and **self-admitted technical debt (SATD)** as
 debt the developer explicitly documents in code comments.
@@ -196,7 +199,7 @@ Application-wide · Process · Prudent & Deliberate
 | **Debt** | Seven `_to_*` functions convert records to entities by hand. A schema change must be made in two places. |
 | **Cause** | The direct consequence of keeping the domain layer framework-free (NFR-07). SQLAlchemy imperative mapping onto the dataclasses would remove it but was not affordable. |
 | **Impact** | Duplication, and silent drift if a column is added to a model but not its mapper. Partially mitigated: an integration test asserts money round-trips the mapping exactly. |
-| **Priority** | **Acceptable.** This is the price of an architecture that pays for itself — it is what makes 116 unit tests run in 0.32 s with no database. Removing the mapping would remove that benefit. |
+| **Priority** | **Acceptable.** This is the price of an architecture that pays for itself — it is what makes 129 unit tests run in 0.34 s with no database. Removing the mapping would remove that benefit. |
 | **Resolution** | Revisit only if entity count grows substantially. Consider SQLAlchemy imperative mapping. Extend round-trip tests to every field in the meantime. |
 
 ---
