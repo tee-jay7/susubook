@@ -1,0 +1,77 @@
+erDiagram
+    USERS ||--o{ CLIENTS : "collects for"
+    USERS ||--|| CLIENTS : "logs in as"
+    CLIENTS ||--o{ CONTRIBUTION_CYCLES : has
+    CONTRIBUTION_CYCLES ||--o{ CONTRIBUTIONS : contains
+    CONTRIBUTION_CYCLES ||--o| PAYOUTS : "settled by"
+    USERS ||--o{ CONTRIBUTIONS : records
+    USERS ||--o{ REMITTANCE_DECLARATIONS : declares
+    USERS ||--o{ AUDIT_LOG : "acts in"
+    CONTRIBUTIONS ||--o| CONTRIBUTIONS : "reversed by"
+
+    USERS {
+        int id PK
+        uuid public_ref UK
+        text full_name
+        text phone UK
+        text password_hash
+        enum role
+        bool is_active
+        timestamptz created_at
+    }
+    CLIENTS {
+        int id PK
+        uuid public_ref UK "QR reference — BR-R14"
+        int user_id FK,UK
+        int collector_id FK
+        text full_name
+        text phone
+        text business_type
+        text location
+        int daily_rate_pesewas "CHECK > 0"
+        bool is_active
+    }
+    CONTRIBUTION_CYCLES {
+        int id PK
+        int client_id FK
+        int cycle_number
+        date start_date
+        date end_date
+        enum status "ACTIVE|MATURED|PAID_OUT"
+        int daily_rate_pesewas "snapshot at open"
+    }
+    CONTRIBUTIONS {
+        int id PK
+        text reference UK
+        int cycle_id FK
+        date contribution_date
+        int amount_pesewas "CHECK > 0"
+        int recorded_by_id FK
+        timestamptz recorded_at
+        int reversed_by_id FK "nullable"
+        bool is_reversal
+    }
+    PAYOUTS {
+        int id PK
+        int cycle_id FK,UK "UK enforces BR-R10"
+        int total_collected_pesewas
+        int commission_pesewas
+        int net_payout_pesewas "CHECK >= 0"
+        int released_by_id FK
+        timestamptz released_at
+    }
+    REMITTANCE_DECLARATIONS {
+        int id PK
+        int collector_id FK
+        date declaration_date
+        int amount_declared_pesewas
+    }
+    AUDIT_LOG {
+        bigint id PK
+        int actor_id FK
+        text action
+        text target_type
+        text target_id
+        jsonb detail
+        timestamptz occurred_at
+    }

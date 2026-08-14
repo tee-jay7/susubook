@@ -1,0 +1,88 @@
+classDiagram
+    class Money {
+        +int pesewas
+        +from_cedis(d) Money
+        +to_cedis() Decimal
+        +__add__(o) Money
+        +__mul__(n) Money
+        +__str__() str
+    }
+    class Client {
+        +int id
+        +UUID public_ref
+        +str full_name
+        +str phone
+        +str business_type
+        +str location
+        +Money daily_rate
+        +int collector_id
+        +bool is_active
+    }
+    class ContributionCycle {
+        +int id
+        +int client_id
+        +int cycle_number
+        +date start_date
+        +date end_date
+        +CycleStatus status
+        +Money daily_rate
+        +is_mature(on) bool
+        +accepts_contributions() bool
+    }
+    class Contribution {
+        +int id
+        +str reference
+        +int cycle_id
+        +date contribution_date
+        +Money amount
+        +int recorded_by_id
+        +datetime recorded_at
+        +int reversed_by_id
+        +bool is_reversal
+        +is_effective() bool
+    }
+    class Payout {
+        +int id
+        +int cycle_id
+        +Money total_collected
+        +Money commission
+        +Money net_payout
+        +int released_by_id
+        +datetime released_at
+    }
+    class RemittanceDeclaration {
+        +int id
+        +int collector_id
+        +date declaration_date
+        +Money amount_declared
+    }
+    class CycleSummary {
+        +int days_paid
+        +int days_missed
+        +Money total_collected
+        +Money commission
+        +Money projected_payout
+    }
+    class CycleStatus {
+        <<enumeration>>
+        ACTIVE
+        MATURED
+        PAID_OUT
+    }
+    class CommissionPolicy {
+        <<interface>>
+        +commission_for(total, rate) Money
+    }
+    class OneDayRatePolicy {
+        +commission_for(total, rate) Money
+    }
+
+    Client "1" --> "*" ContributionCycle
+    ContributionCycle "1" --> "*" Contribution
+    ContributionCycle "1" --> "0..1" Payout
+    ContributionCycle --> CycleStatus
+    ContributionCycle ..> CycleSummary : computed
+    Contribution "0..1" --> "0..1" Contribution : reversed_by
+    CommissionPolicy <|.. OneDayRatePolicy
+    Payout ..> CommissionPolicy : uses
+    Client ..> Money

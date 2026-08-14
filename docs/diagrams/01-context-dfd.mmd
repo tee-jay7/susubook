@@ -1,0 +1,19 @@
+flowchart LR
+    C(["Client"])
+    CO(["Collector"])
+    SU(["Supervisor"])
+    AD(["Administrator"])
+    S["<b>SusuBook</b><br/>Digital Susu Collection<br/>and Accountability System"]
+
+    C -->|"cash (physical, outside system)"| CO
+    CO -->|"contribution record"| S
+    CO -->|"remittance declaration"| S
+    S -->|"route sheet, susu card"| CO
+    C -->|"login"| S
+    S -->|"own contribution history,<br/>balance, projected payout"| C
+    S -->|"variance alerts, matured cycles"| SU
+    SU -->|"payout release, reversal"| S
+    AD -->|"accounts, roles"| S
+    S -->|"audit trail"| SU
+
+    style S fill:#1f4e5f,stroke:#0d2d38,color:#fff

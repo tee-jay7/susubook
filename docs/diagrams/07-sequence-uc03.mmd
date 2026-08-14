@@ -1,0 +1,42 @@
+sequenceDiagram
+    autonumber
+    actor CO as Collector
+    participant W as web/collector.py<br/>(controller)
+    participant S as services/collection.py
+    participant D as domain/rules.py
+    participant R as infrastructure/<br/>repositories.py
+    participant DB as PostgreSQL
+    participant A as services/audit.py
+
+    CO->>W: POST /collect/<public_ref>
+    W->>W: verify session + CSRF
+    W->>S: record_contribution(ref, date, amount, actor)
+    S->>R: client_by_public_ref(ref)
+    R->>DB: SELECT … WHERE public_ref = ?
+    DB-->>R: client row
+    R-->>S: Client entity
+    S->>S: authorise: client.collector_id == actor.id<br/>(FR-05, BR-R15)
+    S->>R: active_cycle_for(client)
+    R->>DB: SELECT … WHERE status='ACTIVE'
+    DB-->>R: cycle row
+    R-->>S: ContributionCycle
+    S->>R: contribution_on(cycle, date)
+    R-->>S: None
+    S->>D: validate_contribution(cycle, date, amount, existing)
+    Note over D: BR-R3 date in cycle<br/>BR-R4 not future<br/>BR-R5 no duplicate<br/>BR-R6 cycle open<br/>BR-R7 multiple of rate
+    D-->>S: ok
+    S->>R: save(Contribution)
+    R->>DB: INSERT … (partial unique index<br/>enforces BR-R5 again)
+    DB-->>R: committed
+    S->>A: log(actor, RECORD_CONTRIBUTION, ref)
+    A->>DB: INSERT INTO audit_log
+    S-->>W: Contribution
+    W-->>CO: 200 — updated route sheet fragment
+
+    rect rgb(255, 240, 240)
+    Note over S,DB: Exception path — duplicate exists
+    S->>D: validate_contribution(…)
+    D-->>S: raise DuplicateContribution(existing.reference)
+    S-->>W: DomainError
+    W-->>CO: 422 — "Already collected today (ref SB-…)"
+    end
