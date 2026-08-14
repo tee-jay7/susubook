@@ -27,7 +27,7 @@
   {% if already_today %}
     <div class="m-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 px-4 py-3 rounded-r">
       <strong class="font-semibold">Already collected today.</strong>
-      A second contribution for {{ today.strftime('%d %b') }} will be refused (BR-R5).
+      Only one contribution can be recorded per client per day.
     </div>
     <div class="px-5 pb-5">
       <a href="{{ url_for('collector.client_detail', public_ref=client.public_ref) }}"
@@ -59,7 +59,7 @@
                  placeholder="{{ cycle.daily_rate.to_cedis() }}"
                  class="tap w-full border border-slate-300 rounded px-3">
           <p class="text-xs text-slate-500 mt-1">
-            Must be a whole multiple of the agreed daily rate (BR-R7).
+            Must be a whole multiple of the agreed daily rate.
           </p>
         </div>
       </details>

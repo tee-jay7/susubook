@@ -3,8 +3,8 @@
 {% block content %}
 <h1 class="text-xl font-semibold mb-1">Matured cycles</h1>
 <p class="text-sm text-slate-600 mb-5">
-  Cycles past their end date awaiting release. The settlement is recomputed at
-  the moment of release, not taken from this screen (BR-R8, BR-R9, BR-R10).
+  Cycles past their end date awaiting release. The settlement is recalculated
+  at the moment of release, not taken from this screen.
 </p>
 
 <div class="space-y-3">
@@ -37,7 +37,7 @@
     {% if d.net_payout.is_zero %}
     <p class="text-xs text-amber-800 bg-amber-50 border-l-4 border-amber-500 px-3 py-2 rounded-r mt-2">
       Total collected does not exceed one day's contribution, so the whole
-      balance is retained as commission and the client receives nothing (BR-R9).
+      balance is retained as commission and the client receives nothing.
     </p>
     {% endif %}
 
