@@ -1,0 +1,31 @@
+# SusuBook — runtime and development dependencies
+# Acknowledged third-party components per examination Rule 6.
+#
+# TODO(TD-12): version ranges rather than pinned versions, and no lockfile.
+#   Builds are not byte-reproducible; a transitive release could break the
+#   deployment. See docs/08-technical-debt.md.
+
+# Web framework and templating
+Flask>=3.0
+Jinja2>=3.1
+Flask-WTF>=1.2            # CSRF protection on state-changing forms (NFR-03)
+
+# Persistence
+SQLAlchemy>=2.0
+psycopg[binary]>=3.1      # PostgreSQL driver
+
+# Security
+argon2-cffi>=23.1         # Argon2id password hashing (NFR-03)
+
+# QR client cards (FR-39)
+segno>=1.6                # pure-Python QR, emits inline SVG, no Pillow
+
+# Configuration
+python-dotenv>=1.0
+
+# Production server
+gunicorn>=21.2
+
+# Testing
+pytest>=8.0
+pytest-cov>=5.0

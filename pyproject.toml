@@ -1,0 +1,26 @@
+[project]
+name = "susubook"
+version = "1.0.0"
+description = "Digital Susu Collection and Accountability System — CSCD602 capstone"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q --strict-markers"
+markers = [
+    "integration: exercises the database (requires docker compose up -d)",
+    "system: end-to-end through the Flask test client",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["*/__init__.py", "*/seed.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",       # invariant guards, unreachable by design
+    "if TYPE_CHECKING:",
+    "\\.\\.\\.",                   # Protocol method stubs
+]

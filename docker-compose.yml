@@ -1,0 +1,27 @@
+# Local development database.
+#
+# The same PostgreSQL major version runs in development and production
+# (NFR-10). Configuration differs only by DATABASE_URL, so promoting from
+# this container to managed Postgres is an environment change, not a code
+# change.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: susubook-db
+    environment:
+      POSTGRES_USER: susubook
+      POSTGRES_PASSWORD: susubook_dev
+      POSTGRES_DB: susubook
+    ports:
+      - "5433:5432"        # 5433 on the host to avoid clashing with a local Postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U susubook -d susubook"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

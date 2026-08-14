@@ -21,3 +21,6 @@ pgdata/
 .DS_Store
 .idea/
 .vscode/
+
+# virtualenv
+.venv/
