@@ -19,6 +19,9 @@
    of Uncertainty's upper bound (49 hours) would consume the entire examination window.
 5. **4.1 hours of implementation quality** were therefore removed in advance, in areas
    that do not touch BR-01 or BR-02, giving a 20.4-hour plan.
+6. Change request **CR-001** subsequently added QR-based client identification at +0.92 h,
+   taking the plan to **21.3 hours against the 20-hour allocation — a 6.4% overrun,
+   deliberately accepted and logged** rather than absorbed by manufacturing further cuts.
 
 The scope below is the output of that process.
 
@@ -35,8 +38,14 @@ The scope below is the output of that process.
 | **Reconciliation** | Daily route sheet, remittance declaration, variance computation, supervisor variance list | FR-23…26 |
 | **Client transparency** | Client login showing every contribution with amount, date, time, recording collector and reference; balance and projected payout | FR-28…30 |
 | **Audit** | Append-only audit log of every state change; reversal instead of edit or delete | FR-32, FR-33 |
+| **Client identification** *(CR-001)* | Opaque UUID public reference per client; printable QR card encoding the contribution URL; scan-to-collect via the phone's native camera | FR-39, FR-40 |
 
-**28 functional requirements · 10 non-functional requirements.**
+**30 functional requirements · 10 non-functional requirements.**
+
+> FR-39 and FR-40 entered scope after the baseline, under CR-001. They are **Should**
+> priority: if Phase 3 runs behind they are the first work abandoned, costing no Must
+> requirement. The opaque-reference rule BR-R14 is retained either way, being a security
+> improvement independent of the QR feature.
 
 ## 6.3 Reduced in quality — built, but knowingly below standard
 
@@ -49,11 +58,16 @@ technical debt entry, not an omission.
 | Styling | Tailwind via CDN, minimal custom CSS | Built and purged stylesheet | TD-02 |
 | Client list | Plain table | Search, filter and pagination | TD-03 |
 | Correction workflow | Minimal supervisor-only reversal form | Guided correction with reason codes | TD-04 |
-| Route sheet | Static list | Filtered to "not yet collected", ordered by route | TD-05 |
+| Route sheet | Static list | Filtered to "not yet collected", ordered by route | TD-05 † |
 | Interaction model | HTMX on three key interactions, full page loads elsewhere | Consistent partial updates throughout | TD-06 |
 
 FR-08 and FR-23 are therefore **partially** satisfied, and are reported as such in
 `09-testing.md` rather than claimed as complete.
+
+† **TD-05 is partially mitigated by CR-001.** QR scanning bypasses the route sheet for the
+common case, so the degraded static list is exercised far less than originally assumed. The
+debt is retained at reduced impact rather than closed, because the fallback path still
+matters whenever a card is lost, damaged or left at home.
 
 ## 6.4 Out of scope — specified but not built
 

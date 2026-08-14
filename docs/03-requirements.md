@@ -112,6 +112,13 @@ functional, non-functional, and constraints.
 | FR-37 | The system shall provide a Supervisor dashboard summarising active clients, today's collections and outstanding variances. | Could |
 | FR-38 | The system shall export a collector's cycle report as CSV. | Could |
 
+### Client identification *(added by CR-001)*
+
+| ID | Requirement | Priority |
+|---|---|---|
+| FR-39 | The system shall assign each client an opaque, non-sequential public reference and render it as a printable QR code encoding the client's contribution URL. | Should |
+| FR-40 | The system shall resolve a scanned client reference to that client's contribution screen, subject to the same authorisation as any other route. | Should |
+
 ## 3.4 Non-functional requirements (how well it must perform)
 
 | ID | Category | Requirement | Verification |
@@ -148,10 +155,14 @@ that merely improves convenience is deferred.
 | Priority | Count | Requirements |
 |---|---|---|
 | **Must** | 28 | FR-01…08, FR-10…14, FR-16…21, FR-23…26, FR-28…30, FR-32, FR-33 |
-| **Should** | 5 | FR-09, FR-15, FR-22, FR-34, FR-35 |
+| **Should** | 7 | FR-09, FR-15, FR-22, FR-34, FR-35, FR-39, FR-40 |
 | **Could** | 4 | FR-27, FR-36, FR-37, FR-38 |
 | **Won't** | 1 | FR-31 (SMS notification) |
-| **Total** | **38** | FR-01 … FR-38 |
+| **Total** | **40** | FR-01 … FR-40 |
+
+> FR-39 and FR-40 were added after the baseline was set, under change request **CR-001**
+> (`CHANGELOG-requirements.md`). They are **Should**, so that abandoning them under
+> schedule pressure costs no Must requirement.
 
 **Why FR-31 is *Won't* despite its importance.** SMS notification is the mitigation for
 assumption A5 — the risk that clients cannot access a web page. It is arguably the single
@@ -169,6 +180,7 @@ therefore not dropped but *carried*: it is the first item in the future evolutio
 | BR-04 | SR-02 | FR-17, FR-18, FR-19 | TC-PAY-01…05 |
 | BR-05 | SR-03, SR-11 | FR-32, FR-33, FR-34, FR-05 | TC-AUD-01…03 |
 | BR-06 | SR-01, SR-03 | FR-28, FR-32, FR-33 | UAT-01…03 |
+| BR-01, BR-06 | SR-04 | FR-39, FR-40 *(CR-001)* | TC-QR-01…03 |
 
 *Test case identifiers are defined in `09-testing.md`.*
 
@@ -189,3 +201,7 @@ project:
 
 Any requirement dropped after this point is recorded there rather than silently removed,
 so that the delivered scope can be compared against the specified scope.
+
+**Changes raised to date:** CR-001 (QR-based client identification) — approved, adding
+FR-39 and FR-40 and business rules BR-R14 and BR-R15. See `CHANGELOG-requirements.md` for
+the impact analysis, cost assessment and decision record.

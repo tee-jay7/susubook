@@ -175,6 +175,27 @@ AFP (Must) = 143 × 1.10 = 157.3 ≈ 157 FP
 
 Cutting ten requirements removes 50 adjusted function points — **24% of the system**.
 
+### 4.2.5 Revision under CR-001
+
+The counts above are the Phase 1 baseline. Change request CR-001 (QR-based client
+identification) subsequently added two components. The baseline is left intact and the
+revision recorded separately, so the effect of the change remains visible.
+
+| Added component | Type | Complexity | FP |
+|---|---|---|---|
+| Printable client QR card | External Output | Average | 5 |
+| Client reference resolution | External Inquiry | Simple | 3 |
+| | | **Subtotal** | **+8** |
+
+| | Baseline | After CR-001 |
+|---|---|---|
+| UFP (Must scope) | 143 | **151** |
+| AFP (Must scope) | 157 | **166** |
+| UFP (full scope) | 188 | 196 |
+| AFP (full scope) | 207 | 216 |
+
+All figures in §4.3 below are computed on the **post-CR-001** counts.
+
 ---
 
 ## 4.3 COCOMO Basic (organic mode)
@@ -190,7 +211,7 @@ Function points are converted to KLOC using a language productivity figure.
 > `References` in the final document.*
 
 ```
-KLOC (Must scope) = 157 FP × 30 LOC/FP ÷ 1000 = 4.71 KLOC
+KLOC (Must scope, post-CR-001) = 166 FP × 30 LOC/FP ÷ 1000 = 4.98 KLOC
 ```
 
 ### 4.3.2 Mode selection
@@ -210,66 +231,70 @@ integrations of the full vision were in scope; they are excluded by CO-05 and FR
 
 ```
 Effort = a × (KLOC)^b
-       = 2.4 × (4.71)^1.05
-       = 2.4 × 5.09
-       = 12.2 person-months
+       = 2.4 × (4.98)^1.05
+       = 2.4 × 5.396
+       = 13.0 person-months
 ```
 
 Converting at the COCOMO standard of 152 hours per person-month:
 
 ```
-Person-hours = 12.2 × 152 = 1,857 person-hours
+Person-hours = 13.0 × 152 = 1,969 person-hours
 ```
 
 Schedule, using Boehm's organic schedule equation `TDEV = 2.5 × (Effort)^0.38`
 (this extends beyond the Session 6 slide, which stops at the effort equation):
 
 ```
-TDEV = 2.5 × (12.2)^0.38 = 2.5 × 2.59 = 6.5 months
-Average staffing = 12.2 ÷ 6.5 ≈ 1.9 developers
+TDEV = 2.5 × (13.0)^0.38 = 2.5 × 2.65 = 6.6 months
+Average staffing = 13.0 ÷ 6.6 ≈ 2.0 developers
 ```
 
 Applying instead the simplified division used in the Session 6 worked example, a single
-developer would need **12.2 months** — the schedule equation's 6.5 months assumes roughly
+developer would need **13.0 months** — the schedule equation's 6.6 months assumes roughly
 two people working in parallel.
 
 ### 4.3.4 Sensitivity to the LOC/FP assumption
 
 | LOC/FP | KLOC | Effort (PM) | Person-hours |
 |---|---|---|---|
-| 25 (optimistic) | 3.92 | 10.1 | 1,533 |
-| **30 (adopted)** | **4.71** | **12.2** | **1,857** |
-| 40 (pessimistic) | 6.28 | 16.5 | 2,511 |
+| 25 (optimistic) | 4.15 | 10.7 | 1,626 |
+| **30 (adopted)** | **4.98** | **13.0** | **1,969** |
+| 40 (pessimistic) | 6.64 | 17.5 | 2,663 |
 
 The estimate is **not** sensitive enough for the conclusion to change: across the entire
-range the requirement is over 1,500 person-hours against a 48-hour budget.
+range the requirement is over 1,600 person-hours against a 48-hour budget.
 
 ### 4.3.5 Full-scope comparison
 
 | Scope | AFP | KLOC | Effort (PM) | Person-hours |
 |---|---|---|---|---|
-| Full specified (38 FRs) | 207 | 6.21 | 16.3 | 2,482 |
-| Must-have only (28 FRs) | 157 | 4.71 | 12.2 | 1,857 |
-| | | | **Saving** | **625 person-hours** |
+| Full specified (40 FRs) | 216 | 6.48 | 17.1 | 2,595 |
+| Must + CR-001 (30 FRs) | 166 | 4.98 | 13.0 | 1,969 |
+| | | | **Saving** | **626 person-hours** |
+
+For reference, the Phase 1 baseline before CR-001: full scope 207 AFP / 16.3 PM /
+2,482 hours; Must scope 157 AFP / 12.2 PM / 1,857 hours. CR-001 added 0.8 person-months
+(112 person-hours) to the delivered scope under COCOMO.
 
 ---
 
 ## 4.4 The gap, stated honestly
 
 ```
-COCOMO estimate (Must scope):        1,857 person-hours
+COCOMO estimate (Must scope):        1,969 person-hours
 Available window:                       48 hours (single developer)
 Implementation allocation (Phase 3):    20 hours
                                      ─────────────────
-Ratio of required to available:          ~93 : 1
+Ratio of required to available:          ~98 : 1
 ```
 
-A ratio of 93:1 is not a usable planning number, and it would be dishonest to present it
+A ratio of 98:1 is not a usable planning number, and it would be dishonest to present it
 as one. It requires explanation rather than presentation:
 
 **Why COCOMO overstates this project.**
 
-1. **It prices the whole lifecycle.** The 1,857 hours include requirements engineering,
+1. **It prices the whole lifecycle.** The 1,969 hours include requirements engineering,
    design, integration, formal QA and documentation. Those activities are being performed
    here, but they are budgeted separately across Phases 1–2 and 4–6, not inside the
    20-hour implementation window.
@@ -313,14 +338,15 @@ with a stated basis. That is the reason it is retained rather than discarded.
 | 14 | Collector route sheet | 0.5 | 1.0 | 2.0 | 1.08 |
 | 15 | UI, HTMX interactions, mobile layout | 1.0 | 2.0 | 3.5 | 2.08 |
 | 16 | Seed data and demo accounts | 0.25 | 0.5 | 1.0 | 0.54 |
-| | **Total expected effort** | | | | **24.5 h** |
+| 17 | QR issuance and scan-to-collect *(CR-001)* | 0.5 | 0.85 | 1.6 | 0.92 |
+| | **Total expected effort** | | | | **25.4 h** |
 
-**Uncertainty.** Per-task `σ = (P − O)/6`; total `σ = √Σσ² = 1.22 h`.
+**Uncertainty.** Per-task `σ = (P − O)/6`; total `σ = √Σσ² = 1.24 h`.
 
 | Confidence | Range |
 |---|---|
-| 68% (±1σ) | 23.2 – 25.7 h |
-| 95% (±2σ) | 22.0 – 26.9 h |
+| 68% (±1σ) | 24.1 – 26.6 h |
+| 95% (±2σ) | 22.9 – 27.8 h |
 
 > **Caveat on that range.** PERT assumes tasks vary independently. They do not: a single
 > developer who is slow on the domain layer will likely be slow on the service layer too,
@@ -328,8 +354,8 @@ with a stated basis. That is the reason it is retained rather than discarded.
 > range above should be read as a lower bound on uncertainty, not a guarantee.
 
 **Cone of Uncertainty.** Session 6 places a project with requirements defined but design
-incomplete in the **0.5× – 2× band**. Applied to 24.5 h, the honest interval is
-**12 – 49 hours**. The upper bound consumes the entire examination window on
+incomplete in the **0.5× – 2× band**. Applied to 25.4 h, the honest interval is
+**12.7 – 50.7 hours**. The upper bound consumes the entire examination window on
 implementation alone, leaving nothing for testing, deployment or documentation — 30 of
 the 50 marks. This is the finding that forces the scope decision below.
 
@@ -337,7 +363,7 @@ the 50 marks. This is the finding that forces the scope decision below.
 
 ## 4.6 How the estimation influenced the project scope
 
-**The finding.** Bottom-up expected effort for the Must scope is **24.5 hours** against a
+**The finding.** Bottom-up expected effort for the Must scope was **24.5 hours** against a
 **20-hour** implementation allocation — a 23% over-commitment at the *expected* value,
 before any allowance for the upper half of the cone.
 
@@ -358,6 +384,25 @@ deliberately reducing implementation quality in areas that do not touch BR-01 or
 ```
 24.5 h − 4.1 h = 20.4 h  ≈  20 h allocation
 ```
+
+### Revision under CR-001
+
+Change request CR-001 subsequently added QR-based client identification (FR-39, FR-40) at
+**+0.92 h**, revising the plan:
+
+```
+25.4 h − 4.1 h = 21.3 h  vs  20 h allocation  →  +6.4% overrun
+```
+
+**The overrun was accepted rather than absorbed.** A further 1.3 hours of quality cuts
+could have been manufactured to land the arithmetic on exactly 20.0. That was rejected:
+Session 6 identifies external schedule pressure as a recognised source of estimate
+distortion, and revising an estimate to fit a predetermined budget *is* that distortion.
+The overrun is carried openly and tracked against actuals in §4.8.
+
+It is contained by priority rather than by arithmetic. FR-39 and FR-40 are **Should**, so
+if Phase 3 runs behind, task 17 is the first work abandoned and no Must requirement is
+affected. The full decision record is in `CHANGELOG-requirements.md`.
 
 **What was explicitly *not* cut, and why.** The domain layer (2.58 h), contribution
 validation (2.58 h), audit log (1.08 h) and client self-service views (1.08 h) were
@@ -421,7 +466,8 @@ This table is completed in Phase 6 and reported in the final document.
 | 14 Route sheet | 1.08 | | | |
 | 15 UI & HTMX | 2.08 | | | |
 | 16 Seed data | 0.54 | | | |
-| **Total** | **24.5** | | | |
+| 17 QR issuance & scan *(CR-001)* | 0.92 | | | |
+| **Total** | **25.4** | | | |
 
 Magnitude of Relative Error will be computed as `MRE = |Actual − Estimated| / Actual`,
 and the result — favourable or not — reported as the closure of the estimation process

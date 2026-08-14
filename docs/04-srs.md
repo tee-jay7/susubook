@@ -51,6 +51,8 @@ offline operation, multi-institution tenancy, and native mobile applications. Se
 | **Variance** | The difference between contributions recorded in the field and cash declared, for one collector on one day. |
 | **Reversal** | A linked correction entry that negates an earlier contribution without deleting it. |
 | **Pesewa** | One hundredth of a Ghana Cedi (GHS). All monetary values are stored as integer pesewas. |
+| **Public reference** | An opaque, non-sequential UUIDv4 identifying a client in externally visible URLs. Identifies but does not authorise. |
+| **QR card** | A printed card carrying a client's public reference as a QR code encoding their contribution URL. The digital successor to the paper susu card. |
 
 ### 1.4 References
 
@@ -124,9 +126,9 @@ an SMS channel instead.
 ```
    User ──1───────*── Client                Client ──1──────*── ContributionCycle
    (role: CLIENT |          (assigned to                          │
-    COLLECTOR |              one collector)                       │ 1
-    SUPERVISOR |                                                  │
-    ADMIN)                                                        *
+    COLLECTOR |              one collector;                       │ 1
+    SUPERVISOR |              public_ref: UUIDv4                   │
+    ADMIN)                    — opaque, used in URLs              *
                                                              Contribution
                                                           (date, amount,
                                                            recorded_by,
@@ -163,6 +165,15 @@ They are the primary subject of unit testing.
 | BR-R11 | A contribution is never edited or deleted; correction is a linked reversal entry. |
 | BR-R12 | A cycle reaches MATURED when the current date passes its end date, regardless of days paid. |
 | BR-R13 | Variance for a collector on a date = sum of contributions recorded − amount declared. |
+| BR-R14 | Public references exposed in URLs or QR codes are opaque and non-sequential (UUIDv4). Sequential database identifiers never appear in a URL. *(CR-001)* |
+| BR-R15 | A client reference identifies; it does not authorise. Possession confers no permission — authorisation remains the collector–client assignment enforced server-side (FR-05). *(CR-001)* |
+
+> **BR-R14 and BR-R15 together are what make a QR card safe to carry through a public
+> market.** The card must be assumed photographable. BR-R14 prevents an observer deriving
+> other clients' references by incrementing a number; BR-R15 ensures that holding a
+> reference grants nothing, because the authorisation decision never consults it. The QR
+> encodes a URL containing an opaque reference and nothing else — no name, phone, balance
+> or rate — so a photographed card leaks no personal data (NFR-06, Act 843).
 
 > **BR-R9 exists because of a real edge case:** a client who contributes on only one day
 > receives nothing, because the single day's contribution *is* the commission. Stating the
@@ -181,6 +192,7 @@ They are the primary subject of unit testing.
 | UC-07 | Release matured payout | Supervisor | FR-18…21 |
 | UC-08 | View own contribution history | Client | FR-28, FR-29 |
 | UC-09 | Reverse an erroneous contribution | Supervisor | FR-33, FR-32 |
+| UC-10 | Issue a client QR card *(CR-001)* | Collector | FR-39 |
 
 #### UC-03 — Record daily contribution *(core use case)*
 
@@ -204,6 +216,7 @@ They are the primary subject of unit testing.
 
 **Alternate flows**
 - **3a. Catch-up payment** *(FR-15, Should)* — collector indicates several unpaid days; system allocates the amount across the specific unpaid dates and validates each against BR-R3 and BR-R5.
+- **3b. Entry by QR scan** *(FR-39, FR-40, Should — CR-001)* — instead of steps 1–3, the collector scans the client's QR card with the phone's camera application, which opens the client's contribution URL directly. The system resolves the public reference (BR-R14), verifies the client is assigned to this collector (FR-05, BR-R15), and enters the flow at step 4. Reduces the interaction to **scan and confirm**. If the card is missing or unreadable, the collector falls back to the main flow.
 - **4a. Amount differs from the daily rate** — collector overrides; system validates BR-R7 (whole multiple of the rate) and rejects any other value.
 
 **Exception flows**
@@ -247,6 +260,7 @@ They are the primary subject of unit testing.
 - **UC-06 Review variance** — supervisor sees all non-zero variances for the day, by collector, with the underlying contributions.
 - **UC-08 Client history** — client sees every contribution against them with amount, date, time recorded, recording collector and reference; the independent record that answers P1.
 - **UC-09 Reverse contribution** — supervisor records a reversal; original remains visible, linked to the reversal; both appear in the audit trail (BR-R11).
+- **UC-10 Issue QR card** — collector opens a client's printable card page; system renders the client's public reference as a QR code encoding their contribution URL, with the client's name for human identification; collector prints and issues it. Re-issuing a lost card by rotating the reference is deferred to the evolution plan.
 
 ### 3.4 User stories
 
