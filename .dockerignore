@@ -1,0 +1,24 @@
+# Keep the image to application code and its dependencies.
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.coverage
+htmlcov
+
+# Never bake secrets into an image
+.env
+*.env
+!.env.example
+
+# Not needed at runtime
+tests
+docs
+README.md
+pyproject.toml
+docker-compose.yml
+deploy
+.DS_Store

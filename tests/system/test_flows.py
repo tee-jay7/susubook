@@ -593,3 +593,21 @@ class TestSecurityControls:
     def test_unknown_page_returns_404(self, client, world):
         login(client, "0244000101")
         assert client.get("/collector/nonexistent").status_code == 404
+
+
+class TestOperational:
+    """TC-OPS — deployment support endpoints."""
+
+    def test_health_endpoint_is_public_and_reports_database(self, client, db):
+        """Cloud Run probes cannot authenticate, so this must be open."""
+        response = client.get("/healthz")
+        assert response.status_code == 200
+        assert response.json == {"status": "ok", "database": "ok"}
+
+    def test_health_endpoint_discloses_nothing_useful_to_an_attacker(
+        self, client, db
+    ):
+        """Open by necessity, so it must not leak version, host or error text."""
+        body = client.get("/healthz").data.decode().lower()
+        for leak in ("postgres", "flask", "python", "traceback", "10.128", "version"):
+            assert leak not in body, f"health endpoint leaked '{leak}'"

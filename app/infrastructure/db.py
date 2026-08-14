@@ -10,10 +10,26 @@ from .models import Base
 
 
 def make_engine(database_url: str, *, echo: bool = False) -> Engine:
+    """Engine with a pool sized for a scale-to-zero runtime.
+
+    Cloud Run runs several instances, each with its own pool, against a single
+    small PostgreSQL server. The defaults (5 + 10 overflow per process, times
+    two gunicorn workers, times N instances) would exhaust the server's
+    connection limit well before the application was under any real load, and
+    the failure mode is being locked out of your own database.
+
+    A deliberately small pool bounds that: 5 connections per worker at most.
+    `pool_recycle` closes connections before an idle server-side timeout can
+    hand back a dead one.
+    """
     return create_engine(
         database_url,
         echo=echo,
-        pool_pre_ping=True,  # free-tier Postgres drops idle connections
+        pool_size=2,
+        max_overflow=3,
+        pool_timeout=10,
+        pool_recycle=1800,
+        pool_pre_ping=True,  # a scaled-to-zero gap outlives idle connections
         future=True,
     )
 

@@ -157,6 +157,26 @@ def declare():
     )
 
 
+def _base_url() -> str:
+    """Origin to encode in QR cards.
+
+    Configured BASE_URL wins; otherwise the request's own origin is used. Cloud
+    Run terminates TLS and forwards the original scheme in X-Forwarded-Proto, so
+    the scheme is read from there rather than from the internal request, which
+    always arrives as plain HTTP. Getting this wrong would encode http:// URLs
+    onto printed cards that then redirect on every scan.
+    """
+    configured = current_app.config.get("BASE_URL")
+    if configured:
+        return configured
+
+    origin = request.url_root.rstrip("/")
+    forwarded_proto = request.headers.get("X-Forwarded-Proto")
+    if forwarded_proto and origin.startswith("http://"):
+        origin = f"{forwarded_proto}://{origin.split('://', 1)[1]}"
+    return origin
+
+
 @bp.route("/card/<uuid:public_ref>", methods=["GET"])
 @roles_required(*COLLECTOR_ROLES)
 def card(public_ref: UUID):
@@ -166,7 +186,7 @@ def card(public_ref: UUID):
         abort(404)
     _assert_on_route(client)
 
-    base = current_app.config["BASE_URL"]
+    base = _base_url()
     return render_template(
         "collector/qr_card.html",
         client=client,

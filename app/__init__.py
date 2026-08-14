@@ -101,6 +101,25 @@ def create_app(
     app.register_blueprint(supervisor.bp)
     app.register_blueprint(client.bp)
 
+    # -- operational endpoints --------------------------------------------
+
+    @app.get("/healthz")
+    def healthz():
+        """Liveness and database reachability.
+
+        Unauthenticated by necessity — a probe cannot log in — so it returns
+        only a status, never a version, hostname or error detail that would help
+        someone map the deployment.
+        """
+        from sqlalchemy import text
+
+        try:
+            g.db.execute(text("SELECT 1"))
+        except Exception:  # noqa: BLE001 — the cause is logged, not disclosed
+            app.logger.exception("health check: database unreachable")
+            return {"status": "degraded", "database": "unreachable"}, 503
+        return {"status": "ok", "database": "ok"}, 200
+
     # -- template helpers -------------------------------------------------
 
     from app.web.security import current_user

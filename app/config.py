@@ -25,9 +25,12 @@ class Config:
             "postgresql+psycopg://susubook:susubook_dev@localhost:5434/susubook",
         )
     )
-    BASE_URL: str = field(
-        default_factory=lambda: os.environ.get("BASE_URL", "http://localhost:5000")
-    )
+    # Optional. When unset, the request's own origin is used (see
+    # app/web/collector.py::_base_url). That avoids a chicken-and-egg on first
+    # deploy — a Cloud Run URL is not known until the service exists — and means
+    # QR cards stay correct if the application later moves to a custom domain,
+    # with no configuration change and no reissued cards.
+    BASE_URL: str = field(default_factory=lambda: os.environ.get("BASE_URL", ""))
     ENV: str = field(default_factory=lambda: os.environ.get("FLASK_ENV", "development"))
 
     # Session cookie hardening (NFR-03)
