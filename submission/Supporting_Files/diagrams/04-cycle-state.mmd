@@ -1,0 +1,20 @@
+stateDiagram-v2
+    [*] --> ACTIVE : client enrolled (FR-10)
+    ACTIVE --> ACTIVE : contribution recorded<br/>(BR-R3…R7)
+    ACTIVE --> MATURED : current date > end_date<br/>(BR-R12)
+    MATURED --> PAID_OUT : supervisor releases<br/>(BR-R8, R9, R10)
+    PAID_OUT --> [*]
+    PAID_OUT --> ACTIVE : next cycle opened
+
+    note right of ACTIVE
+        Only one ACTIVE cycle
+        per client (BR-R2),
+        enforced by a partial
+        unique index
+    end note
+    note right of MATURED
+        No contribution accepted
+        (BR-R6). Payout at most
+        once (BR-R10), enforced
+        by a unique constraint
+    end note

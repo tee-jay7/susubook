@@ -1,0 +1,161 @@
+================================================================================
+CSCD602 ADVANCED SOFTWARE ENGINEERING
+INDIVIDUAL PROJECT-BASED EXAMINATION - DEPLOYMENT AND SOURCE LINKS
+================================================================================
+
+Student Name:   [STUDENT NAME]
+Student ID:     [STUDENT ID]
+Project Title:  SusuBook - A Digital Susu Collection and Accountability System
+
+
+--------------------------------------------------------------------------------
+LIVE APPLICATION
+--------------------------------------------------------------------------------
+
+Live Application:   https://susubook-fdtbppd7sq-uc.a.run.app
+
+Admin URL:          https://susubook-fdtbppd7sq-uc.a.run.app/supervisor/
+
+                    There is no separate administrative site. Administrator and
+                    Supervisor accounts sign in at the same address as everyone
+                    else and are routed to the oversight pages by role.
+
+Health check:       https://susubook-fdtbppd7sq-uc.a.run.app/health
+                    Returns {"database":"ok","status":"ok"} when the application
+                    and its database are both reachable. No sign-in required.
+
+Source Code:        https://github.com/tee-jay7/susubook
+
+
+--------------------------------------------------------------------------------
+TEST CREDENTIALS
+--------------------------------------------------------------------------------
+
+All accounts use the password:  susu1234
+Sign in with the PHONE NUMBER, not a username.
+
+Test Username:      0201000201        (Client - Ama Serwaa)
+Test Password:      susu1234
+
+Admin Username:     0244000199        (Administrator)
+Admin Password:     susu1234
+
+
+ALL DEMONSTRATION ACCOUNTS
+--------------------------------------------------------------------------------
+
+  ROLE            PHONE         NAME                  LANDS ON
+  ------------------------------------------------------------------------
+  Administrator   0244000199    System Administrator  /supervisor/
+  Supervisor      0244000100    Mariama Adjei         /supervisor/
+  Collector       0244000101    Joseph Osei           /collector/   (4 clients)
+  Collector       0244000102    Kwame Tetteh          /collector/   (3 clients)
+  Collector       0244000103    Abena Mensah          /collector/   (3 clients)
+  Client          0201000201    Ama Serwaa            /my/
+  Client          0201000202    Kofi Boateng          /my/
+  Client          0201000203    Akosua Darko          /my/
+  Client          0201000204    Yaw Owusu             /my/
+  Client          0201000205    Efua Asante           /my/
+  Client          0201000206    Kojo Nkrumah          /my/
+  Client          0201000207    Adwoa Yeboah          /my/
+  Client          0201000208    Kwaku Addo            /my/
+  Client          0201000209    Mavis Quaye           /my/
+  Client          0201000210    Grace Amoah           /my/
+
+  All seven role types above were verified against the live deployment before
+  submission: each signs in successfully and reaches the expected page.
+
+
+--------------------------------------------------------------------------------
+SUGGESTED WALKTHROUGH FOR THE EXAMINER
+--------------------------------------------------------------------------------
+
+1. CLIENT VIEW - the problem the system solves
+   Sign in as 0201000201 (Ama Serwaa).
+   The susu card shows every day of the cycle as paid, missed or pending, using
+   a symbol AND a colour so it reads in sunlight and for colour-blind users.
+   Below it, every payment recorded against her, each naming the collector who
+   recorded it and the time. This is the independent record a paper card cannot
+   provide.
+   Note the REVERSED / REVERSAL pair near the top: a correction, with the
+   original still visible. Nothing is ever deleted.
+
+2. COLLECTOR VIEW - daily collection
+   Sign in as 0244000101 (Joseph Osei).
+   The route sheet lists only his own clients. Tap "Collect" on any client to
+   record a contribution; the running total updates without a page reload.
+   Tap "Collect" again on the same client to see the duplicate refused (BR-R5),
+   with the existing reference quoted back.
+   Open any client, then "QR card", to see the printable card.
+
+3. AUTHORISATION - the photographed-card threat
+   While signed in as 0244000102 (Kwame Tetteh), open a client belonging to
+   Joseph Osei:
+     https://susubook-fdtbppd7sq-uc.a.run.app/c/<any of Osei's client refs>
+   The request is refused with 403 "This client is not on your route", and the
+   attempt is written to the audit log. Possession of a client's QR reference
+   confers no capability.
+
+4. SUPERVISOR VIEW - oversight
+   Sign in as 0244000100 (Mariama Adjei).
+   The variance screen compares what each collector recorded in the field
+   against the cash they declared at the branch.
+   "Payouts" lists matured cycles with the settlement computed; releasing one
+   closes the cycle and opens the next automatically.
+   "Reverse" corrects a contribution by linked reversal, never by deletion.
+
+
+--------------------------------------------------------------------------------
+NOTES ON THE DEPLOYMENT
+--------------------------------------------------------------------------------
+
+FIRST REQUEST MAY TAKE A FEW SECONDS
+  The service scales to zero when idle, so the first request after a quiet
+  period waits for a container to start - measured at 3.3 seconds. Subsequent
+  requests are around 0.6 seconds. This keeps the running cost at zero and is
+  documented as a deliberate trade-off in Project_Documentation.pdf, section 13.
+
+HOSTING
+  Google Cloud Run (region us-central1), against PostgreSQL 16 on a Compute
+  Engine VM inside the same VPC. The database has no public address and is
+  reachable only from within the VPC.
+
+LATENCY
+  us-central1 is roughly 150-200 ms from Ghana. It was chosen for Compute Engine
+  free-tier eligibility rather than for proximity to the intended users, and
+  measurement shows that latency dominating every request. This is recorded as a
+  known limitation, not an oversight - see section 12.7 and section 17.5.
+
+DATA
+  All data is demonstration data created by the seed script. No real client
+  information is stored.
+
+
+--------------------------------------------------------------------------------
+SUBMISSION CONTENTS
+--------------------------------------------------------------------------------
+
+  Project_Documentation.pdf    Sections 1-19, the complete project document
+  SRS.pdf                      Software Requirements Specification (IEEE 830)
+  Testing_Report.pdf           Test cases, results, defect log, coverage
+  Technical_Debt_Plan.pdf      17 debt items, classification, repayment plan
+  User_Manual.pdf              Per-role guide with screenshots
+  Deployment_and_Source_Links.txt   This file
+  Supporting_Files/            UML diagrams (source and rendered), screenshots,
+                               requirements change log
+
+
+--------------------------------------------------------------------------------
+DECLARATION
+--------------------------------------------------------------------------------
+
+Submitted as individual work for CSCD602, in accordance with examination
+Rules 1 and 13. All third-party frameworks and libraries are acknowledged with
+versions and licences in Project_Documentation.pdf, section 19.7, per Rule 6.
+No previously submitted academic work has been reused, so no disclosure is
+required under Rule 12.
+
+Signed:  [STUDENT NAME]
+Date:    [DATE OF SUBMISSION]
+
+================================================================================

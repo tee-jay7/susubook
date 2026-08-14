@@ -24,3 +24,8 @@ pgdata/
 
 # virtualenv
 .venv/
+
+# Build artefacts and the assembled submission
+submission/node_modules
+docs/_build/
+docs/_render_*.html

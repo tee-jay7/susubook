@@ -1,0 +1,20 @@
+flowchart TD
+    subgraph L1["① PRESENTATION — app/web/"]
+        A["Flask blueprints (controllers)<br/>Jinja templates (views)<br/>HTMX partials · forms · CSRF"]
+    end
+    subgraph L2["② APPLICATION — app/services/"]
+        B["Use-case orchestration<br/>Transaction boundaries<br/>Authorisation checks · audit writes"]
+    end
+    subgraph L3["③ DOMAIN — app/domain/"]
+        C["Entities · Money value object<br/>Business rules BR-R1…R15<br/><b>No Flask. No SQLAlchemy. No I/O.</b>"]
+    end
+    subgraph L4["④ INFRASTRUCTURE — app/infrastructure/"]
+        D["SQLAlchemy models · repositories<br/>Session management · QR rendering"]
+    end
+
+    L1 --> L2
+    L2 --> L3
+    L2 -.->|"via Protocol<br/>(dependency inversion)"| L4
+    L4 --> L3
+
+    style L3 fill:#1f4e5f,stroke:#0d2d38,color:#fff

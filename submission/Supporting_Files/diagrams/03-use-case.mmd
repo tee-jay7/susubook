@@ -1,0 +1,41 @@
+flowchart LR
+    subgraph actors[" "]
+        direction TB
+        CL(["Client"])
+        CO(["Collector"])
+        SU(["Supervisor"])
+        AD(["Administrator"])
+    end
+
+    subgraph system["SusuBook"]
+        direction TB
+        UC1(["UC-01 Log in"])
+        UC2(["UC-02 Enrol client"])
+        UC3(["UC-03 Record contribution"])
+        UC4(["UC-04 View susu card"])
+        UC5(["UC-05 Declare remittance"])
+        UC6(["UC-06 Review variance"])
+        UC7(["UC-07 Release payout"])
+        UC8(["UC-08 View own history"])
+        UC9(["UC-09 Reverse contribution"])
+        UC10(["UC-10 Issue QR card"])
+    end
+
+    CL --- UC1
+    CL --- UC8
+    CL --- UC4
+    CO --- UC1
+    CO --- UC2
+    CO --- UC3
+    CO --- UC4
+    CO --- UC5
+    CO --- UC10
+    SU --- UC1
+    SU --- UC6
+    SU --- UC7
+    SU --- UC9
+    AD --- UC1
+
+    UC3 -.->|"«include»"| UC1
+    UC7 -.->|"«include»"| UC1
+    UC3 -.->|"«extend»<br/>scan entry"| UC10
