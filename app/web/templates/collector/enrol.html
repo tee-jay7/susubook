@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Enrol a client &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Enrol a client</h1>
+<p class="text-sm text-slate-600 mb-5">
+  This creates the client's own login and opens their first 31-day cycle.
+  Only the details below are stored (NFR-06, Act 843).
+</p>
+
+<form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div>
+    <label for="full_name" class="block text-sm font-medium mb-1">Full name</label>
+    <input id="full_name" name="full_name" required class="tap w-full border border-slate-300 rounded px-3">
+  </div>
+  <div>
+    <label for="phone" class="block text-sm font-medium mb-1">Phone number</label>
+    <input id="phone" name="phone" type="tel" inputmode="numeric" required
+           class="tap w-full border border-slate-300 rounded px-3">
+    <p class="text-xs text-slate-500 mt-1">The client signs in with this.</p>
+  </div>
+  <div>
+    <label for="daily_rate" class="block text-sm font-medium mb-1">Agreed daily contribution (GHS)</label>
+    <input id="daily_rate" name="daily_rate" type="text" inputmode="decimal" required
+           placeholder="10.00" class="tap w-full border border-slate-300 rounded px-3">
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label for="business_type" class="block text-sm font-medium mb-1">Business</label>
+      <input id="business_type" name="business_type" placeholder="Kiosk"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+    <div>
+      <label for="location" class="block text-sm font-medium mb-1">Location</label>
+      <input id="location" name="location" placeholder="Madina Market"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+  </div>
+  <div>
+    <label for="password" class="block text-sm font-medium mb-1">Client's initial password</label>
+    <input id="password" name="password" type="text" required minlength="6"
+           class="tap w-full border border-slate-300 rounded px-3">
+    <p class="text-xs text-slate-500 mt-1">Give this to the client so they can check their own record.</p>
+  </div>
+
+  <button class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+    Enrol and open cycle 1
+  </button>
+</form>
+{% endblock %}

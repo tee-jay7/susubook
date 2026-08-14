@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% from "macros.html" import summary_table %}
+{% block title %}{{ client.full_name }} &middot; Collect{% endblock %}
+
+{% block content %}
+{#
+  UC-03 step 4-5. Reached by scanning the client's QR card.
+
+  The amount is pre-filled with the agreed daily rate and the whole
+  interaction is a single confirmation. Combined with the scan, that is TWO
+  interactions — against NFR-02's limit of three — and it is the design
+  resolution of conflict C1: attribution, timestamping and audit are added
+  server-side, costing the collector nothing.
+#}
+<a href="{{ url_for('collector.route_sheet') }}"
+   class="text-sm text-slate-600 hover:underline">&larr; Route sheet</a>
+
+<div class="bg-white rounded-lg shadow-sm mt-3 overflow-hidden">
+  <div class="px-5 pt-5">
+    <h1 class="text-xl font-semibold">{{ client.full_name }}</h1>
+    <p class="text-sm text-slate-500">
+      {{ client.business_type or 'Client' }}
+      {%- if client.location %} &middot; {{ client.location }}{% endif %}
+    </p>
+  </div>
+
+  {% if already_today %}
+    <div class="m-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 px-4 py-3 rounded-r">
+      <strong class="font-semibold">Already collected today.</strong>
+      A second contribution for {{ today.strftime('%d %b') }} will be refused (BR-R5).
+    </div>
+    <div class="px-5 pb-5">
+      <a href="{{ url_for('collector.client_detail', public_ref=client.public_ref) }}"
+         class="tap w-full inline-flex items-center justify-center border border-slate-300
+                rounded font-semibold hover:bg-slate-50">View susu card</a>
+    </div>
+  {% else %}
+    <form method="post"
+          action="{{ url_for('collector.collect', public_ref=client.public_ref) }}"
+          class="px-5 py-6 text-center">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <p class="text-4xl font-bold tabular-nums">{{ cycle.daily_rate }}</p>
+      <p class="text-sm text-slate-500 mt-1">{{ today.strftime('%A %d %B %Y') }}</p>
+
+      <button type="submit"
+              class="tap w-full mt-6 bg-[#1f4e5f] text-white rounded text-lg
+                     font-semibold hover:bg-[#173d4b] py-3">
+        Confirm collection
+      </button>
+
+      <details class="mt-4 text-left">
+        <summary class="text-sm text-slate-600 cursor-pointer tap inline-flex items-center">
+          Change amount
+        </summary>
+        <div class="mt-2">
+          <label for="amount" class="block text-sm font-medium mb-1">Amount in cedis</label>
+          <input id="amount" name="amount" type="text" inputmode="decimal"
+                 placeholder="{{ cycle.daily_rate.to_cedis() }}"
+                 class="tap w-full border border-slate-300 rounded px-3">
+          <p class="text-xs text-slate-500 mt-1">
+            Must be a whole multiple of the agreed daily rate (BR-R7).
+          </p>
+        </div>
+      </details>
+    </form>
+  {% endif %}
+
+  <div class="border-t border-slate-200 px-5 py-4 bg-slate-50">
+    <p class="text-xs text-slate-500 mb-2">
+      Day {{ summary.days_elapsed }} of {{ summary.days_in_cycle }} &middot;
+      cycle {{ cycle.cycle_number }}
+    </p>
+    {{ summary_table(summary) }}
+  </div>
+</div>
+{% endblock %}

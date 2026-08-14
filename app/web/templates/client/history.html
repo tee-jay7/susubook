@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My past cycles &middot; SusuBook{% endblock %}
+{% block content %}
+<a href="{{ url_for('client.my_card') }}" class="text-sm text-slate-600 hover:underline">&larr; My card</a>
+<h1 class="text-xl font-semibold mt-3 mb-4">Past cycles</h1>
+
+<div class="space-y-3">
+  {% for row in rows %}
+  <div class="bg-white rounded-lg shadow-sm p-5">
+    <div class="flex items-baseline justify-between">
+      <h2 class="font-semibold">Cycle {{ row.cycle.cycle_number }}</h2>
+      <span class="text-xs px-2 py-1 rounded bg-slate-100 text-slate-700">
+        {{ row.cycle.status.value|replace('_',' ')|title }}
+      </span>
+    </div>
+    <p class="text-xs text-slate-500">
+      {{ row.cycle.start_date.strftime('%d %b') }} to {{ row.cycle.end_date.strftime('%d %b %Y') }}
+    </p>
+    <dl class="mt-3 text-sm divide-y divide-slate-200">
+      <div class="flex justify-between py-2">
+        <dt class="text-slate-600">Days paid</dt><dd class="tabular-nums">{{ row.summary.days_paid }}</dd>
+      </div>
+      <div class="flex justify-between py-2">
+        <dt class="text-slate-600">Total saved</dt><dd class="tabular-nums">{{ row.summary.total_collected }}</dd>
+      </div>
+      {% if row.payout %}
+      <div class="flex justify-between py-2 font-bold">
+        <dt>Received</dt><dd class="tabular-nums">{{ row.payout.net_payout }}</dd>
+      </div>
+      {% endif %}
+    </dl>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-lg shadow-sm px-4 py-10 text-center text-slate-500 text-sm">
+    No cycles yet.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -58,7 +58,9 @@ class UserModel(Base):
     email: Mapped[str | None] = mapped_column(Text, unique=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     role: Mapped[str] = mapped_column(String(20), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=text("true")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -90,7 +92,9 @@ class ClientModel(Base):
     business_type: Mapped[str | None] = mapped_column(Text, nullable=True)
     location: Mapped[str | None] = mapped_column(Text, nullable=True)
     daily_rate_pesewas: Mapped[int] = mapped_column(Integer, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=text("true")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -108,7 +112,9 @@ class ContributionCycleModel(Base):
     cycle_number: Mapped[int] = mapped_column(Integer, nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
-    status: Mapped[str] = mapped_column(String(12), nullable=False, default="ACTIVE")
+    status: Mapped[str] = mapped_column(
+        String(12), nullable=False, default="ACTIVE", server_default=text("'ACTIVE'")
+    )
     # Snapshot at open: a later change to the client's rate must not
     # retroactively alter an in-flight cycle's arithmetic.
     daily_rate_pesewas: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -151,7 +157,9 @@ class ContributionModel(Base):
     reversed_by_id: Mapped[int | None] = mapped_column(
         ForeignKey("contributions.id"), nullable=True
     )
-    is_reversal: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_reversal: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
 
     __table_args__ = (
         CheckConstraint("amount_pesewas > 0", name="ck_contribution_positive"),

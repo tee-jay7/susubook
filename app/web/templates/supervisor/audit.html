@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Audit trail &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Audit trail</h1>
+<p class="text-sm text-slate-600 mb-5">{{ target_type|upper }} &middot; <span class="font-mono">{{ target_id }}</span></p>
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <ul class="divide-y divide-slate-200 text-sm">
+    {% for e in entries %}
+    <li class="px-4 py-3">
+      <div class="flex justify-between gap-3">
+        <span class="font-semibold">{{ e.action|replace('_',' ')|title }}</span>
+        <span class="text-xs text-slate-500 whitespace-nowrap">{{ e.occurred_at.strftime('%d %b %Y %H:%M') }}</span>
+      </div>
+      {% if e.detail %}<pre class="text-xs text-slate-600 mt-1 overflow-x-auto">{{ e.detail|tojson(indent=2) }}</pre>{% endif %}
+    </li>
+    {% else %}
+    <li class="px-4 py-8 text-center text-slate-500">No audit entries.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

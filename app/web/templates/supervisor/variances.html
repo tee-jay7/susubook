@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Variances &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Variances &middot; {{ today.strftime('%a %d %b') }}</h1>
+<p class="text-sm text-slate-600 mb-5">
+  What each collector recorded in the field, against the cash they declared at
+  the branch today (FR-25, FR-26). This is the answer to problem P3.
+</p>
+
+{% if outstanding %}
+<div class="mb-4 border-l-4 border-amber-500 bg-amber-50 text-amber-900 px-4 py-3 rounded-r">
+  <strong class="font-semibold">Attention:</strong>
+  {{ outstanding|length }} collector{{ 's' if outstanding|length != 1 }} unreconciled.
+</div>
+{% endif %}
+
+<div class="bg-white rounded-lg shadow-sm overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wide">
+      <tr>
+        <th class="text-left px-4 py-3">Collector</th>
+        <th class="text-right px-4 py-3">Recorded</th>
+        <th class="text-right px-4 py-3">Declared</th>
+        <th class="text-right px-4 py-3">Variance</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-200">
+      {% for row in rows %}
+      <tr class="{% if not row.is_reconciled %}bg-rose-50{% endif %}">
+        <td class="px-4 py-3 font-medium">{{ row.collector_name }}</td>
+        <td class="px-4 py-3 text-right tabular-nums">{{ row.total_recorded }}</td>
+        <td class="px-4 py-3 text-right tabular-nums">
+          {% if row.amount_declared is none %}
+            <span class="text-amber-700 text-xs font-semibold">NOT DECLARED</span>
+          {% else %}{{ row.amount_declared }}{% endif %}
+        </td>
+        <td class="px-4 py-3 text-right tabular-nums font-bold
+                   {% if not row.is_reconciled %}text-rose-700{% else %}text-emerald-700{% endif %}">
+          {% if row.is_reconciled %}&check; {% else %}&#9888; {% endif %}{{ row.variance }}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">No collectors registered.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

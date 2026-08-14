@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Matured payouts &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Matured cycles</h1>
+<p class="text-sm text-slate-600 mb-5">
+  Cycles past their end date awaiting release. The settlement is recomputed at
+  the moment of release, not taken from this screen (BR-R8, BR-R9, BR-R10).
+</p>
+
+<div class="space-y-3">
+  {% for d in due %}
+  <div class="bg-white rounded-lg shadow-sm p-5">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h2 class="font-semibold">{{ d.client.full_name }}</h2>
+        <p class="text-xs text-slate-500">
+          Cycle {{ d.cycle.cycle_number }} &middot;
+          {{ d.cycle.start_date.strftime('%d %b') }} to {{ d.cycle.end_date.strftime('%d %b %Y') }} &middot;
+          {{ d.days_paid }} day{{ 's' if d.days_paid != 1 }} paid
+        </p>
+      </div>
+    </div>
+
+    <dl class="mt-4 text-sm divide-y divide-slate-200">
+      <div class="flex justify-between py-2">
+        <dt class="text-slate-600">Total collected</dt><dd class="tabular-nums">{{ d.total_collected }}</dd>
+      </div>
+      <div class="flex justify-between py-2">
+        <dt class="text-slate-600">Commission</dt>
+        <dd class="tabular-nums text-rose-700">&minus;{{ d.commission }}</dd>
+      </div>
+      <div class="flex justify-between py-2 font-bold">
+        <dt>Net payout</dt><dd class="tabular-nums text-lg">{{ d.net_payout }}</dd>
+      </div>
+    </dl>
+
+    {% if d.net_payout.is_zero %}
+    <p class="text-xs text-amber-800 bg-amber-50 border-l-4 border-amber-500 px-3 py-2 rounded-r mt-2">
+      Total collected does not exceed one day's contribution, so the whole
+      balance is retained as commission and the client receives nothing (BR-R9).
+    </p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('supervisor.release_payout', cycle_id=d.cycle.id) }}"
+          onsubmit="return confirm('Release {{ d.net_payout }} to {{ d.client.full_name }}? This cannot be undone.');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="tap w-full mt-4 bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+        Release payout &amp; open next cycle
+      </button>
+    </form>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-lg shadow-sm px-4 py-10 text-center text-slate-500 text-sm">
+    No cycles have matured.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

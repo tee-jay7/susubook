@@ -1,0 +1,26 @@
+{# One route-sheet row. Swapped in place after a successful collection. #}
+<li id="client-{{ entry.client.public_ref }}"
+    class="flex items-center gap-3 px-4 py-3 {% if just_recorded %}bg-emerald-50{% endif %}">
+  <div class="flex-1 min-w-0">
+    <a href="{{ url_for('collector.client_detail', public_ref=entry.client.public_ref) }}"
+       class="font-medium truncate block hover:underline">{{ entry.client.full_name }}</a>
+    <p class="text-xs text-slate-500 truncate">
+      {{ entry.client.business_type or 'Client' }}
+      {%- if entry.client.location %} &middot; {{ entry.client.location }}{% endif %}
+    </p>
+  </div>
+  <span class="tabular-nums text-sm text-slate-600">{{ entry.client.daily_rate }}</span>
+  {% if entry.collected_today %}
+    <span class="text-sm font-semibold text-emerald-700 whitespace-nowrap">
+      &check; Paid{% if just_recorded %}<span class="block text-[10px] font-normal text-emerald-600">{{ just_recorded.reference }}</span>{% endif %}
+    </span>
+  {% else %}
+    <form hx-post="{{ url_for('collector.collect', public_ref=entry.client.public_ref) }}"
+          hx-target="#client-{{ entry.client.public_ref }}"
+          hx-swap="outerHTML">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="tap px-3 bg-[#1f4e5f] text-white rounded text-sm font-semibold
+                     hover:bg-[#173d4b] whitespace-nowrap">Collect</button>
+    </form>
+  {% endif %}
+</li>

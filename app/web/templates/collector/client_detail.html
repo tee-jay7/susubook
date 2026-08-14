@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "macros.html" import susu_card, summary_table %}
+{% block title %}{{ client.full_name }} &middot; SusuBook{% endblock %}
+{% block content %}
+<a href="{{ url_for('collector.route_sheet') }}" class="text-sm text-slate-600 hover:underline">&larr; Route sheet</a>
+
+<div class="bg-white rounded-lg shadow-sm mt-3 p-5">
+  <div class="flex items-start justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-semibold">{{ client.full_name }}</h1>
+      <p class="text-sm text-slate-500">
+        {{ client.business_type or 'Client' }}{% if client.location %} &middot; {{ client.location }}{% endif %}
+        &middot; {{ client.daily_rate }}/day
+      </p>
+    </div>
+    <a href="{{ url_for('collector.card', public_ref=client.public_ref) }}"
+       class="tap px-3 inline-flex items-center border border-slate-300 rounded text-sm hover:bg-slate-50">
+      QR card
+    </a>
+  </div>
+
+  <p class="text-xs text-slate-500 mt-4 mb-2">
+    Cycle {{ cycle.cycle_number }} &middot; {{ cycle.start_date.strftime('%d %b') }} to
+    {{ cycle.end_date.strftime('%d %b %Y') }} &middot; {{ cycle.status.value|replace('_',' ')|title }}
+  </p>
+  {{ susu_card(cycle, summary, today) }}
+  <div class="mt-5">{{ summary_table(summary) }}</div>
+</div>
+
+<h2 class="text-sm font-semibold mt-6 mb-2 text-slate-700">Contributions</h2>
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <ul class="divide-y divide-slate-200 text-sm">
+    {% for c in contributions %}
+    <li class="px-4 py-3 flex items-center justify-between gap-3 {% if not c.is_effective %}opacity-50{% endif %}">
+      <div class="min-w-0">
+        <p class="font-medium">
+          {{ c.contribution_date.strftime('%d %b %Y') }}
+          {% if c.is_reversal %}<span class="text-xs text-rose-700 font-semibold">REVERSAL</span>
+          {% elif not c.is_effective %}<span class="text-xs text-rose-700 font-semibold">REVERSED</span>{% endif %}
+        </p>
+        <p class="text-xs text-slate-500 font-mono">{{ c.reference }}</p>
+      </div>
+      <span class="tabular-nums font-semibold">{{ c.amount }}</span>
+    </li>
+    {% else %}
+    <li class="px-4 py-6 text-center text-slate-500">No contributions recorded yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reverse a contribution &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Reverse a contribution</h1>
+<p class="text-sm text-slate-600 mb-5">
+  Nothing is edited or deleted. A reversal is a new linked entry, and both
+  remain visible on the client's record (BR-R11). This is how an honest
+  mistake gets fixed without weakening the client's guarantee.
+</p>
+
+<form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div>
+    <label for="reference" class="block text-sm font-medium mb-1">Contribution reference</label>
+    <input id="reference" name="reference" required placeholder="SB-XXXX-XXXX"
+           class="tap w-full border border-slate-300 rounded px-3 font-mono uppercase">
+  </div>
+  <div>
+    <label for="reason" class="block text-sm font-medium mb-1">Reason</label>
+    <input id="reason" name="reason" required placeholder="Recorded against the wrong client"
+           class="tap w-full border border-slate-300 rounded px-3">
+    <p class="text-xs text-slate-500 mt-1">Stored in the audit log against both entries.</p>
+  </div>
+  <button class="tap w-full bg-rose-700 text-white rounded font-semibold hover:bg-rose-800">
+    Reverse contribution
+  </button>
+</form>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Sign in &middot; SusuBook{% endblock %}
+
+{% block content %}
+<div class="max-w-sm mx-auto">
+  <h1 class="text-2xl font-semibold mb-1">Sign in</h1>
+  <p class="text-sm text-slate-600 mb-6">
+    Clients, collectors and supervisors sign in with their phone number.
+  </p>
+
+  <form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div>
+      <label for="phone" class="block text-sm font-medium mb-1">Phone number</label>
+      <input id="phone" name="phone" type="tel" inputmode="numeric" required
+             autocomplete="username" value="{{ phone }}"
+             class="tap w-full border border-slate-300 rounded px-3 text-base
+                    focus:border-[#1f4e5f] focus:ring-1 focus:ring-[#1f4e5f]">
+    </div>
+
+    <div>
+      <label for="password" class="block text-sm font-medium mb-1">Password</label>
+      <input id="password" name="password" type="password" required
+             autocomplete="current-password"
+             class="tap w-full border border-slate-300 rounded px-3 text-base
+                    focus:border-[#1f4e5f] focus:ring-1 focus:ring-[#1f4e5f]">
+    </div>
+
+    <button type="submit"
+            class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold
+                   hover:bg-[#173d4b]">Sign in</button>
+  </form>
+</div>
+{% endblock %}

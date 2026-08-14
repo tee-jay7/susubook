@@ -1,0 +1,68 @@
+{# Shared components. #}
+
+{% macro susu_card(cycle, summary, today) %}
+  {#
+    FR-16 — the 31-box card, the digital successor to the paper one.
+
+    NFR-08: each state is distinguished by a SYMBOL and a text label, not by
+    colour alone. A collector in direct sunlight and a colour-blind client
+    fail in the same way, so one fix serves both.
+  #}
+  <div class="grid grid-cols-7 gap-1.5" role="list" aria-label="Contribution days">
+    {% for day in cycle_days(cycle) %}
+      {% set state = summary.state_of(day, today) %}
+      {% if state == 'paid' %}
+        {% set style = 'bg-emerald-600 text-white border-emerald-700' %}{% set mark = '✓' %}
+      {% elif state == 'missed' %}
+        {% set style = 'bg-white text-rose-700 border-rose-400 border-dashed' %}{% set mark = '✗' %}
+      {% else %}
+        {% set style = 'bg-slate-100 text-slate-400 border-slate-300' %}{% set mark = '·' %}
+      {% endif %}
+      <div role="listitem"
+           class="aspect-square border rounded flex flex-col items-center justify-center {{ style }}"
+           title="{{ day.strftime('%d %b %Y') }} — {{ state }}"
+           aria-label="{{ day.strftime('%d %B') }}: {{ state }}">
+        <span class="text-[10px] leading-none opacity-75">{{ day.day }}</span>
+        <span class="text-sm leading-none font-bold" aria-hidden="true">{{ mark }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="flex flex-wrap gap-4 mt-3 text-xs text-slate-600">
+    <span><span class="font-bold text-emerald-700">✓</span> paid</span>
+    <span><span class="font-bold text-rose-700">✗</span> missed</span>
+    <span><span class="font-bold text-slate-400">·</span> pending</span>
+  </div>
+{% endmacro %}
+
+
+{% macro summary_table(summary) %}
+  <dl class="divide-y divide-slate-200 text-sm">
+    <div class="flex justify-between py-2">
+      <dt class="text-slate-600">Days paid</dt>
+      <dd class="font-semibold tabular-nums">{{ summary.days_paid }} of {{ summary.days_elapsed }}</dd>
+    </div>
+    <div class="flex justify-between py-2">
+      <dt class="text-slate-600">Days missed</dt>
+      <dd class="font-semibold tabular-nums">{{ summary.days_missed }}</dd>
+    </div>
+    <div class="flex justify-between py-2">
+      <dt class="text-slate-600">Total saved</dt>
+      <dd class="font-semibold tabular-nums">{{ summary.total_collected }}</dd>
+    </div>
+    <div class="flex justify-between py-2">
+      <dt class="text-slate-600">Commission (one day)</dt>
+      <dd class="font-semibold tabular-nums text-rose-700">&minus;{{ summary.commission }}</dd>
+    </div>
+    <div class="flex justify-between py-3 bg-slate-50 -mx-4 px-4">
+      <dt class="font-semibold">You will receive</dt>
+      <dd class="font-bold text-lg tabular-nums">{{ summary.projected_payout }}</dd>
+    </div>
+  </dl>
+{% endmacro %}
+
+
+{% macro money_cell(amount, emphasise=false) %}
+  <span class="tabular-nums {% if emphasise %}font-bold{% endif %}
+    {% if amount.is_negative %}text-rose-700{% endif %}">{{ amount }}</span>
+{% endmacro %}

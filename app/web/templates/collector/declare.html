@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Declare remittance &middot; SusuBook{% endblock %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-1">Declare remittance</h1>
+<p class="text-sm text-slate-600 mb-5">
+  Enter the cash you banked at the branch today. The system compares it with
+  what you recorded in the field (FR-25).
+</p>
+
+<div class="bg-white rounded-lg shadow-sm p-5 mb-4">
+  <div class="flex justify-between py-1 text-sm">
+    <span class="text-slate-600">Recorded in the field today</span>
+    <span class="tabular-nums font-semibold">{{ position.total_recorded }}</span>
+  </div>
+  {% if position.amount_declared is not none %}
+  <div class="flex justify-between py-1 text-sm border-t border-slate-200 mt-2 pt-2">
+    <span class="text-slate-600">Already declared</span>
+    <span class="tabular-nums font-semibold">{{ position.amount_declared }}</span>
+  </div>
+  <div class="flex justify-between py-1 text-sm">
+    <span class="text-slate-600">Variance</span>
+    <span class="tabular-nums font-bold {% if not position.variance.is_zero %}text-rose-700{% endif %}">
+      {{ position.variance }}
+    </span>
+  </div>
+  {% endif %}
+</div>
+
+<form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div>
+    <label for="amount" class="block text-sm font-medium mb-1">Cash banked (GHS)</label>
+    <input id="amount" name="amount" type="text" inputmode="decimal" required
+           class="tap w-full border border-slate-300 rounded px-3">
+  </div>
+  <button class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+    Declare
+  </button>
+</form>
+{% endblock %}

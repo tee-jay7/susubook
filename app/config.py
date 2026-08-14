@@ -22,7 +22,7 @@ class Config:
     DATABASE_URL: str = field(
         default_factory=lambda: os.environ.get(
             "DATABASE_URL",
-            "postgresql+psycopg://susubook:susubook_dev@localhost:5433/susubook",
+            "postgresql+psycopg://susubook:susubook_dev@localhost:5434/susubook",
         )
     )
     BASE_URL: str = field(

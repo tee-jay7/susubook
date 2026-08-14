@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Today's route &middot; SusuBook{% endblock %}
+
+{% block content %}
+<div class="flex items-baseline justify-between mb-4">
+  <h1 class="text-xl font-semibold">Today &middot; {{ today.strftime('%a %d %b') }}</h1>
+  <span class="text-sm text-slate-600 tabular-nums">
+    Recorded {{ position.total_recorded }}
+  </span>
+</div>
+
+{#
+  FR-40 — the QR path. The card's code is read by the phone's own camera
+  application, which opens /c/<ref> directly. No in-app scanner, no camera
+  API, no JavaScript QR library (CR-001).
+#}
+<div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+  <p class="text-sm text-slate-700">
+    <strong>Scan a client's susu card</strong> with your phone camera to collect in
+    two taps. No card? Use the list below.
+  </p>
+</div>
+
+<div id="collect-errors" class="mb-4"></div>
+
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <ul class="divide-y divide-slate-200"
+      hx-target-422="#collect-errors">
+    {% for entry in entries %}
+      {% include "partials/route_row.html" %}
+    {% else %}
+      <li class="px-4 py-8 text-center text-slate-500 text-sm">
+        No clients yet.
+        <a class="text-[#1f4e5f] underline" href="{{ url_for('collector.enrol') }}">Enrol your first client</a>.
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% if entries %}
+<div class="mt-4 bg-white rounded-lg shadow-sm p-4">
+  <div class="flex items-center justify-between text-sm">
+    <span class="text-slate-600">Cash declared today</span>
+    <span class="tabular-nums font-semibold">
+      {% if position.amount_declared is none %}
+        <span class="text-amber-700">Not declared</span>
+      {% else %}
+        {{ position.amount_declared }}
+      {% endif %}
+    </span>
+  </div>
+  <a href="{{ url_for('collector.declare') }}"
+     class="tap mt-3 w-full inline-flex items-center justify-center border
+            border-[#1f4e5f] text-[#1f4e5f] rounded font-semibold
+            hover:bg-slate-50">Declare remittance</a>
+</div>
+{% endif %}
+
+<script>
+  // HTMX puts a 422 response body nowhere by default; route rule violations
+  // (duplicate collection, closed cycle) into the error banner instead.
+  document.body.addEventListener('htmx:responseError', function (event) {
+    if (event.detail.xhr.status === 422) {
+      document.getElementById('collect-errors').innerHTML = event.detail.xhr.responseText;
+      event.detail.shouldSwap = false;
+    }
+  });
+</script>
+{% endblock %}

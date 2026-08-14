@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} &middot; SusuBook{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow-sm p-6 text-center">
+  <p class="text-4xl font-bold text-slate-300">{{ code }}</p>
+  <p class="mt-2 text-slate-700">{{ message }}</p>
+  <a href="/" class="tap inline-flex items-center justify-center mt-5 px-4
+     bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">Back to start</a>
+</div>
+{% endblock %}

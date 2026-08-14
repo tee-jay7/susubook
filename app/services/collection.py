@@ -351,6 +351,14 @@ class CollectionService:
             for c in clients
         ]
 
+    def today(self) -> date:
+        """The service's notion of the current date.
+
+        Exposed so callers need not reach for the injected clock directly, and
+        so tests that advance the calendar stay consistent with the views.
+        """
+        return self._clock()
+
     # -- FR-16, FR-17 susu card ------------------------------------------
 
     def card_for(self, cycle: ContributionCycle) -> tuple[CycleSummary, list[Contribution]]:

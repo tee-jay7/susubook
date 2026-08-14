@@ -1,0 +1,5 @@
+{# Returned with 422 to an HTMX request so the collector sees why the
+   contribution was refused without losing their place on the route sheet. #}
+<div class="border-l-4 border-rose-500 bg-rose-50 text-rose-900 px-4 py-3 rounded-r" role="alert">
+  <strong class="font-semibold">Not recorded:</strong> {{ message }}
+</div>

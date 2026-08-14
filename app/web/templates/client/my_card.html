@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "macros.html" import susu_card, summary_table %}
+{% block title %}My susu card &middot; SusuBook{% endblock %}
+{% block content %}
+{#
+  UC-08 — the answer to problem P1.
+
+  This is the client's own view, reached through their own login. Every row
+  names the collector who recorded it and the time it was recorded. This is
+  the independent record the paper card cannot provide, and it is the reason
+  the system exists (BR-02).
+#}
+<div class="bg-white rounded-lg shadow-sm p-5">
+  <div class="flex items-baseline justify-between">
+    <h1 class="text-xl font-semibold">My susu card</h1>
+    <span class="text-sm text-slate-500">Cycle {{ cycle.cycle_number }}</span>
+  </div>
+  <p class="text-sm text-slate-500 mb-4">
+    {{ cycle.start_date.strftime('%d %b') }} to {{ cycle.end_date.strftime('%d %b %Y') }}
+    &middot; {{ cycle.daily_rate }} per day
+  </p>
+
+  {{ susu_card(cycle, summary, today) }}
+  <div class="mt-5">{{ summary_table(summary) }}</div>
+
+  <p class="text-xs text-slate-500 mt-4">
+    Matures {{ cycle.end_date.strftime('%d %B %Y') }}.
+    The commission is one day's contribution, as agreed with your collector.
+  </p>
+</div>
+
+<h2 class="text-sm font-semibold mt-6 mb-2 text-slate-700">Every payment recorded against me</h2>
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+  <ul class="divide-y divide-slate-200 text-sm">
+    {% for c in contributions %}
+    <li class="px-4 py-3 {% if not c.is_effective %}opacity-50{% endif %}">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="font-medium">
+            {{ c.contribution_date.strftime('%d %b %Y') }}
+            {% if c.is_reversal %}<span class="text-xs text-rose-700 font-semibold">REVERSAL</span>
+            {% elif not c.is_effective %}<span class="text-xs text-rose-700 font-semibold">REVERSED</span>{% endif %}
+          </p>
+          <p class="text-xs text-slate-500">
+            Recorded {{ c.recorded_at.strftime('%H:%M') if c.recorded_at else '' }}
+            by {{ collectors.get(c.recorded_by_id).full_name if collectors.get(c.recorded_by_id) else 'unknown' }}
+          </p>
+          <p class="text-xs text-slate-400 font-mono">{{ c.reference }}</p>
+        </div>
+        <span class="tabular-nums font-semibold">{{ c.amount }}</span>
+      </div>
+    </li>
+    {% else %}
+    <li class="px-4 py-8 text-center text-slate-500">
+      No payments recorded yet this cycle.
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<a href="{{ url_for('client.history') }}"
+   class="tap mt-4 w-full inline-flex items-center justify-center border border-slate-300
+          rounded font-semibold hover:bg-white">Past cycles</a>
+{% endblock %}

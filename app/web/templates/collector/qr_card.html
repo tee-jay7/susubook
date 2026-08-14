@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Susu card &middot; {{ client.full_name }}{% endblock %}
+{% block content %}
+<a href="{{ url_for('collector.client_detail', public_ref=client.public_ref) }}"
+   class="text-sm text-slate-600 hover:underline print:hidden">&larr; Back</a>
+
+<p class="text-sm text-slate-600 my-3 print:hidden">
+  Print this and give it to the client. Scanning it with a phone camera opens
+  their collection screen. The code carries only an opaque reference &mdash; no
+  name, phone, balance or rate &mdash; so a photographed card discloses nothing
+  and grants nothing (BR-R14, BR-R15).
+</p>
+
+<div class="bg-white rounded-lg shadow-sm p-6 text-center max-w-xs mx-auto border-2 border-dashed border-slate-300">
+  <p class="text-xs uppercase tracking-widest text-slate-500">SusuBook</p>
+  <h1 class="text-lg font-bold mt-1">{{ client.full_name }}</h1>
+  <p class="text-sm text-slate-600">{{ client.daily_rate }} per day</p>
+  <div class="my-4 flex justify-center">{{ qr|safe }}</div>
+  <p class="text-[10px] text-slate-400 font-mono break-all">{{ client.public_ref }}</p>
+</div>
+
+<button onclick="window.print()"
+        class="tap mt-5 w-full max-w-xs mx-auto flex items-center justify-center
+               bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b] print:hidden">
+  Print card
+</button>
+{% endblock %}
