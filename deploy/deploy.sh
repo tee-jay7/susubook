@@ -134,7 +134,7 @@ deploy_service() {
   url="$(gcloud run services describe "$SERVICE" --region "$REGION" \
         --project "$PROJECT_ID" --format='value(status.url)')"
   green "\nLive at: ${url}"
-  green "Health:  ${url}/healthz"
+  green "Health:  ${url}/health"
 }
 
 # Admin tasks run as Cloud Run Jobs from the same image, inside the same VPC.

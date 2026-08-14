@@ -103,9 +103,16 @@ def create_app(
 
     # -- operational endpoints --------------------------------------------
 
-    @app.get("/healthz")
-    def healthz():
+    @app.get("/health")
+    def health():
         """Liveness and database reachability.
+
+        Mounted at /health, not /healthz: Google Front End intercepts /healthz
+        on Cloud Run and answers it with its own 404 before the request reaches
+        the container. Verified empirically — the identical image serves
+        /healthz correctly when run locally, and requests to it never appear in
+        Cloud Run's request log at all. /health and every other candidate path
+        pass through untouched.
 
         Unauthenticated by necessity — a probe cannot log in — so it returns
         only a status, never a version, hostname or error detail that would help

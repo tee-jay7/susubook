@@ -600,7 +600,7 @@ class TestOperational:
 
     def test_health_endpoint_is_public_and_reports_database(self, client, db):
         """Cloud Run probes cannot authenticate, so this must be open."""
-        response = client.get("/healthz")
+        response = client.get("/health")
         assert response.status_code == 200
         assert response.json == {"status": "ok", "database": "ok"}
 
@@ -608,6 +608,6 @@ class TestOperational:
         self, client, db
     ):
         """Open by necessity, so it must not leak version, host or error text."""
-        body = client.get("/healthz").data.decode().lower()
+        body = client.get("/health").data.decode().lower()
         for leak in ("postgres", "flask", "python", "traceback", "10.128", "version"):
             assert leak not in body, f"health endpoint leaked '{leak}'"

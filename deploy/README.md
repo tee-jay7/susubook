@@ -54,25 +54,31 @@ worker and instances at 4, bounding the system at well under the server's limit.
 
 ## Secrets
 
-Created once, by hand, so credentials never enter the repository or a transcript:
+Only the **password** is a secret. Host, port, database and role are ordinary
+configuration and are passed as environment variables, so Secret Manager holds
+exactly one value that needs protecting and the rest stays legible in the
+service definition.
 
 ```bash
-printf 'postgresql+psycopg://susu_app:PASSWORD@10.128.0.6:5432/susu_book' | \
-  gcloud secrets create susubook-database-url --data-file=- --project=PROJECT_ID
-
-python3 -c "import secrets; print(secrets.token_hex(32))" | \
-  gcloud secrets create susubook-secret-key --data-file=- --project=PROJECT_ID
+# The database password — created by hand, so the value never enters the
+# repository, a config file, or a terminal transcript.
+printf 'YOUR_PASSWORD' | gcloud secrets create susu-db-password --data-file=-
 ```
 
-`+psycopg` selects psycopg 3. Plain `postgresql://` makes SQLAlchemy look for
-psycopg2, which is not installed.
+`./deploy/deploy.sh setup` generates the session signing key
+(`susubook-secret-key`) if it does not already exist, and grants the Cloud Run
+runtime service account `secretAccessor` on both.
+
+The application composes the connection URL from these parts at startup
+(`app/config.py::resolve_database_url`), percent-encoding the password so that
+a `@`, `:`, `/`, `#` or `?` in it cannot corrupt the URL.
 
 ## Deploy
 
-```bash
-export PROJECT_ID=your-project-id
+The project defaults to the gcloud CLI's configured project.
 
-./deploy/deploy.sh setup      # once: enable APIs, create registry, grant secret access
+```bash
+./deploy/deploy.sh setup      # once: APIs, registry, signing key, secret IAM
 ./deploy/deploy.sh deploy     # build image, deploy service
 ./deploy/deploy.sh db-init    # create schema  (TD-01: no migrations)
 ./deploy/deploy.sh seed       # load demo accounts and data
@@ -85,12 +91,25 @@ short git SHA, so a deployed revision is traceable to a commit.
 ## Verify
 
 ```bash
-curl -s "$(./deploy/deploy.sh url)/healthz"
+curl -s "$(./deploy/deploy.sh url)/health"
 # {"database":"ok","status":"ok"}
 ```
 
-`/healthz` reports database reachability and is unauthenticated — a probe cannot
+`/health` reports database reachability and is unauthenticated — a probe cannot
 log in. It returns a status only: no version, hostname or error detail.
+
+> **Why `/health` and not `/healthz`.** The conventional Kubernetes-style path
+> does not work on Cloud Run: **Google Front End intercepts `/healthz` and
+> answers it with its own 404 before the request reaches the container.**
+>
+> This was established empirically, because the symptom is misleading — the
+> route is registered, the container serves it correctly, and the application
+> looks broken. Three observations identified it: the identical image returns
+> `200` for `/healthz` when run locally; requests to `/healthz` never appear in
+> Cloud Run's request log at all, while `/nope` does; and of eleven candidate
+> paths tested through the deployed service, `/healthz` was the *only* one
+> intercepted. `/health`, `/livez`, `/readyz`, `/status`, `/ping` and the rest
+> all reach the application.
 
 ## Operational characteristics
 
