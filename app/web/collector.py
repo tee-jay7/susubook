@@ -169,10 +169,25 @@ def card(public_ref: UUID):
 
 
 def _assert_on_route(client) -> None:
-    """FR-05 / BR-R15 — the reference identifies, it does not authorise."""
+    """FR-05 / BR-R15 — the reference identifies, it does not authorise.
+
+    A denial is audited here as well as in the service layer. Someone
+    presenting a client reference they should not hold is exactly the signal a
+    supervisor needs, and it arrives on the GET — before any write is
+    attempted — so auditing only the write path would miss it entirely.
+    """
     user = current_user()
     if user.is_supervisor or client.is_collected_by(user.id):
         return
+
+    g.services.audit.append(
+        actor_id=user.id,
+        action="AUTHORISATION_DENIED",
+        target_type="CLIENT",
+        target_id=str(client.public_ref),
+        detail={"attempted": request.endpoint},
+    )
+    g.db.commit()
     raise NotAuthorised("This client is not on your route.")
 
 
