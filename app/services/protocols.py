@@ -1,0 +1,103 @@
+"""Repository contracts — layer 2 (Application).
+
+Deliberately several narrow Protocols rather than one wide `DataAccess`
+(Interface Segregation). PayoutService depends only on what it uses, so a
+change to contribution queries cannot break it.
+
+Services depend on these abstractions; the application factory injects
+concrete SQLAlchemy implementations, and the test suite injects in-memory
+fakes (Dependency Inversion). That substitution is why service tests need no
+database.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+from typing import Protocol
+from uuid import UUID
+
+from app.domain.entities import (
+    Client,
+    Contribution,
+    ContributionCycle,
+    DailyVariance,
+    Payout,
+    RemittanceDeclaration,
+    User,
+)
+from app.domain.money import Money
+
+
+class UserRepository(Protocol):
+    def get_by_id(self, user_id: int) -> User | None: ...
+    def find_credentials(self, phone: str) -> tuple[User, str] | None:
+        """Return (user, password_hash) or None.
+
+        The hash is returned alongside rather than on the User entity: the
+        domain layer has no business knowing how credentials are stored.
+        """
+        ...
+
+    def add(self, user: User, password_hash: str) -> User: ...
+    def list_collectors(self) -> list[User]: ...
+
+
+class ClientRepository(Protocol):
+    def get_by_id(self, client_id: int) -> Client | None: ...
+    def get_by_public_ref(self, public_ref: UUID) -> Client | None: ...
+    def get_by_user_id(self, user_id: int) -> Client | None: ...
+    def list_for_collector(self, collector_id: int) -> list[Client]: ...
+    def add(self, client: Client) -> Client: ...
+
+
+class CycleRepository(Protocol):
+    def get_by_id(self, cycle_id: int) -> ContributionCycle | None: ...
+    def active_for_client(self, client_id: int) -> ContributionCycle | None: ...
+    def list_for_client(self, client_id: int) -> list[ContributionCycle]: ...
+    def list_due_for_payout(self, today: date) -> list[tuple[ContributionCycle, Client]]: ...
+    def add(self, cycle: ContributionCycle) -> ContributionCycle: ...
+    def set_status(self, cycle_id: int, status: str) -> None: ...
+
+
+class ContributionRepository(Protocol):
+    def list_for_cycle(self, cycle_id: int) -> list[Contribution]: ...
+    def get_by_reference(self, reference: str) -> Contribution | None: ...
+    def add(self, contribution: Contribution) -> Contribution: ...
+    def mark_reversed(self, contribution_id: int, reversal_id: int) -> None: ...
+    def total_recorded_by(self, collector_id: int, on: date) -> Money: ...
+    def collected_dates_for_collector(self, collector_id: int, on: date) -> set[int]:
+        """Client ids this collector has already recorded against on `on`."""
+        ...
+
+
+class PayoutRepository(Protocol):
+    def get_for_cycle(self, cycle_id: int) -> Payout | None: ...
+    def add(self, payout: Payout) -> Payout: ...
+
+
+class RemittanceRepository(Protocol):
+    def get(self, collector_id: int, on: date) -> RemittanceDeclaration | None: ...
+    def save(self, declaration: RemittanceDeclaration) -> RemittanceDeclaration: ...
+    def variances_for(self, on: date) -> list[DailyVariance]: ...
+
+
+class AuditRepository(Protocol):
+    def append(
+        self,
+        *,
+        actor_id: int | None,
+        action: str,
+        target_type: str,
+        target_id: str | None = None,
+        detail: dict | None = None,
+    ) -> None: ...
+
+    def list_for_target(self, target_type: str, target_id: str) -> list[dict]: ...
+
+
+class UnitOfWork(Protocol):
+    """Transaction boundary. Services commit once, at the end of a use case."""
+
+    def commit(self) -> None: ...
+    def rollback(self) -> None: ...
+    def flush(self) -> None: ...
