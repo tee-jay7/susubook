@@ -55,6 +55,10 @@ def history():
     """Every cycle this client has completed."""
     client = _my_client()
     cycles = g.services.cycles.list_for_client(client.id)
+
+    # FIXME(TD-16): N+1 — two queries per cycle below. Bounded by how many
+    #   cycles a client has completed (12 after a year), so it degrades slowly,
+    #   but it is the same defect as the route sheet and should be fixed with it.
     rows = []
     for cycle in cycles:
         summary, _ = g.services.collection.card_for(cycle)

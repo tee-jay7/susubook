@@ -342,6 +342,11 @@ class CollectionService:
         on = on or self._clock()
         clients = self._clients.list_for_collector(collector_id)
         collected = self._contributions.collected_dates_for_collector(collector_id, on)
+
+        # FIXME(TD-16): N+1 — active_for_client is queried once per client
+        #   below. Fine at 20-50 clients per route, but it grows linearly and
+        #   this is the collector's most-loaded screen (NFR-01). Replace with a
+        #   single join returning clients and their active cycles together.
         return [
             RouteEntry(
                 client=c,

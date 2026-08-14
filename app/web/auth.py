@@ -43,6 +43,13 @@ def login():
     return render_template("login.html", phone="")
 
 
+# TODO(TD-15): there is no password reset and no forced change at first login.
+#   The collector sets the client's initial password at enrolment and therefore
+#   knows it — which undercuts the independence of the client's record, the
+#   property this whole system exists to establish. Ranked Critical alongside
+#   TD-14 in docs/08-technical-debt.md for that reason, not for convenience.
+
+
 @bp.route("/logout", methods=["POST"])
 def logout():
     log_out()

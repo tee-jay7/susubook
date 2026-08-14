@@ -38,6 +38,13 @@ class AuthService:
         A failed attempt is audited (NFR-09) but the caller is told only that
         authentication failed — never whether the phone number exists, which
         would let an attacker enumerate accounts.
+
+        FIXME(TD-14): no rate limiting, no account lockout, no backoff. Every
+          failure is audited, so an attack is *visible* after the fact, but
+          nothing *stops* one. Argon2id makes each guess expensive, which
+          raises the cost of an online attack but does not bound it. On a
+          system holding savings records this is the most serious outstanding
+          debt — see docs/08-technical-debt.md, classified Critical.
         """
         found = self._users.find_credentials(phone.strip())
 
