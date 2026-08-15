@@ -1,6 +1,6 @@
 # 12. Deployment
 
-> Examination document §13. The live application, how it is deployed, and how it
+> Covers section 13 of the examination's required document structure: the live application, how it is deployed, and how it
 > actually performs: measured, not asserted.
 
 ---
@@ -49,7 +49,7 @@ connection to it.
 **Cloud Run over a free PaaS.** Both scale to zero. The difference is what
 happens on the first request afterwards: a suspended free-tier PaaS instance can
 take around 50 seconds to wake, which an examiner would reasonably read as a
-dead link. Cloud Run's measured cold start here is **3.3 seconds** (§12.6). Under
+dead link. Cloud Run's measured cold start here is **3.3 seconds** (Section 12.6). Under
 examination Rule 8, the deployment must remain accessible for grading, that
 difference is the whole argument.
 
@@ -150,7 +150,7 @@ Median of seven requests from a residential connection to `us-central1`.
 , a seventy-fold difference, yet their timings are within 8 ms of each other.
 The application is not the constraint. Roughly **0.31 s is consumed before the
 request is even sent**, on TCP and TLS handshakes; that is pure geography, and
-the same code measured 2–12 ms of server work when run locally (§9.6).
+the same code measured 2–12 ms of server work when run locally (Section 9.6).
 
 **Cold start: 3.3 seconds**, measured on the first request after the service had
 been idle following a deployment. Subsequent requests are ~0.6 s. Setting

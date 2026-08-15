@@ -1,8 +1,8 @@
 # 9. Testing and Quality Assurance
 
-> Examination Part A §8. Test cases are recorded as
+> Required by the examination paper, Part A, section 8. Test cases are recorded as
 > **Test case → Expected result → Actual result → Pass/fail**, with a defect
-> log and corrective actions in §9.8.
+> log and corrective actions in Section 9.8.
 
 ---
 
@@ -324,7 +324,7 @@ register rather than presented as satisfied:
   database permission. Classified **Critical**.
 
 No penetration testing or automated dependency vulnerability scanning was
-performed; both are named as gaps in §9.10.
+performed; both are named as gaps in Section 9.10.
 
 ## 9.6 Performance testing (NFR-01)
 
@@ -351,7 +351,7 @@ the route sheet's N+1 (**TD-16**) grows with route size. Neither is a problem at
 demonstration scale and both are recorded.
 
 **Not performed:** load testing, concurrency testing, testing against a real 3G
-connection or a real low-end Android device. Named as gaps in §9.10.
+connection or a real low-end Android device. Named as gaps in Section 9.10.
 
 ## 9.7 Requirements verification
 
@@ -417,7 +417,7 @@ could not have been found by them, because every test asserted the *response* to
 a collect request and none asserted the *state of the page afterwards*. The
 suite verified that the correct row was returned; the inconsistency in the total
 above it was observable only to a person. This provides direct evidence for the
-value of the user acceptance testing recorded as outstanding at §9.9: automated
+value of the user acceptance testing recorded as outstanding at Section 9.9: automated
 tests confirm the behaviour the developer thought to specify, whereas a user
 encounters behaviour the developer did not anticipate.
 
@@ -464,7 +464,7 @@ Recorded so the coverage claim is not overstated:
 
 | Gap | Consequence | Why |
 |---|---|---|
-| No UAT with an independent participant | NFR-02 unverified; usability findings unknown | No participant available within the window (§9.9) |
+| No UAT with an independent participant | NFR-02 unverified; usability findings unknown | No participant available within the window (Section 9.9) |
 | No real-device or real-network testing | NFR-01 unverified end-to-end; NFR-08 outdoor legibility unverified | No 3G connection or low-end Android available |
 | No load or concurrency testing | Behaviour under simultaneous collectors unknown | Out of scope for the window |
 | **No SMS delivered to a real handset** | FR-31 verified in mechanism only; the gateway's actual behaviour is untested | Recipients are restricted to an allowlist, and no allowlisted handset was available |

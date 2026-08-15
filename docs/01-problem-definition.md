@@ -118,7 +118,7 @@ remitted.
 SusuBook digitises the **record of collection**, not the movement of money. Contributions
 remain physical cash handed to the collector; the system records that event, computes its
 consequences and makes it visible to all parties. Mobile money and bank payment
-integration are deliberately excluded: see Appendix A for the reasoning, and §11 for their treatment as future evolution.
+integration are deliberately excluded: see Appendix A for the reasoning, and Section 11 for their treatment as future evolution.
 
 ---
 
@@ -138,5 +138,5 @@ savings sector, for example from the Bank of Ghana or the Ghana Statistical
 Service. No such source was consulted, and none is cited, because citing a source
 that was not consulted would be worse than stating the limitation.
 
-This constraint is recorded again at §17.1, alongside the absence of primary
+This constraint is recorded again at Section 17.1 (Requirements and validation), alongside the absence of primary
 stakeholder elicitation, which arises from the same cause.

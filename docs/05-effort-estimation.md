@@ -160,7 +160,7 @@ AFP = UFP × VAF = 188 × 1.10 = 206.8 ≈ 207 FP
 
 ### 4.2.4 Count B: Must-have scope only (28 functional requirements)
 
-Removing the Should/Could/Won't items from §3.6:
+Removing the Should/Could/Won't items from Section 3.6 (Prioritisation (MoSCoW)):
 
 | Component | Removed | Subtotal |
 |---|---|---|
@@ -196,7 +196,7 @@ revision recorded separately, so the effect of the change remains visible.
 | UFP (full scope) | 188 | 196 |
 | AFP (full scope) | 207 | 216 |
 
-All figures in §4.3 below are computed on the **post-CR-001** counts.
+All figures in Section 4.3 below are computed on the **post-CR-001** counts.
 
 ---
 
@@ -212,7 +212,7 @@ Function points are converted to KLOC using a language productivity figure.
 > **Assumption AS-01:** 30 source lines of code per function point, for Python with an
 > ORM and server-side templating. The figure was adopted at estimation time as a
 > plausible value for the language class, **without a specific published source**. The
-> two standard gearing-factor tables were consulted afterwards, and §4.3.4 records what
+> two standard gearing-factor tables were consulted afterwards, and Section 4.3.4 records what
 > they give and how far apart they are.
 
 **The published figures for this language class disagree substantially.** Jones's
@@ -277,7 +277,7 @@ themselves, with the value this project actually measured included for compariso
 | Basis | Source | LOC/FP | KLOC | Effort (PM) | Person-hours |
 |---|---|---|---|---|---|
 | Perl, median | QSM 5.0 [27] | 15.00 | 2.49 | 6.25 | 951 |
-| **Measured, this project** | §4.8.1 | **20.70** | **3.44** | **8.77** | **1,333** |
+| **Measured, this project** | Section 4.8.1 | **20.70** | **3.44** | **8.77** | **1,333** |
 | Perl, average | QSM 5.0 [27] | 24.00 | 3.98 | 10.25 | 1,557 |
 | **Adopted (AS-01)** | none recorded | **30.00** | **4.98** | **12.95** | **1,969** |
 | Perl | Jones 2017 [22] | 35.56 | 5.90 | 15.48 | 2,353 |
@@ -285,16 +285,16 @@ themselves, with the value this project actually measured included for compariso
 
 Two observations follow.
 
-**The conclusion of §4.4 is robust across the whole published range.** Even at the
+**The conclusion of Section 4.4 is robust across the whole published range.** Even at the
 lowest figure any source supports, the estimate is 951 person-hours against a 48-hour
 window. The gap is of the same order at every point in the table, so the scope decision
-at §4.6 does not depend on resolving which source is right.
+at Section 4.6 does not depend on resolving which source is right.
 
 **The individual number is not robust at all.** Between the lowest and highest published
 basis the effort estimate varies by a factor of 3.8, from 6.25 to 23.69 person-months.
 Any single figure quoted from this method carries that uncertainty whether or not it is
 stated. This is the strongest practical argument in this document for the triangulation
-recommended in Session 6 [6]: the PERT estimate at §4.5 does not depend on a gearing
+recommended in Session 6 [6]: the PERT estimate at Section 4.5 does not depend on a gearing
 factor at all, which is why it, and not COCOMO, was used to set the plan.
 
 ### 4.3.5 Full-scope comparison
@@ -389,7 +389,7 @@ with a stated basis. That is the reason it is retained rather than discarded.
 incomplete in the **0.5× – 2× band**. Applied to 25.4 h, the honest interval is
 **12.7 – 50.7 hours**. The upper bound consumes the entire examination window on
 implementation alone, leaving nothing for testing, deployment or documentation — 30 of
-the 50 marks. This finding drives the scope decision recorded at §4.6.
+the 50 marks. This finding drives the scope decision recorded at Section 4.6.
 
 ---
 
@@ -430,7 +430,7 @@ Change request CR-001 subsequently added QR-based client identification (FR-39, 
 could have been manufactured to land the arithmetic on exactly 20.0. That was rejected:
 Session 6 identifies external schedule pressure as a recognised source of estimate
 distortion, and revising an estimate to fit a predetermined budget *is* that distortion.
-The overrun is carried openly and tracked against actuals in §4.8.
+The overrun is carried openly and tracked against actuals in Section 4.8.
 
 It is contained by priority rather than by arithmetic. FR-39 and FR-40 are **Should**, so
 if Phase 3 runs behind, task 17 is the first work abandoned and no Must requirement is
@@ -446,7 +446,7 @@ scoping decision.
 entry on Fowler's technical debt quadrant, taken knowingly, for a stated reason, with an
 intended repayment. Each one carries forward into the debt register in
 Section 8 (Technical Debt) with its cause, impact, priority and proposed resolution, and into
-the repayment plan at §11.6. The estimation did not merely predict
+the repayment plan at Section 11.6 (Technical debt repayment plan). The estimation did not merely predict
 the work; it generated the debt register.
 
 ---
@@ -457,10 +457,10 @@ the work; it generated the debt register.
 
 | ID | Assumption |
 |---|---|
-| AS-01 | 30 LOC per function point for Python with ORM and templating (sensitivity tested, §4.3.4). |
+| AS-01 | 30 LOC per function point for Python with ORM and templating (sensitivity tested, Section 4.3.4). |
 | AS-02 | Organic COCOMO mode applies, small system, familiar technology, no hardware constraints. |
 | AS-03 | 152 hours per person-month (COCOMO standard). |
-| AS-04 | Requirements remain stable through the window; the change control process of §3.8 governs any deviation. |
+| AS-04 | Requirements remain stable through the window; the change control process of Section 3.8 (Change management) governs any deviation. |
 | AS-05 | Development environment, Docker and deployment accounts are working and not counted as project effort. |
 | AS-06 | The developer sustains productive work across the window; sleep and breaks are outside the 20-hour implementation allocation, not inside it. |
 
@@ -479,7 +479,7 @@ the work; it generated the debt register.
 
 Session 6's closing best practice is to record actuals and review accuracy
 afterwards. Two elements can be closed out: the **size** estimate, precisely, and
-the **effort** estimate, which cannot, for reasons set out in §4.9, because
+the **effort** estimate, which cannot, for reasons set out in Section 4.9, because
 knowing when data does not support a conclusion is part of the practice.
 
 ### 4.8.1 Size: closed
@@ -496,11 +496,11 @@ MRE = |3.43 − 4.98| / 3.43 = 0.45
 ```
 
 Measured over 3,433 non-blank, non-comment lines of application code
-(§10.2).
+(Section 10.2).
 
 **Assumption AS-01 was wrong, and in a specific direction.** The adopted figure of
 30 LOC per function point had no recorded source; actual productivity was **20.7**.
-Measured against the sources consulted afterwards (§4.3.4), the actual sits below
+Measured against the sources consulted afterwards (Section 4.3.4), the actual sits below
 QSM's Perl average of 24 [27] and far below Jones's Python figure of 53.33 [22]. Two causes are consistent with the delivered code: modern frameworks
 supply as configuration what those averages assume is hand-written (routing,
 sessions, ORM persistence, CSRF, templating), and some function points produce
@@ -511,7 +511,7 @@ The sensitivity analysis anticipated this *class* of error but under-bounded it,
 setting the range at 25–40. Derived from measurement rather than published
 tables, it would have started lower.
 
-**The conclusion of §4.4 is unaffected.** Even at actual size, COCOMO puts the
+**The conclusion of Section 4.4 is unaffected.** Even at actual size, COCOMO puts the
 system at 8.76 person-months: over 1,300 person-hours against a 48-hour window.
 The gap narrows and remains of the same order.
 
@@ -552,7 +552,7 @@ magnitude:
 75% of the time actually spent.** Implementation was allocated 42% and consumed
 11%.
 
-This inverts the assumption the whole estimate was built on. §4.5 spent seventeen
+This inverts the assumption the whole estimate was built on. Section 4.5 spent seventeen
 WBS tasks decomposing implementation and treated testing and deployment as
 comparatively minor. The reverse held:
 
@@ -565,7 +565,7 @@ comparatively minor. The reverse held:
   assumptions rather than in the code.
 
 **This is the most useful output of the estimation process.** The magnitude comparison
-is contaminated (§4.9); the distribution is not, because both figures come from
+is contaminated (Section 4.9); the distribution is not, because both figures come from
 the same project. The corrective action for a future estimate is specific: shift
 weight out of implementation and into deployment and testing, and decompose
 deployment into a WBS rather than treating it as a single 4-hour block.
@@ -599,7 +599,7 @@ rather than measured.
 | 15 UI & HTMX | 2.08 | | | |
 | 16 Seed data | 0.54 | | | |
 | 17 QR issuance & scan *(CR-001)* | 0.92 | — | — | Not separable |
-| **Total** | **25.4** | — | — | See §4.8.2 for phase-level actuals |
+| **Total** | **25.4** | — | — | See Section 4.8.2 for phase-level actuals |
 
 ---
 
@@ -611,42 +611,42 @@ Three qualifications, so the figures are not read as more than they are.
 infrastructure setup, container builds, deploy waits and review. The 2.48 hours
 against Phase 5 covers a period in which much of the work was cloud
 configuration, which AS-05 excludes from project effort by definition. The
-distribution finding in §4.8.3 survives this, because the same measure is applied
+distribution finding in Section 4.8.3 survives this, because the same measure is applied
 to every phase; the absolute total does not.
 
 **No instrument was in place.** Effort was not tracked as the work happened;
 these figures are reconstructed from commit timestamps afterwards. Session 6's
 practice is to *record* actuals as work occurs, and reconstruction is inference.
 A future project should instrument at the WBS level from the first hour, that
-is the specific corrective action, and it is what would have made §4.8.4
+is the specific corrective action, and it is what would have made Section 4.8.4
 completable.
 
 **The magnitude comparison is weaker than the distribution comparison.** The
 25.4-hour PERT estimate priced a single developer building this system task by
 task. Dividing the elapsed total into it would yield a tidy MRE, and it would be
-a number about production method rather than about estimation accuracy. §4.8.3 is
+a number about production method rather than about estimation accuracy. Section 4.8.3 is
 reported instead because a ratio between phases, both measured the same way in
 the same project, does not depend on that.
 
 **What the estimate is nonetheless credited with.** It did the job it was built
 for. It exposed a 23% over-commitment *before* implementation began, forced the
-scope decision in §4.6, and generated the technical debt register in the process.
+scope decision in Section 4.6, and generated the technical debt register in the process.
 That value was realised at the time of estimating and does not depend on
 retrospective validation.
 
 **What is not claimed.** That the effort estimate was validated against measured
-effort. It was not, and §4.8.4 is left incomplete rather than filled with
+effort. It was not, and Section 4.8.4 is left incomplete rather than filled with
 plausible numbers.
 
 **Closing the loop to ES-01.** Constraint ES-01 recorded that no historical
 project data existed to calibrate against. That was true because no earlier
-project recorded actuals. §4.8.2 and §4.8.3 are the beginning of that data, the
+project recorded actuals. Section 4.8.2 and Section 4.8.3 are the beginning of that data, the
 first entry in a baseline that Lehman's third law
-(§11.4) says is what eventually makes effort
+(Section 11.4) says is what eventually makes effort
 predictable. Its most useful content is not the total but the finding that
 implementation was over-weighted by a factor of roughly four while deployment was
 under-weighted by nearly five.
 
 Magnitude of Relative Error will be computed as `MRE = |Actual − Estimated| / Actual`,
 and the result (favourable or not) reported as the closure of the estimation process
-described in §4.1.
+described in Section 4.1.

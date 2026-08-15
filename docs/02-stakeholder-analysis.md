@@ -35,7 +35,7 @@
 
 **Implication for the project.** S1, S2 and S3 are the *manage closely* group and are the
 three roles the system implements. Their conflicting needs drive the central design
-tension recorded in §2.4.
+tension recorded in Section 2.4.
 
 ## 2.3 Elicitation techniques applied
 
@@ -45,7 +45,7 @@ Following the elicitation techniques set out in Session 2 [2]:
 |---|---|---|
 | **Artefact analysis** | The existing paper susu card was analysed as the current system's data model: 31 boxes, one per day; client name and daily rate on the header; collector's signature. | The card's structure became the `ContributionCycle` / `Collection` model (FR-11, FR-12). |
 | **Process observation (documentary)** | The established susu collection workflow, route visit → cash handed over → box marked → end-of-day remittance to branch → maturity payout less one day, was traced end to end. | Workflow requirements FR-08, FR-17, FR-18, FR-13. |
-| **Analysis of failure modes** | The known ways the manual process fails (P1–P4, §1.2) were treated as the source of the system's differentiating requirements. | Transparency and audit requirements FR-19 to FR-22. |
+| **Analysis of failure modes** | The known ways the manual process fails (P1–P4, Section 1.2 (The problem)) were treated as the source of the system's differentiating requirements. | Transparency and audit requirements FR-19 to FR-22. |
 | **Expert/analyst judgement** | Applied where stakeholder access was unavailable, and recorded as an assumption rather than a finding. | Default cycle length, commission policy, arrears tolerance. |
 
 ### Elicitation limitation (declared)
@@ -55,8 +55,8 @@ or a JAD workshop with branch staff — **was not conducted**, because the 48-ho
 examination window does not permit field access. The requirements below are therefore
 derived from analysis of a well-documented existing manual process, not from primary
 data. Every point where a real stakeholder would have been consulted is recorded as a
-numbered assumption in §2.5 so that it can be validated later. This limitation is
-carried forward into §17 (Limitations).
+numbered assumption in Section 2.5 so that it can be validated later. This limitation is
+carried forward into Section 17 (Limitations).
 
 ## 2.4 Conflicting stakeholder needs
 

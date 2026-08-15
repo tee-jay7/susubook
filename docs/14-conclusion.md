@@ -1,6 +1,6 @@
 # 14. Limitations, Conclusion and References
 
-> Examination document §17, §18 and §19.
+> Covers sections 17, 18 and 19 of the examination's required document structure.
 
 ---
 
@@ -16,7 +16,7 @@ anything below is a genuine shortfall.
 supervisor or branch officer was interviewed. Requirements were derived from
 analysis of a well-documented manual process, and every point where a real
 stakeholder would have been consulted is recorded as a numbered assumption
-(§2.5). This is the most significant limitation of the requirements work, and it
+(Section 2.5). This is the most significant limitation of the requirements work, and it
 was declared at the time rather than discovered afterwards.
 
 **Assumption A5 is unvalidated, and its mitigation is built but not yet in
@@ -36,7 +36,7 @@ not have. The delivery path is also unverified end to end: no message has been
 confirmed as received on a real handset.
 
 **User acceptance testing was not carried out.** Nine UAT scenarios are prepared
-(§9.9) and none has been executed with an independent participant. The 58 system
+(Section 9.9) and none has been executed with an independent participant. The 58 system
 tests exercise complete journeys but were written by the developer, and
 presenting them as UAT would misrepresent what they establish.
 
@@ -44,7 +44,7 @@ presenting them as UAT would misrepresent what they establish.
 
 | Requirement | Status | Why |
 |---|---|---|
-| **NFR-01** performance | **Not met** | Measured first render exceeds 1.1 s on a *good* connection against a 2 s budget specified for 3G (§12.6) |
+| **NFR-01** performance | **Not met** | Measured first render exceeds 1.1 s on a *good* connection against a 2 s budget specified for 3G (Section 12.6) |
 | **NFR-02** ≤3 interactions | **Unverified** | Design achieves two by inspection; never measured with a participant |
 | **NFR-08** accessibility | **Partial** | Shape-and-text encoding and 44 px targets implemented; no contrast audit, no screen-reader test, no outdoor-light trial |
 | **FR-08** client list | **Partial** | List renders; search and pagination not implemented (TD-03) |
@@ -62,7 +62,7 @@ off paper (the actual interaction) is untested.
 
 ## 17.3 Security
 
-**Two** debt items remain classified **Critical** (§8.4):
+**Two** debt items remain classified **Critical** (Section 8.4):
 
 - **TD-14**, no login rate limiting or lockout. Failed attempts are audited, so
   an attack is visible afterwards; nothing prevents one. The *password reset*
@@ -81,9 +81,9 @@ are closed.** That is a statement about this release, not a hypothetical.
 
 ## 17.4 Scope
 
-Deliberately excluded, with reasons in §6.5: mobile money and bank integration,
+Deliberately excluded, with reasons in Section 6.5 (Explicitly excluded from the product vision): mobile money and bank integration,
 offline operation, multi-institution tenancy, native mobile applications. Ten
-specified requirements were deferred (§6.4).
+specified requirements were deferred (Section 6.4).
 
 Scope was reduced against the estimate before implementation began, and six areas
 were knowingly delivered below standard (TD-01…TD-06). The system demonstrates
@@ -92,7 +92,7 @@ the lifecycle; it is not a production deployment.
 ## 17.5 Deployment
 
 **Region.** `us-central1` sits roughly 150–200 ms from Ghana, and measurement
-shows that latency dominating every request (§12.6). It was chosen for Compute
+shows that latency dominating every request (Section 12.6). It was chosen for Compute
 Engine free-tier eligibility, not for the users.
 
 **Cold start.** 3.3 s on the first request after idle.
@@ -105,7 +105,7 @@ reports it.
 
 **Effort was not instrumented.** Actuals are reconstructed from commit timestamps
 rather than recorded as work occurred, so per-task figures could not be produced
-and the effort estimate could not be validated against measured effort (§4.9).
+and the effort estimate could not be validated against measured effort (Section 4.9).
 The phase-level distribution finding survives; the magnitude comparison does not.
 
 **Single developer, single estimator.** No Delphi convergence, no independent
@@ -114,10 +114,10 @@ ES-04 record the consequences.
 
 ## 17.7 Documentation
 
-**Referencing was retrofitted.** Sources are cited in §19 below, but they were
+**Referencing was retrofitted.** Sources are cited in Section 19 below, but they were
 assembled at the end rather than recorded as the work drew on them. One
 assumption — AS-01, the 30 LOC per function point used to convert function points
-to size, is flagged in §19.6 as requiring verification before submission,
+to size, is flagged in Section 19.6 (Note on assumption AS-01) as requiring verification before submission,
 because the specific published table it came from was never recorded.
 
 ---
@@ -136,7 +136,7 @@ https://susubook-fdtbppd7sq-uc.a.run.app.
 
 | | Objective | Outcome |
 |---|---|---|
-| **O1** | Elicit, analyse, prioritise requirements; produce an SRS | **Met** — 40 requirements, MoSCoW-prioritised, traceability matrix, IEEE 830 SRS. Limited by the absence of primary elicitation (§17.1) |
+| **O1** | Elicit, analyse, prioritise requirements; produce an SRS | **Met** — 40 requirements, MoSCoW-prioritised, traceability matrix, IEEE 830 SRS. Limited by the absence of primary elicitation (Section 17.1) |
 | **O2** | Estimate effort and use it to define achievable scope | **Met** — FPA → COCOMO → PERT triangulated; the estimate exposed a 23% over-commitment *before* implementation and drove the scope decision |
 | **O3** | Design a maintainable layered architecture with UML | **Met**, four layers, eight UML artefacts, SOLID applied at named sites |
 | **O4** | Implement the prioritised requirements as a deployed application | **Met**, deployed, with authentication, role-based authorisation, validation and an append-only audit trail |
@@ -192,7 +192,7 @@ value than a limitation that a reader can confirm independently.
 
 ## 18.4 If the work continued
 
-The order is already fixed by §11.6: migrations, rate limiting, forced password
+The order is already fixed by Section 11.6 (Technical debt repayment plan): migrations, rate limiting, forced password
 change, audit enforcement (8 to 11 hours) before the system touches real client
 money. Then SMS notification, which mitigates the one assumption the value
 proposition depends on.
@@ -253,7 +253,7 @@ yet solve it for anyone.
 
 ## 19.6 Note on assumption AS-01
 
-§4.3.1 converts function points to source size at **30 lines of code per function
+Section 4.3.1 (Size conversion) converts function points to source size at **30 lines of code per function
 point**. That figure was adopted at estimation time without a recorded source. Both
 standard gearing-factor tables were consulted subsequently, and both are now cited:
 
@@ -263,11 +263,11 @@ standard gearing-factor tables were consulted subsequently, and both are now cit
 
 The published range for this language class is therefore approximately **15 to 53 LOC
 per function point**, and the value adopted sits inside it without having been derived
-from it. §4.3.4 now presents the sensitivity analysis across the sourced range rather
+from it. Section 4.3.4 (Sensitivity to the LOC/FP assumption) now presents the sensitivity analysis across the sourced range rather
 than an arbitrary band, and records that the effort estimate varies by a factor of 3.8
-across it while the conclusion at §4.4 holds at every point.
+across it while the conclusion at Section 4.4 (Interpreting the gap) holds at every point.
 
-**The measured value for this project was 20.7 LOC per function point** (§4.8.1), below
+**The measured value for this project was 20.7 LOC per function point** (Section 4.8.1), below
 both published figures. Two explanations are consistent with the delivered code: modern
 frameworks supply as configuration what the datasets underlying these tables counted as
 hand-written code, and Python is absent from the larger of the two datasets entirely,

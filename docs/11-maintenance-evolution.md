@@ -1,6 +1,6 @@
 # 11. Maintenance Strategy and Future Evolution
 
-> Examination document §15 and §16, including the technical debt repayment plan
+> Covers sections 15 and 16 of the examination's required document structure, including the technical debt repayment plan
 > the paper requires.
 
 ---
@@ -20,7 +20,7 @@ with instances already identified.
 |---|---|
 | **Trigger** | Defect reported by a user, or surfaced by the audit log |
 | **Current capability** | **Weak.** No error aggregation and no alerting (**TD-17**), so a production failure is discovered when a user reports it |
-| **Evidence** | Seven of the eight defects found so far (§9.8) came from tests or probing; **DEF-06 came from a person clicking through**, and no automated test could have caught it |
+| **Evidence** | Seven of the eight defects found so far (Section 9.8) came from tests or probing; **DEF-06 came from a person clicking through**, and no automated test could have caught it |
 | **Improvement** | TD-17's repayment (structured logging, error tracking, uptime checks) moves detection ahead of the user report |
 
 ### Adaptive: responding to environmental change
@@ -44,7 +44,7 @@ it accepted that a change in Android's camera behaviour becomes our problem.
 Driven by the debt register and by measurement, not by taste:
 
 - **TD-02**, self-host and purge the stylesheet. Measured at 0.52 s of serial
-  round trip today (§12.6), and the largest single contributor to NFR-01 failing.
+  round trip today (Section 12.6), and the largest single contributor to NFR-01 failing.
 - **TD-16**, the N+1 on the route sheet, before client counts make it visible.
 - **TD-03, TD-04, TD-05, TD-06**, the convenience features cut under time
   pressure. FR-08 and FR-23 remain *partially* satisfied until these land.
@@ -69,7 +69,7 @@ Driven by the debt register and by measurement, not by taste:
 | **S4 Low** | Cosmetic or documentation | Scheduled | DEF-01, an incorrect claim in a docstring |
 
 Rollback is a first-class response: Cloud Run retains previous revisions, so
-reverting is one command and needs no rebuild (§12.9).
+reverting is one command and needs no rebuild (Section 12.9).
 
 ## 11.3 Security and dependency maintenance
 
@@ -116,7 +116,7 @@ commission policy is the term most likely to be renegotiated (FR-36).
 **Where this law bites hardest.** Mobile money is the change most likely to make
 this system less useful, and not by competing with it: client self-payment would
 remove the collector the entire product is built around. That is analysed at
-§11.8.1, because responding to it is a product decision rather than a
+Section 11.8.1, because responding to it is a product decision rather than a
 development task.
 
 ### 2. Increasing complexity
@@ -147,7 +147,7 @@ register kept current rather than allowed to become archaeology.
 dishonest.** It describes behaviour across many releases; SusuBook has one.
 
 What exists is the beginning of the baseline the law depends on: the estimation
-record in §4.8, with estimates against actuals and an
+record in Section 4.8 (Estimation accuracy review), with estimates against actuals and an
 MRE. Session 6's closing advice (record actuals, review accuracy) is exactly
 how a team acquires the historical data that makes this law predictive rather
 than merely descriptive.
@@ -157,7 +157,7 @@ than merely descriptive.
 > *The average rate of development is approximately constant and independent of
 > the resources devoted to it.*
 
-The debt repayment plan totals 19–24 hours (§11.6). The temptation, facing a
+The debt repayment plan totals 19–24 hours (Section 11.6). The temptation, facing a
 deadline, is to assume two developers would halve it.
 
 **Response.** The law says otherwise, as does Brooks [13], and the plan is not
@@ -199,14 +199,14 @@ funded alongside features rather than after them.
 > operational environment.*
 
 **This law is already operating on SusuBook, with no code change required.**
-NFR-01 specifies 2 seconds on a 3G connection. Measurement (§12.6) shows first
+NFR-01 specifies 2 seconds on a 3G connection. Measurement (Section 12.6) shows first
 render already exceeding 1.1 s on a *good* connection, so the requirement is
 probably not met today. As client counts grow, TD-16's N+1 degrades the route
 sheet further. Nothing will have changed in the code; the environment will have
 moved.
 
 **Response.** Quality attributes need measurement over time, not a one-off
-verification at release. The performance figures in §12.6 are a baseline to be
+verification at release. The performance figures in Section 12.6 are a baseline to be
 re-measured, and NFR-01 is recorded as *not met* rather than quietly dropped.
 
 ### 8. Feedback system
@@ -230,7 +230,7 @@ The development process contains a further loop, for which this project provides
 That is Lehman's eighth law demonstrated inside the project rather than quoted at
 it. Automated tests confirm what the developer thought to check; only the user
 loop finds what they did not. It is also the clearest argument for closing the
-outstanding UAT (§9.9).
+outstanding UAT (Section 9.9).
 
 ## 11.5 Evolution roadmap
 
@@ -241,11 +241,11 @@ outstanding UAT (§9.9).
 | **v1.3 — Field efficiency** | FR-15 catch-up payments, TD-05 route ordering, TD-03 search, TD-16 N+1 | The collector's daily experience. Domain rules already accept `days_covered`, so FR-15 needs no change to the business rules. |
 | **v1.4 — Oversight** | FR-34 audit viewer, FR-37 dashboard, FR-27 variance resolution, FR-35 user admin | Supervisor and administrator capability |
 | **v1.5 — Performance** | TD-02 stylesheet build, region relocation, TD-11 denormalised totals | Directly targets NFR-01, which is currently not met |
-| **v2.0 — Reshaping** | Multi-institution tenancy, offline capability, **client self-payment** and **variable contribution amounts** | Each changes the data model or the product's scope, not merely its features. The last two are analysed in §11.8: one removes the collector the system is built around, the other replaces the card of days with a ledger of amounts. Neither is additive. |
+| **v2.0 — Reshaping** | Multi-institution tenancy, offline capability, **client self-payment** and **variable contribution amounts** | Each changes the data model or the product's scope, not merely its features. The last two are analysed in Section 11.8: one removes the collector the system is built around, the other replaces the card of days with a ledger of amounts. Neither is additive. |
 
 ## 11.6 Technical debt repayment plan
 
-> Required explicitly by the examination. Full analysis at §8.
+> Required explicitly by the examination. Full analysis at Section 8.
 
 | Order | Item | Est. | Why here |
 |---|---|---|---|
@@ -275,11 +275,11 @@ fixing only if cycle length ever exceeds a month.
 |---|---|---|
 | Features ship, debt does not | 2, 7 | Repayment plan sequenced ahead of features in v1.1 |
 | Backlog discharged in one release | 5 | Roadmap deliberately incremental |
-| Quality erodes without anyone noticing | 7 | Re-measure §12.6 baseline each release; NFR-01 already recorded as not met |
+| Quality erodes without anyone noticing | 7 | Re-measure Section 12.6 baseline each release; NFR-01 already recorded as not met |
 | Maintainer changes, context lost | 2 | SATD markers name their register entry; every rule traces to the SRS |
 | Feedback loops not closed | 8 | UAT completed and repeated; audit log reviewed weekly |
-| MoMo displaces cash collection | 1 | Monitored as a domain shift, not a feature request. Analysed at §11.8.1: self-payment partially obsoletes the product rather than extending it |
-| Strategic changes implemented incrementally by accident | 2, 5 | §11.8 records self-payment and variable amounts as questions requiring a product decision, so they cannot be absorbed one endpoint at a time |
+| MoMo displaces cash collection | 1 | Monitored as a domain shift, not a feature request. Analysed at Section 11.8.1: self-payment partially obsoletes the product rather than extending it |
+| Strategic changes implemented incrementally by accident | 2, 5 | Section 11.8 records self-payment and variable amounts as questions requiring a product decision, so they cannot be absorbed one endpoint at a time |
 
 ## 11.8 Two proposed changes, analysed
 
@@ -311,10 +311,10 @@ exists. Every core mechanism assumes one:
 **Assessment.** Self-payment does not extend SusuBook. It
 **partially obsoletes it**. If clients pay digitally, the payment rail already
 produces the timestamped, attributable, non-repudiable record that this system
-was built to supply. The problem stated in §1.3 is a problem
+was built to supply. The problem stated in Section 1.3 (Problem statement) is a problem
 *because* collection is cash-in-hand and the record is a paper card.
 
-This is **Lehman's first law with a specific name on it** (§11.4). The adaptive
+This is **Lehman's first law with a specific name on it** (Section 11.4). The adaptive
 maintenance table already lists "mobile money displacing cash collection" as an
 environmental change; self-payment is what that change looks like when it
 arrives.
@@ -380,7 +380,7 @@ discarded.
 **Recommendation.** v2.0 alongside self-payment, and probably the same decision:
 both are consequences of the same shift away from a collector arriving daily for
 a fixed amount. If either is adopted, the domain model in
-§7.9 is rewritten, not extended.
+Section 7.9 (Domain class diagram) is rewritten, not extended.
 
 ### 11.8.3 Why these are recorded and not scheduled
 

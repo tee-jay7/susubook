@@ -1,6 +1,6 @@
 # 10. Implementation
 
-> Examination document §10. What was built, the decisions taken while building
+> Covers section 10 of the examination's required document structure: what was built, the decisions taken while building
 > it, and where the implementation departed from the design.
 
 ---
@@ -202,14 +202,14 @@ Seventeen commits, conventional-commit format, each recording what changed and
 why. Notable process facts:
 
 - **CR-001** (QR client identification) was raised mid-project and put through
-  the change control process defined in §3.8, options
+  the change control process defined in Section 3.8 (Change management), options
   costed, impact traced through the traceability matrix, estimate revised, and a
   6.4% schedule overrun **accepted and logged rather than absorbed** by
   manufacturing further cuts.
 - Eight defects were found and closed; five by tests or probing, one by a user,
   two by inspection.
 - Two of the developer's own test assumptions were found wrong and corrected
-  rather than worked around (§9.8).
+  rather than worked around (Section 9.8).
 - Container images are tagged with the git SHA, so any deployed revision is
   traceable to a commit.
 
@@ -230,7 +230,7 @@ The size estimate can be closed out precisely.
 **The finding is that assumption AS-01 was wrong, and wrong in a specific
 direction.** 30 LOC per function point was taken from published averages for the
 language class. The actual figure was **20.7**, below even the optimistic 25
-used in the sensitivity analysis (§4.3.4).
+used in the sensitivity analysis (Section 4.3.4).
 
 Two plausible causes, both consistent with the code as written. Flask, SQLAlchemy
 and Jinja supply as configuration what the published averages assume is written
@@ -238,10 +238,10 @@ by hand, routing, session handling, ORM persistence, CSRF, templating. And the
 function point count included work that produces very little code: the QR card is
 5 function points and roughly 15 lines, because `segno` does the work.
 
-The sensitivity analysis in §4.3.4 anticipated this class of error but not its
+The sensitivity analysis in Section 4.3.4 anticipated this class of error but not its
 size, having bounded the range at 25–40. Had the range been set from measurement
 rather than from published tables, it would have started lower.
 
-**This does not change the conclusion of §4.4.** Even at the actual size, COCOMO
+**This does not change the conclusion of Section 4.4 (Interpreting the gap).** Even at the actual size, COCOMO
 puts the system at 8.76 person-months, over 1,300 person-hours against a 48-hour
 window. The gap is smaller than estimated and remains of the same order.

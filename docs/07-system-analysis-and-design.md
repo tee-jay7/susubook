@@ -1,6 +1,6 @@
 # 7. System Analysis and Design
 
-Covers examination document sections 8 (System analysis) and 9 (System design).
+Covers sections 8 (System analysis) and 9 (System design) of the examination's required document structure.
 
 ---
 
@@ -19,7 +19,7 @@ Covers examination document sections 8 (System analysis) and 9 (System design).
 | **Failure detection** | On dispute, or when a collector disappears |
 
 **Structural weakness.** The party whose conduct requires verification is the sole custodian
-of the evidence. Every failure identified in §1.2 (P1–P4) descends from that one
+of the evidence. Every failure identified in Section 1.2 (The problem) (P1–P4) descends from that one
 fact, so the analysis below treats *separating the record from the collector* as the
 system's defining requirement rather than one feature among many.
 
@@ -256,7 +256,7 @@ which this section does; the choice is defended on architectural grounds.
 | **Templating** | Jinja2 | Server-rendered HTML — Session 5's MVC pattern, the same family as Django and Rails which that slide names. |
 | **Interactivity** | HTMX | The interaction set (forms, tables, inline validation, confirmations) needs partial page updates, not client-side state. HTMX delivers these by returning HTML fragments, with no build step, no bundler and no hydration. |
 | **ORM** | SQLAlchemy 2 | Confined to the infrastructure layer. The repository boundary keeps it out of the domain, satisfying NFR-07. |
-| **Database** | PostgreSQL 16 | Partial unique indexes let three business invariants be enforced in the database as well as in code (§7.11). Identical engine in dev (Docker) and production, satisfying NFR-10. |
+| **Database** | PostgreSQL 16 | Partial unique indexes let three business invariants be enforced in the database as well as in code (Section 7.11). Identical engine in dev (Docker) and production, satisfying NFR-10. |
 | **QR rendering** | segno | Pure Python, no Pillow dependency, emits inline SVG that scales without an image pipeline. |
 | **Testing** | pytest + coverage | The domain layer's independence makes fast, database-free unit tests possible. |
 | **Containerisation** | Docker Compose (dev) | Dev/prod parity on the same Postgres engine. |
@@ -412,7 +412,7 @@ sequenceDiagram
     end
 ```
 
-Steps 3–4 are what resolves conflict **C1** from §2.4: the collector supplies one
+Steps 3–4 are what resolves conflict **C1** from Section 2.4 (Conflicting stakeholder needs): the collector supplies one
 confirmation, while attribution, timestamping and audit are added server-side at no
 interaction cost.
 
@@ -545,7 +545,7 @@ accidentally.
 
 Session 5's five principles [5], originally set out by Martin [15], each with
 the concrete place it applies. Session 5 also notes
-that SOLID compliance *reduces technical debt*, the connection to §8 is direct.
+that SOLID compliance *reduces technical debt*, the connection to Section 8 is direct.
 
 **S — Single Responsibility.**
 `domain/rules.py` holds one pure function per computation (`validate_contribution`,
@@ -697,7 +697,7 @@ the people for whom that reference is legible.
 
 Both are drawn as SVG, which is what makes them affordable. The motif is a
 single ~2 KB cacheable tile; a raster background would have added weight to a
-page whose performance budget is already exceeded (**TD-02**, §12.6). It is tiled
+page whose performance budget is already exceeded (**TD-02**, Section 12.6 (Measured performance)). It is tiled
 at 5% opacity behind the content cards and never beneath body text, so contrast
 is set by the card rather than the background.
 
@@ -739,7 +739,7 @@ data.
 Session 5's key takeaway (that SOLID compliance reduces technical debt) is treated
 literally here: debt is identified at design time, before any is incurred, rather than
 discovered afterwards. TD-01…TD-06 were created by the scope decision in
-§4.6; TD-07…TD-11 arise from the design choices above.
+Section 4.6 (How the estimation influenced the project scope); TD-07…TD-11 arise from the design choices above.
 
 | ID | Debt | Origin | Fowler quadrant | Type |
 |---|---|---|---|---|
@@ -749,8 +749,8 @@ discovered afterwards. TD-01…TD-06 were created by the scope decision in
 | TD-04 | Minimal reversal form | Scope cut | Prudent & deliberate | Code |
 | TD-05 | Static route sheet *(partly mitigated by CR-001)* | Scope cut | Prudent & deliberate | Usability |
 | TD-06 | HTMX applied inconsistently | Scope cut | Prudent & deliberate | Design |
-| **TD-07** | Hand-written mapping between domain dataclasses and ORM models, every schema change must be made in two places | Layered design (§7.6) | Prudent & deliberate | Architecture |
-| **TD-08** | Sinkhole: simple reads pass through the service layer adding little | Layered design (§7.6) | Prudent & deliberate | Architecture |
+| **TD-07** | Hand-written mapping between domain dataclasses and ORM models, every schema change must be made in two places | Layered design (Section 7.6) | Prudent & deliberate | Architecture |
+| **TD-08** | Sinkhole: simple reads pass through the service layer adding little | Layered design (Section 7.6) | Prudent & deliberate | Architecture |
 | **TD-09** | Audit log is append-only by convention, not enforced by database permissions or a trigger | Time constraint | Prudent & deliberate | Architecture/Security |
 | **TD-10** | Cycle maturity computed on read rather than by a scheduled job; a cycle no one opens is never marked MATURED | No scheduler on free-tier hosting | Prudent & deliberate | Architecture |
 | **TD-11** | Cycle summaries recomputed from all contributions on every render; no caching or denormalised totals | Simplicity over optimisation | Prudent & inadvertent | Performance |

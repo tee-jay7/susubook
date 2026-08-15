@@ -71,7 +71,7 @@ offline operation, multi-institution tenancy, and native mobile applications. Ap
 
 SusuBook is a new, self-contained system. It replaces a paper artefact, the susu card, rather than an existing software system, so there is no legacy data migration and no
 external interface (hence zero External Interface Files in the function point count,
-§4.2.2 of the estimation).
+Section 4.2.2 (Count A: full specified scope (all 38 functional requirements)) of the estimation).
 
 ```
  ┌──────────┐   cash    ┌─────────────┐  banks cash  ┌────────────┐
@@ -106,13 +106,13 @@ Python 3.12 with Flask, against PostgreSQL 16. Identical database engine in deve
 
 ### 2.4 Design and implementation constraints
 
-Carried from §3.5: 48-hour window (CO-01), single developer (CO-02), public deployment
+Carried from Section 3.5 (Constraints): 48-hour window (CO-01), single developer (CO-02), public deployment
 required (CO-03), free-tier hosting (CO-04), no payment API access (CO-05), Act 843
 compliance (CO-06), low-end devices on mobile data (CO-07).
 
 ### 2.5 Assumptions and dependencies
 
-Carried from §2.5, of which **A5 is critical**: clients are assumed able to reach a mobile
+Carried from Section 2.5 (Assumptions requiring stakeholder validation), of which **A5 is critical**: clients are assumed able to reach a mobile
 web page. If false, the system's central value (independent client visibility) requires
 an SMS channel instead.
 
@@ -226,7 +226,7 @@ They are the primary subject of unit testing.
 
 > Step 4 pre-fills the amount and step 5 is a single confirmation. That is what satisfies
 > NFR-02's three-interaction limit, and it is the design resolution of conflict C1
-> (collector speed vs. client verifiability) from §2.4, integrity is added server-side at
+> (collector speed vs. client verifiability) from Section 2.4 (Conflicting stakeholder needs), integrity is added server-side at
 > steps 7 and 8, costing the collector nothing.
 
 #### UC-07: Release matured payout
@@ -292,15 +292,15 @@ WCAG 2.1 AA contrast, legible in outdoor light (NFR-08). Four role-specific land
 
 ## 5. Non-functional requirements
 
-Specified in full at §3.4: NFR-01 performance, NFR-02 usability,
+Specified in full at Section 3.4 (Non-functional requirements (how well it must perform)): NFR-01 performance, NFR-02 usability,
 NFR-03 security, NFR-04 data integrity, NFR-05 availability, NFR-06 compliance, NFR-07
 maintainability, NFR-08 accessibility, NFR-09 auditability, NFR-10 portability. Each
-carries a verification method, and each is exercised by a test case at §9.4.
+carries a verification method, and each is exercised by a test case at Section 9.4 (Functional test cases).
 
 ---
 
 ## 6. Verification
 
 Every requirement in this specification is traceable to at least one test case through
-the matrix at §3.7. Requirements not covered by an executed test
-are listed as such at §9.7 rather than presented as satisfied.
+the matrix at Section 3.7 (Requirements traceability matrix). Requirements not covered by an executed test
+are listed as such at Section 9.7 (Requirements verification) rather than presented as satisfied.

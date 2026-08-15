@@ -1,7 +1,7 @@
 # Requirements Change Log
 
 Changes to the requirements baseline are recorded here under the formal change control
-process defined in §3.8. Nothing is removed from or added to the
+process defined in Section 3.8. Nothing is removed from or added to the
 baseline silently; each entry records the request, its impact, its cost, the decision
 taken and who took it.
 
@@ -31,7 +31,7 @@ one: a user-centred design argument (Session 5) as much as an efficiency one.
 
 | Option | Description | PERT effort | Assessment |
 |---|---|---|---|
-| **A** | In-app camera scanner: `getUserMedia`, JS QR-decoding library, live viewfinder | **2.12 h** | Rejected, see §3 |
+| **A** | In-app camera scanner: `getUserMedia`, JS QR-decoding library, live viewfinder | **2.12 h** | Rejected, see Section 3 |
 | **B** | **QR encodes a URL; collector uses the phone's native camera app, which opens the client's contribution screen** | **0.92 h** | **Selected** |
 | C | Opaque public references only, QR deferred to evolution | ~0.1 h | Rejected, forgoes the throughput benefit that motivated the request |
 | D | Reject entirely | 0 h | Rejected, the benefit is real and the cost is modest |
@@ -47,7 +47,7 @@ better than NFR-02 requires. Both options degrade to the same fallback: the rout
 
 ### 3. Impact analysis
 
-Traced through the matrix at §3.7.
+Traced through the matrix at Section 3.7.
 
 **Requirements added**
 
@@ -147,7 +147,7 @@ quality cuts so the arithmetic landed on exactly 20.0; that would have produced 
 number and a less honest plan. Session 6 identifies external schedule pressure as a
 recognised source of estimate distortion, and adjusting an estimate to fit a predetermined
 budget is precisely that distortion. The overrun is therefore carried openly and tracked
-against actuals in §4.8.
+against actuals in Section 4.8.
 
 **Containment.** FR-39 and FR-40 are **Should**, not Must. If Phase 3 runs behind, this is
 the first work abandoned, and abandoning it costs no Must requirement. BR-R14 (opaque
@@ -156,7 +156,7 @@ security improvement independent of it.
 
 With no Change Control Board available on an individual assessment, the decision was taken
 by the developer and recorded here with its full justification so that it is reviewable —
-as specified in §3.8 step 4.
+as specified in Section 3.8 step 4.
 
 ### 6. Implementation record
 
@@ -190,7 +190,7 @@ Arkesel account subsequently became available, removing both obstacles.
 **Why it matters more than an ordinary feature.** Assumption **A5** holds that
 clients can reach a mobile web page. The entire value proposition, an
 independent record the client controls, depends on it, and A5 is unvalidated
-(§2.5, §17.1). SMS is the stated mitigation: a text message reaches a handset
+(Section 2.5, Section 17.1). SMS is the stated mitigation: a text message reaches a handset
 that cannot open a browser. This is the highest-value deferred item in the
 project, and it was ranked first in the evolution roadmap for that reason.
 
@@ -240,7 +240,7 @@ removed without a test failing.
 | Every dispatch audited (`SMS_DISPATCHED`) | A later dispute about notification has an answer (NFR-09) |
 
 **Architectural note.** `SmsGateway` is the second worked example of the
-dependency inversion the design claims (§7.12): the service depends on a
+dependency inversion the design claims (Section 7.12): the service depends on a
 Protocol, production injects the Arkesel adapter, tests inject a null adapter,
 and neither knows the difference. The seam existed before the feature did.
 
@@ -274,7 +274,7 @@ and it must remain abandonable if the gateway proves unreliable.
 **FR-31 is delivered but not fully realised.** With the allowlist bounded to
 developer-controlled numbers, real clients still do not receive messages.
 Assumption A5 is therefore **mitigated in mechanism but not yet in practice** —
-recorded at §17.1 rather than claimed as closed.
+recorded at Section 17.1 rather than claimed as closed.
 
 ### 6. Implementation record
 

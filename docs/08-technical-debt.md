@@ -1,6 +1,6 @@
 # 8. Technical Debt Identification and Management
 
-> Examination Part A §7. Every item below records
+> Required by the examination paper, Part A, section 7. Every item below records
 > **Debt → Cause → Impact → Priority → Proposed Resolution**, and is classified
 > as *acceptable temporarily*, *scheduled for future resolution*, or *critical
 > and requiring immediate attention*.
@@ -25,7 +25,7 @@ and every item is marked in the source at the site that carries it.
 
 | Route | When | Items | Character |
 |---|---|---|---|
-| **The scope decision** | Phase 1, before any code | TD-01…TD-06 | Chosen. The effort estimate exceeded the budget by 23%, so 4.1 hours of implementation quality were removed deliberately (§4.6). |
+| **The scope decision** | Phase 1, before any code | TD-01…TD-06 | Chosen. The effort estimate exceeded the budget by 23%, so 4.1 hours of implementation quality were removed deliberately (Section 4.6). |
 | **Design decisions** | Phase 2, before any code | TD-07…TD-13 | Consequential. The layered architecture, the free-tier constraint and deferred requirements each carry a known cost. |
 | **Implementation and testing** | Phase 3–4 | TD-14…TD-17 | Discovered. Found while building and while writing tests, the only items not anticipated. |
 | **Change request CR-002** | Phase 6 | TD-18 | Consequential. Reinstating FR-31 (SMS) carried a known cost: free-tier hosting provides no worker, so there is no queue. |
@@ -117,7 +117,7 @@ that works but is wrong, `HACK` for a knowingly poor mechanism.
 | | |
 |---|---|
 | **Debt** | `Base.metadata.create_all()` plus a seed script. No Alembic, no migration history, no downgrade path. |
-| **Cause** | Cut deliberately in the scope decision to recover 0.7 hours (§4.6). |
+| **Cause** | Cut deliberately in the scope decision to recover 0.7 hours (Section 4.6). |
 | **Impact** | Any schema change in production requires hand-written DDL against live data, with no review artefact and no rollback. Blocks TD-09's resolution. Risk grows the moment real data exists, because `create_all` cannot alter an existing table. |
 | **Priority** | **Scheduled: first item.** It is a prerequisite for several others. |
 | **Interest paid, observed** | Repaying TD-15 required a new column on a populated table. `create_all()` cannot alter an existing table, so the change had to be hand-written as idempotent DDL in `MANUAL_MIGRATIONS` with a bespoke `flask db-upgrade` command and a Cloud Run job to run it. That file and that command exist **only** because this debt is unpaid; with Alembic neither would. This is the first time the cost was actually incurred rather than predicted. |
@@ -197,7 +197,7 @@ Application-wide · Process · Prudent & Deliberate
 |---|---|
 | **Debt** | Default Flask logging to stdout. No structured logs, no error aggregation, no uptime monitoring, no alerting. |
 | **Cause** | Not required to demonstrate the lifecycle, and out of the time budget. |
-| **Impact** | A production failure is discovered by a user reporting it. Diagnosis depends on whatever the platform retained. Directly limits the *corrective maintenance* capability described at §11.1. |
+| **Impact** | A production failure is discovered by a user reporting it. Diagnosis depends on whatever the platform retained. Directly limits the *corrective maintenance* capability described at Section 11.1 (The four maintenance categories, applied). |
 | **Priority** | **Scheduled.** |
 | **Resolution** | Structured JSON logging with a request id; error tracking (Sentry free tier); uptime check against a health endpoint. Estimated 2–3 hours. |
 
@@ -226,7 +226,7 @@ Application-wide · Process · Prudent & Deliberate
 | | |
 |---|---|
 | **Debt** | Session 5's named anti-pattern: reads such as listing clients traverse the service layer adding little transformation. |
-| **Cause** | Accepted at design time (§7.6). |
+| **Cause** | Accepted at design time (Section 7.6). |
 | **Impact** | A few extra function calls; negligible at this scale. |
 | **Priority** | **Acceptable.** The cost buys one consistent path for authorisation and audit. Bypassing the layer for reads would create two paths and invite an unauthorised read. |
 | **Resolution** | None planned. This is a deliberate trade, documented so it is not mistaken for an oversight. |
@@ -247,7 +247,7 @@ Application-wide · Process · Prudent & Deliberate
 ---
 
 **TD-03 · Client list has no search, filter or pagination** · `app/web/collector.py` · Code · Prudent & Deliberate
-Cut for 0.5 h. FR-08 is therefore only **partially** satisfied and is reported as such at §9.7. Degrades past roughly 50 clients; QR scanning (FR-40) bypasses it for the common case. **Acceptable.** Resolution: server-side filter plus pagination, ~1 h.
+Cut for 0.5 h. FR-08 is therefore only **partially** satisfied and is reported as such at Section 9.7 (Requirements verification). Degrades past roughly 50 clients; QR scanning (FR-40) bypasses it for the common case. **Acceptable.** Resolution: server-side filter plus pagination, ~1 h.
 
 **TD-04 · Reversal is a bare reference-and-reason form** · `app/web/supervisor.py:65` · Code · Prudent & Deliberate
 Cut for 0.6 h. The supervisor must copy a reference by hand rather than acting from the contribution row, which invites transcription error though a mistyped reference fails safe, since no contribution matches. **Acceptable.** Resolution: reverse action on each row, reason codes, ~1 h.

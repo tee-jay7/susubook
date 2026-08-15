@@ -206,7 +206,7 @@ project:
 
 1. **Change request logging**, any scope change during the 48 hours is recorded as a
    dated entry in `docs/CHANGELOG-requirements.md` with the reason.
-2. **Impact analysis**, the traceability matrix (§3.7) identifies which business
+2. **Impact analysis**, the traceability matrix (Section 3.7) identifies which business
    requirements and test cases a change touches.
 3. **Cost/schedule assessment**, the change is re-estimated against the remaining hours
    in the window.
