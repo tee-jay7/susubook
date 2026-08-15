@@ -42,12 +42,41 @@ def create_app(
 
     csrf.init_app(app)  # NFR-03: CSRF token on every state-changing form
 
+    # SMS notification (FR-31, CR-002). Built once at startup rather than per
+    # request. Without an API key this is a gateway that sends nothing, so the
+    # failure mode of missing configuration is silence, not an exception.
+    from app.services.notifications import NotificationService, NullSmsGateway
+
+    if cfg.sms_enabled:
+        from app.infrastructure.arkesel import ArkeselSmsGateway
+
+        gateway = ArkeselSmsGateway(
+            cfg.SMS_API_KEY,
+            sender_id=cfg.SMS_SENDER_ID,
+            **({"endpoint": cfg.SMS_API_URL} if cfg.SMS_API_URL else {}),
+        )
+        app.logger.info(
+            "sms enabled; allowlist holds %d number(s)%s",
+            len(cfg.sms_allowlist),
+            " — ALLOW-ALL IS SET" if cfg.sms_allow_all else "",
+        )
+    else:
+        gateway = NullSmsGateway()
+        app.logger.info("sms disabled: no API key configured")
+
+    notifications = NotificationService(
+        gateway,
+        allowlist=cfg.sms_allowlist,
+        allow_all=cfg.sms_allow_all,
+    )
+    app.extensions["notifications"] = notifications
+
     # -- request-scoped session and services ------------------------------
 
     @app.before_request
     def _open_unit_of_work() -> None:
         g.db = session_factory()
-        g.services = build_services(g.db, clock=clock)
+        g.services = build_services(g.db, clock=clock, notifications=notifications)
         from app.web.security import load_current_user
 
         load_current_user()

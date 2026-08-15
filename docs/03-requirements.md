@@ -93,7 +93,7 @@ functional, non-functional, and constraints.
 | FR-28 | A Client shall log in and view their own digital card, showing every contribution with amount, date, time recorded and recording Collector. | Must |
 | FR-29 | A Client shall view their running balance, cycle maturity date and projected net payout. | Must |
 | FR-30 | The system shall issue a unique reference for every recorded contribution. | Must |
-| FR-31 | The system shall notify a Client by SMS on each recorded contribution. | Won't (this release) |
+| FR-31 | The system shall notify a Client by SMS on each recorded contribution. | Should *(CR-002)* |
 
 ### Audit and correction
 
@@ -155,20 +155,21 @@ that merely improves convenience is deferred.
 | Priority | Count | Requirements |
 |---|---|---|
 | **Must** | 28 | FR-01…08, FR-10…14, FR-16…21, FR-23…26, FR-28…30, FR-32, FR-33 |
-| **Should** | 7 | FR-09, FR-15, FR-22, FR-34, FR-35, FR-39, FR-40 |
+| **Should** | 8 | FR-09, FR-15, FR-22, FR-31, FR-34, FR-35, FR-39, FR-40 |
 | **Could** | 4 | FR-27, FR-36, FR-37, FR-38 |
-| **Won't** | 1 | FR-31 (SMS notification) |
+| **Won't** | 0 | — |
 | **Total** | **40** | FR-01 … FR-40 |
 
 > FR-39 and FR-40 were added after the baseline was set, under change request **CR-001**
 > (`CHANGELOG-requirements.md`). They are **Should**, so that abandoning them under
 > schedule pressure costs no Must requirement.
 
-**Why FR-31 is *Won't* despite its importance.** SMS notification is the mitigation for
-assumption A5 — the risk that clients cannot access a web page. It is arguably the single
-most valuable feature for the real user. It is excluded because it requires a paid SMS
-gateway (CO-04) and an account approval lead time that does not fit CO-01. It is
-therefore not dropped but *carried*: it is the first item in the future evolution plan.
+**FR-31 was originally *Won't*, and was reinstated under CR-002.** SMS notification is the
+mitigation for assumption A5 — the risk that clients cannot reach a web page — and is
+arguably the single most valuable feature for the real user. It was excluded because it
+required a paid SMS gateway (CO-04) with an account lead time that did not fit CO-01. Once
+a gateway became available that constraint no longer applied, and it was reinstated as
+**Should** through the change control process (`CHANGELOG-requirements.md`, CR-002).
 
 ## 3.7 Requirements traceability matrix
 
@@ -202,6 +203,10 @@ project:
 Any requirement dropped after this point is recorded there rather than silently removed,
 so that the delivered scope can be compared against the specified scope.
 
-**Changes raised to date:** CR-001 (QR-based client identification) — approved, adding
-FR-39 and FR-40 and business rules BR-R14 and BR-R15. See `CHANGELOG-requirements.md` for
-the impact analysis, cost assessment and decision record.
+**Changes raised to date:**
+
+- **CR-001** — QR-based client identification. Approved, adding FR-39, FR-40 and business
+  rules BR-R14 and BR-R15.
+- **CR-002** — SMS notification. Approved, reinstating FR-31 from *Won't* to *Should*.
+
+See `CHANGELOG-requirements.md` for impact analysis, cost and decision record in each case.

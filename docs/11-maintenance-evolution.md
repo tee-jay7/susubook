@@ -122,7 +122,7 @@ complicate contribution allocation, early withdrawal complicates the cycle state
 machine, multi-institution complicates every query.
 
 **Response — and this law is the reason for several earlier decisions.** The
-domain layer's isolation from Flask and SQLAlchemy, the 226 tests, and the
+domain layer's isolation from Flask and SQLAlchemy, the 256 tests, and the
 business rules expressed as pure functions are precisely the "work done
 explicitly to reduce complexity" the law demands. They are not architectural
 taste; they are the mechanism by which the second law is resisted.
@@ -216,7 +216,7 @@ SusuBook contains three feedback loops by design:
 
 And the development process has its own, with evidence from this project:
 **DEF-06 was found by a user clicking through the interface, not by any of the
-226 automated tests — and could not have been, because every test asserted the
+256 automated tests — and could not have been, because every test asserted the
 *response* to a request and none asserted the state of the page afterwards.**
 
 That is Lehman's eighth law demonstrated inside the project rather than quoted at
@@ -229,7 +229,7 @@ outstanding UAT (§9.9).
 | Release | Contents | Rationale |
 |---|---|---|
 | **v1.1 — Security** | TD-01 migrations, TD-14 rate limiting, TD-15 forced password change, TD-09 audit enforcement | Everything blocking real client money. Nothing else ships first. |
-| **v1.2 — Reach** | FR-31 SMS notification | Mitigates assumption **A5** — that clients can reach a web page — on which the entire value proposition rests. Highest user value of any single item. |
+| **v1.2 — Reach** | ~~FR-31 SMS notification~~ **delivered under CR-002**; remaining: lift the recipient allowlist, TD-18 delivery tracking | FR-31 shipped in this release. The mechanism mitigating **A5** now exists, but recipients are still restricted to an allowlist, so the mitigation is not yet realised for real clients. |
 | **v1.3 — Field efficiency** | FR-15 catch-up payments, TD-05 route ordering, TD-03 search, TD-16 N+1 | The collector's daily experience. Domain rules already accept `days_covered`, so FR-15 needs no change to the business rules. |
 | **v1.4 — Oversight** | FR-34 audit viewer, FR-37 dashboard, FR-27 variance resolution, FR-35 user admin | Supervisor and administrator capability |
 | **v1.5 — Performance** | TD-02 stylesheet build, region relocation, TD-11 denormalised totals | Directly targets NFR-01, which is currently not met |

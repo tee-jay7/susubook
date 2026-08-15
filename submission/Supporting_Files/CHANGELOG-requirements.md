@@ -166,3 +166,123 @@ as specified in `03-requirements.md` §3.8 step 4.
 - [x] `06-scope.md` — QR capability added to in-scope table; overrun recorded
 - [ ] Implementation in Phase 3
 - [ ] Test cases TC-QR-01…03 in `09-testing.md`
+
+---
+
+## CR-002 — SMS notification of recorded contributions
+
+| Field | Value |
+|---|---|
+| **Raised** | Phase 6, after the submission package was first assembled |
+| **Raised by** | Developer |
+| **Status** | **Approved and incorporated** |
+| **Affects** | `03-requirements.md`, `06-scope.md`, `08-technical-debt.md`, `09-testing.md`, `11-maintenance-evolution.md`, `12-deployment.md`, `13-user-manual.md`, `14-conclusion.md` |
+
+### 1. Change request
+
+Send a client an SMS when a contribution is recorded against them, so they learn
+of it without signing in.
+
+**Stated reason.** FR-31 was classified **Won't (this release)** because it needs
+a paid SMS gateway (CO-04) with an account lead time that did not fit CO-01. An
+Arkesel account subsequently became available, removing both obstacles.
+
+**Why it matters more than an ordinary feature.** Assumption **A5** holds that
+clients can reach a mobile web page. The entire value proposition — an
+independent record the client controls — depends on it, and A5 is unvalidated
+(§2.5, §17.1). SMS is the stated mitigation: a text message reaches a handset
+that cannot open a browser. This is the highest-value deferred item in the
+project, and it was ranked first in the evolution roadmap for that reason.
+
+### 2. Options considered
+
+| Option | Description | Assessment |
+|---|---|---|
+| **A** | Full integration, sending restricted to an allowlist of numbers the developer controls | **Selected** |
+| B | Build the gateway seam and wire it, with a logging-only adapter | Rejected — demonstrates the architecture but leaves A5 unmitigated, which was the point |
+| C | Full integration, re-seeding the demonstration data with numbers under the developer's control | Rejected — changes a dataset already documented and screenshotted, for no additional safety over A |
+| D | Leave deferred | Rejected — the blocking constraint no longer applies |
+
+### 3. Impact analysis
+
+**Requirement changed**
+
+| ID | Before | After |
+|---|---|---|
+| FR-31 | The system shall notify a Client by SMS on each recorded contribution — **Won't (this release)** | Unchanged text — **Should** |
+
+**A safety risk identified during analysis, and the reason for the allowlist.**
+
+The demonstration dataset uses **valid-format Ghanaian mobile numbers**:
+`0201000201` is a well-formed Telecel number and `0244000101` a well-formed MTN
+number. These were invented for seed data, but nothing prevents them belonging to
+real subscribers.
+
+An unguarded rollout would therefore have sent a text message to a real stranger
+**every time an examiner recorded a collection** — repeatedly, at the project's
+expense, to people with no relationship to the system. That is a real harm, not
+an inconvenience.
+
+The mitigation is an **allowlist that defaults to empty**. No recipient is
+permitted unless explicitly configured. Tests assert that every number in the
+seed dataset is refused by a default-configured service, so the guard cannot be
+removed without a test failing.
+
+**Design constraints adopted**
+
+| Constraint | Reason |
+|---|---|
+| Notification dispatched **after** the database commit | The contribution is the record of truth and must be durable before anything else is attempted |
+| Every failure swallowed and logged, never raised | A notification failure must not be able to fail, delay or roll back a collection |
+| Delivery on a daemon thread | A slow gateway must not stall the collector's route sheet (NFR-01, NFR-02) |
+| Gateway behind a `Protocol`, defaulting to a no-op | Tests and local development can never send a message; a missing API key produces silence, not an exception |
+| Message carries no link, credential or balance beyond the cycle total | A text is readable by anyone holding the handset |
+| Every dispatch audited (`SMS_DISPATCHED`) | A later dispute about notification has an answer (NFR-09) |
+
+**Architectural note.** `SmsGateway` is the second worked example of the
+dependency inversion the design claims (§7.12): the service depends on a
+Protocol, production injects the Arkesel adapter, tests inject a null adapter,
+and neither knows the difference. The seam existed before the feature did.
+
+### 4. Cost and risk
+
+| Item | Estimate |
+|---|---|
+| Gateway Protocol, null adapter, service, message construction | 0.6 h |
+| Arkesel adapter (stdlib `urllib`, no new dependency) | 0.4 h |
+| Configuration, Secret Manager, deployment wiring | 0.4 h |
+| Tests (27 unit, 3 system) | 0.5 h |
+| Documentation | 0.6 h |
+| **Total** | **~2.5 h** |
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Message reaches a real stranger | **Was high** | **High** | Allowlist defaults to empty; asserted by test against every seed number |
+| API key exposure | Low | High | Secret Manager, never logged, never in the repository |
+| Gateway latency degrades the route sheet | Medium | Medium | Dispatch on a daemon thread, after commit |
+| Provider API changes | Medium | Low | Endpoint and sender configurable; failure is silent and logged |
+| Cost of messages | Low | Low | Allowlist bounds volume to numbers the developer controls |
+
+### 5. Decision
+
+**Approved.** The blocking constraint (no gateway) no longer applies, and the
+requirement mitigates the project's most significant unvalidated assumption.
+
+Classified **Should**, not **Must**: the system is fully functional without it,
+and it must remain abandonable if the gateway proves unreliable.
+
+**FR-31 is delivered but not fully realised.** With the allowlist bounded to
+developer-controlled numbers, real clients still do not receive messages.
+Assumption A5 is therefore **mitigated in mechanism but not yet in practice** —
+recorded honestly in `14-conclusion.md` §17.1 rather than claimed as closed.
+
+### 6. Implementation record
+
+- [x] `app/services/notifications.py` — Protocol, null adapter, service, allowlist
+- [x] `app/infrastructure/arkesel.py` — Arkesel v2 adapter
+- [x] `app/config.py`, `app/__init__.py`, `app/services/container.py` — wiring
+- [x] `app/services/collection.py` — dispatch after commit, audited
+- [x] `deploy/deploy.sh` — optional secret, allowlist environment variable
+- [x] 27 unit tests, 3 system tests
+- [x] Documentation updated across eight files
+- [ ] Live verification with a real handset — pending an allowlisted number

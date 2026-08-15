@@ -19,14 +19,24 @@ stakeholder would have been consulted is recorded as a numbered assumption
 (§2.5). This is the most significant limitation of the requirements work, and it
 was declared at the time rather than discovered afterwards.
 
-**Assumption A5 is unvalidated and the value proposition rests on it.** A5 holds
-that clients can reach a mobile web page. If false, the client-transparency
-feature — the reason the system exists — does not reach the people it is for. The
-mitigation (SMS notification, FR-31) is excluded from this release by the same
-constraints that make A5 risky: no paid gateway.
+**Assumption A5 is unvalidated, and its mitigation is built but not yet in
+effect.** A5 holds that clients can reach a mobile web page. If false, the
+client-transparency feature — the reason the system exists — does not reach the
+people it is for.
+
+SMS notification (FR-31) was reinstated under **CR-002** and is implemented: a
+client is texted the amount, date, collector and reference when a contribution is
+recorded. But **recipients are restricted to a configured allowlist**, because
+the demonstration dataset uses valid-format Ghanaian numbers that may belong to
+real people, and an unguarded rollout would text strangers on every collection.
+
+So A5 is **mitigated in mechanism, not yet in practice**. Lifting the allowlist
+requires client numbers that are genuinely the clients', which this project does
+not have. The delivery path is also unverified end to end: no message has been
+confirmed as received on a real handset.
 
 **User acceptance testing was not carried out.** Nine UAT scenarios are prepared
-(§9.9) and none has been executed with an independent participant. The 55 system
+(§9.9) and none has been executed with an independent participant. The 58 system
 tests exercise complete journeys but were written by the developer, and
 presenting them as UAT would misrepresent what they establish.
 
@@ -115,7 +125,7 @@ because the specific published table it came from was never recorded.
 A functional, deployed web application that replaces the paper susu card with a
 record both the client and the collector can see and neither can silently alter.
 Thirty functional requirements across four roles, 3,433 lines of application
-code, 226 automated tests at 97% coverage, live at
+code, 256 automated tests at 97% coverage, live at
 https://susubook-fdtbppd7sq-uc.a.run.app.
 
 ## 18.2 Against the objectives
@@ -126,8 +136,8 @@ https://susubook-fdtbppd7sq-uc.a.run.app.
 | **O2** | Estimate effort and use it to define achievable scope | **Met** — FPA → COCOMO → PERT triangulated; the estimate exposed a 23% over-commitment *before* implementation and drove the scope decision |
 | **O3** | Design a maintainable layered architecture with UML | **Met** — four layers, eight UML artefacts, SOLID applied at named sites |
 | **O4** | Implement the prioritised requirements as a deployed application | **Met** — deployed, with authentication, role-based authorisation, validation and an append-only audit trail |
-| **O5** | Verify through unit, integration, system and acceptance testing | **Partially met** — 226 tests across three levels; **UAT not conducted** |
-| **O6** | Identify, classify and document technical debt with a repayment plan | **Met** — 17 items, each with cause, impact, priority and resolution; 13 identified before the code carrying them existed |
+| **O5** | Verify through unit, integration, system and acceptance testing | **Partially met** — 256 tests across three levels; **UAT not conducted** |
+| **O6** | Identify, classify and document technical debt with a repayment plan | **Met** — 18 items, each with cause, impact, priority and resolution; 13 identified before the code carrying them existed |
 | **O7** | Define maintenance and evolution grounded in theory | **Met** — four maintenance categories, Lehman's eight laws applied individually, six-release roadmap |
 
 Six of seven met; O5 partially, and the shortfall is named rather than glossed.
@@ -142,20 +152,20 @@ debt register, because every quality reduction made to fit the budget became a
 debt entry with a known cause. The two sections that carry the most marks turned
 out to be the same decision documented twice.
 
-**Debt taken knowingly behaves differently from debt taken accidentally.** Of 17
+**Debt taken knowingly behaves differently from debt taken accidentally.** Of 18
 items, 13 were identified before the code carrying them existed. All 13 landed in
 the *acceptable* or *scheduled* bands. All three **Critical** items were
 discovered later — during implementation and testing — and none was a deliberate
 trade-off. The dangerous debt was the debt nobody decided to take on.
 
 **Architecture is a scheduling decision.** Keeping the domain layer free of Flask
-and SQLAlchemy reads as purity. It was the reason 129 unit tests run in 0.34
+and SQLAlchemy reads as purity. It was the reason 156 unit tests run in 0.36
 seconds with no database, and therefore the reason a real test suite was
 affordable at all inside the window.
 
 **Some defects are only reachable by a person.** DEF-06 — a route row marked
 "Paid" above a total still reading GHS 0.00 — was found by clicking through the
-interface, not by any of the 226 tests, and could not have been: every test
+interface, not by any of the automated tests, and could not have been: every test
 asserted the *response* to a request and none asserted the state of the page
 afterwards. DEF-08 was similar in kind, invisible outside a real deployment.
 Lehman's eighth law describes evolution as a feedback system; this project

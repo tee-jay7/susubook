@@ -63,6 +63,42 @@ class Config:
     BASE_URL: str = field(default_factory=lambda: os.environ.get("BASE_URL", ""))
     ENV: str = field(default_factory=lambda: os.environ.get("FLASK_ENV", "development"))
 
+    # SMS notification (FR-31, CR-002).
+    #
+    # Absent an API key the gateway is a no-op, so the failure mode of missing
+    # configuration is silence rather than an error — and tests and local
+    # development can never send a message.
+    #
+    # SMS_ALLOWLIST defaults to EMPTY, meaning send to nobody. The demonstration
+    # data uses valid-format Ghanaian numbers which may belong to real people;
+    # an unguarded send would text strangers every time a collection is recorded.
+    SMS_API_KEY: str = field(default_factory=lambda: os.environ.get("SMS_API_KEY", ""))
+    SMS_SENDER_ID: str = field(
+        default_factory=lambda: os.environ.get("SMS_SENDER_ID", "SusuBook")
+    )
+    SMS_API_URL: str = field(default_factory=lambda: os.environ.get("SMS_API_URL", ""))
+    SMS_ALLOWLIST: str = field(
+        default_factory=lambda: os.environ.get("SMS_ALLOWLIST", "")
+    )
+
+    @property
+    def sms_enabled(self) -> bool:
+        return bool(self.SMS_API_KEY)
+
+    @property
+    def sms_allowlist(self) -> frozenset[str]:
+        from app.services.notifications import normalise_msisdn
+
+        numbers = (n.strip() for n in self.SMS_ALLOWLIST.split(",") if n.strip())
+        return frozenset(
+            m for m in (normalise_msisdn(n) for n in numbers) if m is not None
+        )
+
+    @property
+    def sms_allow_all(self) -> bool:
+        """Explicit opt-out of the allowlist. Never set this for a demo."""
+        return self.SMS_ALLOWLIST.strip() == "*"
+
     # Session cookie hardening (NFR-03)
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SAMESITE: str = "Lax"

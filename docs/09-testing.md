@@ -11,8 +11,8 @@
 Testing was shaped by one architectural decision made in Phase 2: **the domain
 layer imports neither Flask nor SQLAlchemy**. That is what made a real test
 suite affordable inside the examination window — business rules can be tested
-with no database, no fixtures and no HTTP client, so the 129 unit tests run in
-**0.34 seconds**. An Active-Record design would have required a live database
+with no database, no fixtures and no HTTP client, so the 156 unit tests run in
+**0.36 seconds**. An Active-Record design would have required a live database
 for every rule test, and under a 20-hour implementation budget those tests would
 simply not have been written.
 
@@ -20,10 +20,10 @@ Three levels, each covering what the level below cannot:
 
 | Level | Count | Runtime | Covers | Deliberately excludes |
 |---|---|---|---|---|
-| **Unit** | 129 | 0.34 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
+| **Unit** | 156 | 0.36 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
 | **Integration** | 42 | 3.3 s | Repositories, entity/record mapping, and above all the **database-enforced invariants** | HTTP, sessions, templates |
-| **System** | 55 | 10.4 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
-| **Total** | **226** | **14.3 s** | | |
+| **System** | 58 | 10.6 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
+| **Total** | **256** | **15.0 s** | | |
 
 **Why the integration level exists at all.** The design claims three business
 invariants are enforced *twice* — in the domain layer and again by PostgreSQL
@@ -208,6 +208,29 @@ suite; no result is stated from memory.
 | TC-QR-02 | Card discloses no phone number | Phone absent from page | Absent | **P** |
 | TC-QR-03 | Another collector cannot print the card | 403 | 403 | **P** |
 
+### TC-SMS — Client notification (FR-31, CR-002)
+
+The negative cases matter most here. The demonstration dataset uses valid-format
+Ghanaian numbers that may belong to real people, so an unguarded send would text
+strangers on every recorded collection.
+
+| ID | Test case | Expected | Actual | |
+|---|---|---|---|---|
+| TC-SMS-01 | **Default configuration sends nothing** | No message, no `SMS_DISPATCHED` audit | Gateway untouched, audit absent | **P** |
+| TC-SMS-02 | **Every seeded phone number is refused by default** | All 15 refused | All 15 refused | **P** |
+| TC-SMS-03 | Allowlisted client is notified | Message dispatched to the normalised number | `233201000202`, correct body | **P** |
+| TC-SMS-04 | Dispatch is audited | `SMS_DISPATCHED` written | Present | **P** |
+| TC-SMS-05 | **A failing gateway does not fail the collection** | 302, contribution still committed | 302, one contribution row | **P** |
+| TC-SMS-06 | Number forms normalise identically | `024…`, `+233…`, `233…`, spaced all match | All match | **P** |
+| TC-SMS-07 | Unparseable number refused even under allow-all | Refused | Refused | **P** |
+| TC-SMS-08 | Message fits one SMS segment | ≤160 characters | Within limit | **P** |
+| TC-SMS-09 | Message carries no link, credential or token | None present | None present | **P** |
+| TC-SMS-10 | Message carries amount, date, collector, reference, total | All five present | All five present | **P** |
+
+> TC-SMS-02 is a regression guard against a specific harm rather than a rule. It
+> asserts that every number in the seed dataset is refused by a default-configured
+> service, so the safety gate cannot be removed without a test failing.
+
 ### TC-DB — Database-enforced invariants (defence in depth)
 
 Written through the ORM, **bypassing the service layer**, so the guarantee is
@@ -320,6 +343,7 @@ connection or a real low-end Android device. Named as gaps in §9.10.
 | FR-28…30 client transparency | ✅ Satisfied | TC-CLI |
 | FR-32, FR-33 audit and reversal | ✅ Satisfied | TC-REV, audit assertions |
 | FR-39, FR-40 QR cards | ✅ Satisfied | TC-QR |
+| **FR-31 SMS notification** | ⚠️ **Partial** | TC-SMS passes; **restricted to an allowlist and never verified on a real handset** |
 | NFR-01 performance | ⚠️ **Partial** | Server time measured; end-to-end on 3G not measured |
 | NFR-02 usability (≤3 interactions) | ⚠️ **Unverified** | Design achieves 2 by inspection; **not measured with a participant** |
 | NFR-03 security | ⚠️ **Partial** | TC-SEC passes; TD-09, TD-14, TD-15 outstanding |
@@ -416,6 +440,7 @@ Recorded so the coverage claim is not overstated:
 | No UAT with an independent participant | NFR-02 unverified; usability findings unknown | No participant available within the window (§9.9) |
 | No real-device or real-network testing | NFR-01 unverified end-to-end; NFR-08 outdoor legibility unverified | No 3G connection or low-end Android available |
 | No load or concurrency testing | Behaviour under simultaneous collectors unknown | Out of scope for the window |
+| **No SMS delivered to a real handset** | FR-31 verified in mechanism only; the gateway's actual behaviour is untested | Recipients are restricted to an allowlist, and no allowlisted handset was available |
 | No accessibility audit or screen-reader test | NFR-08 partially verified | Requires tooling and time not budgeted |
 | No penetration testing or dependency vulnerability scan | Unknown vulnerabilities may exist | Out of scope; TD-12 also leaves dependencies unpinned |
 | No browser-matrix testing | Rendering verified in Chromium only | Single-browser check only |

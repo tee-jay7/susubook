@@ -28,6 +28,7 @@ from app.domain.rules import (
     validate_contribution,
 )
 
+from .notifications import NotificationService, NullSmsGateway
 from .protocols import (
     AuditRepository,
     ClientRepository,
@@ -197,6 +198,8 @@ class CollectionService:
         audit: AuditRepository,
         uow: UnitOfWork,
         clock: Callable[[], date] = date.today,
+        users: UserRepository | None = None,
+        notifications: NotificationService | None = None,
     ) -> None:
         self._clients = clients
         self._cycles = cycles
@@ -204,6 +207,9 @@ class CollectionService:
         self._audit = audit
         self._uow = uow
         self._clock = clock
+        self._users = users
+        # Defaults to a gateway that sends nothing (CR-002).
+        self._notifications = notifications or NotificationService(NullSmsGateway())
 
     # -- authorisation ---------------------------------------------------
 
@@ -287,7 +293,49 @@ class CollectionService:
             },
         )
         self._uow.commit()
+
+        # After the commit, deliberately. The contribution is the record of
+        # truth and is already durable; a notification is best-effort and must
+        # never be able to roll one back or delay its confirmation (FR-31).
+        self._notify_client(client, saved, actor, cycle)
         return saved
+
+    def _notify_client(
+        self,
+        client: Client,
+        contribution: Contribution,
+        actor: User,
+        cycle: ContributionCycle,
+    ) -> None:
+        """Tell the client what was recorded. Never raises."""
+        try:
+            summary = compute_cycle_summary(
+                cycle=cycle,
+                contributions=self._contributions.list_for_cycle(cycle.id),
+                today=self._clock(),
+            )
+            dispatched = self._notifications.notify_contribution(
+                client=client,
+                contribution=contribution,
+                collector_name=actor.full_name,
+                cycle_total=summary.total_collected,
+            )
+            if dispatched:
+                self._audit.append(
+                    actor_id=actor.id,
+                    action="SMS_DISPATCHED",
+                    target_type="CONTRIBUTION",
+                    target_id=contribution.reference,
+                    detail={"client_ref": str(client.public_ref)},
+                )
+                self._uow.commit()
+        except Exception:  # noqa: BLE001
+            # A notification failure is not a collection failure.
+            import logging
+
+            logging.getLogger(__name__).exception(
+                "notification failed for %s", contribution.reference
+            )
 
     # -- UC-09 -----------------------------------------------------------
 

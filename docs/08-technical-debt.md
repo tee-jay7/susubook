@@ -28,8 +28,9 @@ and every item is marked in the source at the site that carries it.
 | **The scope decision** | Phase 1, before any code | TD-01…TD-06 | Chosen. The effort estimate exceeded the budget by 23%, so 4.1 hours of implementation quality were removed deliberately (`05-effort-estimation.md` §4.6). |
 | **Design decisions** | Phase 2, before any code | TD-07…TD-13 | Consequential. The layered architecture, the free-tier constraint and deferred requirements each carry a known cost. |
 | **Implementation and testing** | Phase 3–4 | TD-14…TD-17 | Discovered. Found while building and while writing tests — the only items not anticipated. |
+| **Change request CR-002** | Phase 6 | TD-18 | Consequential. Reinstating FR-31 (SMS) carried a known cost: free-tier hosting provides no worker, so there is no queue. |
 
-Thirteen of seventeen items were identified **before the code that carries them
+Thirteen of eighteen items were identified **before the code that carries them
 existed**. That is the substantive claim of this section, and it is why the debt
 register and the effort estimate are the same document read twice.
 
@@ -174,6 +175,19 @@ that works but is wrong, `HACK` for a knowingly poor mechanism.
 
 ---
 
+**TD-18 · SMS is fire-and-forget: no delivery receipt, no retry, no queue**
+`app/services/notifications.py` · Architecture/Design · Prudent & Deliberate
+
+| | |
+|---|---|
+| **Debt** | A message is dispatched on a daemon thread and the outcome is logged, not stored. There is no delivery receipt, no retry on failure, and no queue. |
+| **Cause** | A durable queue needs a worker process, which free-tier hosting does not provide — the same constraint as **TD-10**. Dispatching inline was the only option that kept the send off the collector's critical path. |
+| **Impact** | If the gateway is down or the message is rejected, the client is never told and no one knows. The audit log records that a send was *dispatched*, not that it was *delivered*, so the record cannot answer "I was never notified". The contribution itself is unaffected — the ledger is committed before any send is attempted. |
+| **Priority** | **Scheduled.** The system is correct without it; the notification is an assurance layer, and its silent failure degrades that assurance rather than the record. |
+| **Resolution** | Persist an outbox row per message, dispatch from a worker, record the provider's delivery status against it, and retry with backoff. Estimated 3–4 hours, and dependent on hosting that provides a worker (as TD-10 also is). |
+
+---
+
 **TD-17 · No structured logging, error tracking or monitoring**
 Application-wide · Process · Prudent & Deliberate
 
@@ -199,7 +213,7 @@ Application-wide · Process · Prudent & Deliberate
 | **Debt** | Seven `_to_*` functions convert records to entities by hand. A schema change must be made in two places. |
 | **Cause** | The direct consequence of keeping the domain layer framework-free (NFR-07). SQLAlchemy imperative mapping onto the dataclasses would remove it but was not affordable. |
 | **Impact** | Duplication, and silent drift if a column is added to a model but not its mapper. Partially mitigated: an integration test asserts money round-trips the mapping exactly. |
-| **Priority** | **Acceptable.** This is the price of an architecture that pays for itself — it is what makes 129 unit tests run in 0.34 s with no database. Removing the mapping would remove that benefit. |
+| **Priority** | **Acceptable.** This is the price of an architecture that pays for itself — it is what makes 156 unit tests run in 0.36 s with no database. Removing the mapping would remove that benefit. |
 | **Resolution** | Revisit only if entity count grows substantially. Consider SQLAlchemy imperative mapping. Extend round-trip tests to every field in the meantime. |
 
 ---
@@ -254,9 +268,9 @@ FR-36 (configurable institutional defaults) was deferred as *Could*. Cycles snap
 | Classification | Count | Items |
 |---|---|---|
 | **Critical — immediate attention** | 3 | TD-09, TD-14, TD-15 |
-| **Scheduled for future resolution** | 6 | TD-01, TD-02, TD-10, TD-12, TD-16, TD-17 |
+| **Scheduled for future resolution** | 7 | TD-01, TD-02, TD-10, TD-12, TD-16, TD-17, TD-18 |
 | **Acceptable temporarily** | 8 | TD-03, TD-04, TD-05, TD-06, TD-07, TD-08, TD-11, TD-13 |
-| **Total** | **17** | |
+| **Total** | **18** | |
 
 > **All three critical items are security items, and none of them was a
 > deliberate scope cut.** TD-09 follows from a scope cut (no migrations), TD-14
@@ -269,7 +283,7 @@ FR-36 (configurable institutional defaults) was deferred as *Could*. Cycles snap
 
 | | **Deliberate** | **Inadvertent** |
 |---|---|---|
-| **Prudent** | **14 items** — TD-01…10, 12, 13, 14, 17. Taken knowingly, for a stated reason, with an intended repayment. | **3 items** — TD-11, TD-15, TD-16. "We now know how we should have done it." |
+| **Prudent** | **15 items** — TD-01…10, 12, 13, 14, 17, 18. Taken knowingly, for a stated reason, with an intended repayment. | **3 items** — TD-11, TD-15, TD-16. "We now know how we should have done it." |
 | **Reckless** | **0** | **0** |
 
 No item is reckless. Every one has a recorded cause and a resolution, which is
@@ -280,7 +294,7 @@ the distinction Session 3 draws between managed and unmanaged debt.
 | Type | Count | Items |
 |---|---|---|
 | Code debt | 8 | TD-03, 04, 05, 11, 13, 14, 15, 16 |
-| Architecture / design debt | 5 | TD-06, 07, 08, 09, 10 |
+| Architecture / design debt | 6 | TD-06, 07, 08, 09, 10, 18 |
 | Infrastructure debt | 3 | TD-01, 02, 12 |
 | Process debt | 1 | TD-17 |
 | **Test debt** | **0** | — |

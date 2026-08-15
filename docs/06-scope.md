@@ -39,6 +39,7 @@ The scope below is the output of that process.
 | **Client transparency** | Client login showing every contribution with amount, date, time, recording collector and reference; balance and projected payout | FR-28…30 |
 | **Audit** | Append-only audit log of every state change; reversal instead of edit or delete | FR-32, FR-33 |
 | **Client identification** *(CR-001)* | Opaque UUID public reference per client; printable QR card encoding the contribution URL; scan-to-collect via the phone's native camera | FR-39, FR-40 |
+| **Client notification** *(CR-002)* | SMS to the client when a contribution is recorded, carrying amount, date, collector and reference. Recipients restricted to a configured allowlist; disabled entirely without an API key | FR-31 |
 
 **30 functional requirements · 10 non-functional requirements.**
 
@@ -82,7 +83,6 @@ matters whenever a card is lost, damaged or left at home.
 | FR-36 Configurable defaults | Could | Cycle length and commission are constants for now | Evolution plan |
 | FR-37 Supervisor dashboard | Could | Variance list carries the essential signal | Evolution plan |
 | FR-38 CSV export | Could | Not required to demonstrate any principle | Evolution plan |
-| **FR-31 SMS notification** | **Won't** | **Requires a paid gateway (CO-04) with account lead time exceeding CO-01** | **First item in evolution plan** |
 
 ## 6.5 Explicitly excluded from the product vision
 

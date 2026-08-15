@@ -35,6 +35,14 @@ DB_PORT="${DB_PORT:-5432}"
 DB_NAME="${DB_NAME:-susu_book}"
 DB_USER="${DB_USER:-susu_app}"
 KEY_SECRET="${KEY_SECRET:-susubook-secret-key}"
+
+# SMS notification (FR-31, CR-002). Optional: absent the secret the gateway
+# sends nothing. SMS_ALLOWLIST defaults to EMPTY, meaning no recipient — the
+# demonstration data holds valid-format Ghanaian numbers, so an unguarded
+# rollout would text real strangers on every collection.
+SMS_SECRET="${SMS_SECRET:-susubook-sms-key}"
+SMS_ALLOWLIST="${SMS_ALLOWLIST:-}"
+SMS_SENDER_ID="${SMS_SENDER_ID:-SusuBook}"
 IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${SERVICE}"
 TAG="$(git rev-parse --short HEAD 2>/dev/null || date +%s)"
 
@@ -50,9 +58,16 @@ VPC_FLAGS=(
 SECRET_FLAGS=(
   --set-secrets "DB_PASSWORD=${DB_SECRET}:latest,SECRET_KEY=${KEY_SECRET}:latest"
 )
+# Only mount the SMS key if the secret actually exists, so a deployment without
+# it stays valid and simply runs with notification disabled.
+if gcloud secrets describe "$SMS_SECRET" --project "$PROJECT_ID" >/dev/null 2>&1; then
+  SECRET_FLAGS=(
+    --set-secrets "DB_PASSWORD=${DB_SECRET}:latest,SECRET_KEY=${KEY_SECRET}:latest,SMS_API_KEY=${SMS_SECRET}:latest"
+  )
+fi
 
 ENV_FLAGS=(
-  --set-env-vars "FLASK_ENV=production,FLASK_APP=app,DB_HOST=${DB_HOST},DB_PORT=${DB_PORT},DB_NAME=${DB_NAME},DB_USER=${DB_USER}"
+  --set-env-vars "FLASK_ENV=production,FLASK_APP=app,DB_HOST=${DB_HOST},DB_PORT=${DB_PORT},DB_NAME=${DB_NAME},DB_USER=${DB_USER},SMS_ALLOWLIST=${SMS_ALLOWLIST},SMS_SENDER_ID=${SMS_SENDER_ID}"
 )
 
 green() { printf '\033[0;32m%s\033[0m\n' "$*"; }
@@ -87,7 +102,9 @@ setup() {
   local project_number sa
   project_number="$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')"
   sa="${project_number}-compute@developer.gserviceaccount.com"
-  for secret in "$DB_SECRET" "$KEY_SECRET"; do
+  for secret in "$DB_SECRET" "$KEY_SECRET" "$SMS_SECRET"; do
+    gcloud secrets describe "$secret" --project "$PROJECT_ID" >/dev/null 2>&1 || {
+      green "  ${secret} not present — skipping (optional)"; continue; }
     gcloud secrets add-iam-policy-binding "$secret" \
       --member="serviceAccount:${sa}" \
       --role=roles/secretmanager.secretAccessor \

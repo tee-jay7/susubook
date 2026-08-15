@@ -329,8 +329,10 @@ Not in this version. Each day is recorded separately, on the day. This is planne
 for a future release.
 
 **Will I be told when a payment is recorded?**
-Not by SMS in this version — you check your card. SMS notification is the first
-feature planned for the next release.
+SusuBook can send you a text message each time a payment is recorded, showing the
+amount, the date, which collector recorded it and the reference. Ask your branch
+whether it is switched on for your number. You can always check your card
+yourself, whether or not you receive a text.
 
 **What happens when my cycle ends?**
 Your supervisor releases the payout and a new cycle opens automatically at the

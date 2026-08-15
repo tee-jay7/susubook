@@ -25,6 +25,7 @@ from app.infrastructure.repositories import (
 )
 
 from .collection import CollectionService, CycleService, EnrolmentService
+from .notifications import NotificationService, NullSmsGateway, SmsGateway
 from .payout import PayoutService
 from .reconciliation import ReconciliationService
 from .security import AuthService
@@ -33,6 +34,7 @@ from .security import AuthService
 @dataclass
 class Services:
     auth: AuthService
+    notifications: NotificationService
     enrolment: EnrolmentService
     collection: CollectionService
     payout: PayoutService
@@ -46,7 +48,10 @@ class Services:
 
 
 def build_services(
-    session: Session, *, clock: Callable[[], date] = date.today
+    session: Session,
+    *,
+    clock: Callable[[], date] = date.today,
+    notifications: NotificationService | None = None,
 ) -> Services:
     users = SqlUserRepository(session)
     clients = SqlClientRepository(session)
@@ -58,9 +63,13 @@ def build_services(
     uow = SqlAlchemyUnitOfWork(session)
 
     cycle_service = CycleService(cycles, clock=clock)
+    # Defaults to a gateway that sends nothing, so a missing configuration can
+    # never result in an accidental message (CR-002).
+    notifier = notifications or NotificationService(NullSmsGateway())
 
     return Services(
         auth=AuthService(users, audit),
+        notifications=notifier,
         enrolment=EnrolmentService(
             users=users,
             clients=clients,
@@ -76,6 +85,8 @@ def build_services(
             audit=audit,
             uow=uow,
             clock=clock,
+            users=users,
+            notifications=notifier,
         ),
         payout=PayoutService(
             cycles=cycles,

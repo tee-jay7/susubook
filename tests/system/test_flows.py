@@ -595,6 +595,78 @@ class TestSecurityControls:
         assert client.get("/collector/nonexistent").status_code == 404
 
 
+class TestNotification:
+    """TC-SMS — FR-31 via CR-002, exercised through the full stack."""
+
+    def test_default_configuration_sends_nothing(self, client, world, db, app):
+        """The deployed default. No API key, empty allowlist, no message.
+
+        Seed numbers are valid Ghanaian formats that may belong to real people,
+        so silence here is a safety property, not an absence of a feature.
+        """
+        from app.infrastructure.models import AuditLogModel
+
+        gateway = app.extensions["notifications"]._gateway
+        before = len(getattr(gateway, "sent", []))
+
+        login(client, "0244000101")
+        client.post(f"/collector/collect/{world['public_ref']}")
+
+        assert len(getattr(gateway, "sent", [])) == before
+        actions = [a.action for a in db.query(AuditLogModel).all()]
+        assert "SMS_DISPATCHED" not in actions
+
+    def test_an_allowlisted_client_is_notified(self, client, world, db, app):
+        from app.infrastructure.models import AuditLogModel
+        from app.services.notifications import normalise_msisdn
+
+        service = app.extensions["notifications"]
+        original_allow, original_sync = service._allowlist, service._synchronous
+        service._allowlist = frozenset({normalise_msisdn("0201000202")})
+        service._synchronous = True  # observable without joining a thread
+        try:
+            login(client, "0244000101")
+            client.post(f"/collector/collect/{world['public_ref']}")
+
+            sent = service._gateway.sent
+            assert len(sent) == 1
+            to, message = sent[0]
+            assert to == "233201000202"
+            assert "GHS 10.00" in message and "SB-" in message
+
+            db.expire_all()
+            actions = [a.action for a in db.query(AuditLogModel).all()]
+            assert "SMS_DISPATCHED" in actions
+        finally:
+            service._allowlist = original_allow
+            service._synchronous = original_sync
+            service._gateway.sent.clear()
+
+    def test_a_failing_gateway_does_not_fail_the_collection(
+        self, client, world, db, app
+    ):
+        """The ledger is the record of truth; notification is best-effort."""
+        from app.infrastructure.models import ContributionModel
+        from app.services.notifications import normalise_msisdn
+
+        class ExplodingGateway:
+            def send(self, *, to: str, message: str) -> bool:
+                raise RuntimeError("gateway down")
+
+        service = app.extensions["notifications"]
+        saved = (service._gateway, service._allowlist, service._synchronous)
+        service._gateway = ExplodingGateway()
+        service._allowlist = frozenset({normalise_msisdn("0201000202")})
+        service._synchronous = True
+        try:
+            login(client, "0244000101")
+            response = client.post(f"/collector/collect/{world['public_ref']}")
+            assert response.status_code == 302
+            assert db.query(ContributionModel).count() == 1
+        finally:
+            service._gateway, service._allowlist, service._synchronous = saved
+
+
 class TestOperational:
     """TC-OPS — deployment support endpoints."""
 

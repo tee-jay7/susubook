@@ -8,14 +8,14 @@
 ## 10.1 Delivered system
 
 A functional, deployed web application implementing 30 functional requirements
-across four roles, with 226 automated tests at 97% coverage.
+across four roles, with 256 automated tests at 97% coverage.
 
 | | |
 |---|---|
 | **Live** | https://susubook-fdtbppd7sq-uc.a.run.app |
 | **Source** | https://github.com/tee-jay7/susubook |
 | **Stack** | Python 3.12 · Flask 3 · SQLAlchemy 2 · PostgreSQL 16 · Jinja2 · HTMX · segno |
-| **Tests** | 226 (129 unit, 42 integration, 55 system) |
+| **Tests** | 256 (156 unit, 42 integration, 58 system) |
 | **Coverage** | 97% overall; 99–100% on the domain layer |
 
 ## 10.2 Structure as built
@@ -43,7 +43,7 @@ consequence of the architectural decision described below.
 This looks like architectural purity. It was a scheduling decision.
 
 Business rules expressed as pure functions can be tested with no database, no
-fixtures and no HTTP client. The 129 unit tests run in **0.34 seconds**. Under an
+fixtures and no HTTP client. The 156 unit tests run in **0.36 seconds**. Under an
 implementation budget of roughly 20 hours, an Active-Record design — rules living
 on ORM models — would have required a live database for every rule test, and
 those tests would not have been written at all. Testing carries 5 marks and had
@@ -149,7 +149,7 @@ reference.
 
 ### Out-of-band updates on the collector's critical path
 
-**DEF-06**, found by exploratory testing rather than by any of the 226 automated
+**DEF-06**, found by exploratory testing rather than by any of the automated
 tests. Recording a contribution swapped the client's row to "Paid" but left the
 day's running total stale until a manual refresh — a row marked Paid sitting
 above a total reading GHS 0.00.
@@ -171,6 +171,7 @@ would be a design nobody followed.
 | `/healthz` became `/health` | **DEF-08.** Google Front End intercepts `/healthz` on Cloud Run before the request reaches the container. |
 | `validate_contribution` gained `days_covered` | FR-15 (catch-up payments) is deferred, but parameterising the rule means enabling it later needs no change to the business rules — only an allocation step in the service layer. |
 | A health endpoint was added | Not in the original design; required by the deployment target. |
+| SMS notification added (FR-31) | **CR-002.** The gateway constraint that made it *Won't* no longer applied. `SmsGateway` is the second worked example of the dependency inversion the design claims — the seam existed before the feature did. |
 
 ## 10.6 Self-admitted technical debt in the source
 
