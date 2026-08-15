@@ -679,6 +679,28 @@ paper card cannot provide.
 └───────────────────────────────────────────┘
 ```
 
+### Visual identity
+
+Two design elements carry meaning rather than decoration.
+
+**The mark** is the susu card itself — a card outline containing nine days, the
+first five filled and the rest faded. It is the same image the client sees on
+their own card, reduced to nine squares, so the identity states what the product
+does.
+
+**The background motif is cowrie shells.** Cowries were currency across West
+Africa for centuries, including the Gold Coast, and remain a cultural shorthand
+for money and saving. A digital ledger for a traditional savings practice is
+better placed in that tradition than in the visual language of a retail bank,
+and the users this system is built for — market traders and kiosk owners — are
+the people for whom that reference is legible.
+
+Both are drawn as SVG, which is what makes them affordable. The motif is a
+single ~2 KB cacheable tile; a raster background would have added weight to a
+page whose performance budget is already exceeded (**TD-02**, §12.6). It is tiled
+at 5% opacity behind the content cards and never beneath body text, so contrast
+is set by the card rather than the background.
+
 ### Accessibility (NFR-08)
 
 Interface work follows the user-centred design activities of ISO 9241-210 [28]

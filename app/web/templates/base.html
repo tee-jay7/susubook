@@ -15,7 +15,24 @@
   <style>
     /* Minimum comfortable touch target for one-handed use outdoors. */
     .tap { min-height: 44px; min-width: 44px; }
-    body { -webkit-text-size-adjust: 100%; }
+
+    body {
+      -webkit-text-size-adjust: 100%;
+      /* Cowrie motif — West African shell currency, and the tradition susu
+         belongs to. Tiled behind the content cards at very low opacity, so it
+         never sits under body text and contrast is unaffected (NFR-08).
+         An SVG tile keeps this to ~1KB and one cacheable request, which a
+         raster background would not (NFR-01, TD-02). */
+      background-image: url("{{ url_for('static', filename='cowries.svg') }}");
+      background-size: 190px 190px;
+      background-attachment: fixed;
+    }
+
+    /* Cards sit above the motif on solid white, so text contrast is
+       determined by the card, not the background. */
+    @media print {
+      body { background-image: none; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-900 min-h-screen">
