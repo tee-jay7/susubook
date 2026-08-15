@@ -3,8 +3,17 @@
 
 {% block content %}
 <div class="max-w-sm mx-auto">
-  <h1 class="text-2xl font-semibold mb-1">Sign in</h1>
-  <p class="text-sm text-slate-600 mb-6">
+  <div class="text-center mb-7">
+    <span class="text-[#1f4e5f] inline-block">
+      {% with size = 52 %}{% include "partials/logo.html" %}{% endwith %}
+    </span>
+    <h1 class="text-2xl font-semibold mt-3">SusuBook</h1>
+    <p class="text-sm text-slate-500 mt-1">
+      Your susu savings, recorded and visible to you.
+    </p>
+  </div>
+
+  <p class="text-sm text-slate-600 mb-4 text-center">
     Clients, collectors and supervisors sign in with their phone number.
   </p>
 

@@ -1,0 +1,20 @@
+{#
+  Inline mark, so it inherits currentColor and needs no extra request.
+  Usage: {% with size = 28 %}{% include "partials/logo.html" %}{% endwith %}
+#}
+<svg viewBox="0 0 32 32" fill="none" width="{{ size|default(28) }}"
+     height="{{ size|default(28) }}" class="shrink-0" aria-hidden="true">
+  <rect x="2.6" y="2.6" width="26.8" height="26.8" rx="6.5"
+        stroke="currentColor" stroke-width="2.2"/>
+  <g fill="currentColor">
+    <rect x="7.0" y="7.0" width="5.2" height="5.2" rx="1.35"/>
+    <rect x="13.4" y="7.0" width="5.2" height="5.2" rx="1.35"/>
+    <rect x="19.8" y="7.0" width="5.2" height="5.2" rx="1.35"/>
+    <rect x="7.0" y="13.4" width="5.2" height="5.2" rx="1.35"/>
+    <rect x="13.4" y="13.4" width="5.2" height="5.2" rx="1.35"/>
+    <rect x="19.8" y="13.4" width="5.2" height="5.2" rx="1.35" opacity=".35"/>
+    <rect x="7.0" y="19.8" width="5.2" height="5.2" rx="1.35" opacity=".35"/>
+    <rect x="13.4" y="19.8" width="5.2" height="5.2" rx="1.35" opacity=".35"/>
+    <rect x="19.8" y="19.8" width="5.2" height="5.2" rx="1.35" opacity=".35"/>
+  </g>
+</svg>
