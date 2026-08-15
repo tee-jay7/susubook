@@ -21,7 +21,7 @@ was declared at the time rather than discovered afterwards.
 
 **Assumption A5 is unvalidated, and its mitigation is built but not yet in
 effect.** A5 holds that clients can reach a mobile web page. If false, the
-client-transparency feature — the reason the system exists — does not reach the
+client-transparency feature (the reason the system exists) does not reach the
 people it is for.
 
 SMS notification (FR-31) was reinstated under **CR-002** and is implemented: a
@@ -30,7 +30,7 @@ recorded. But **recipients are restricted to a configured allowlist**, because
 the demonstration dataset uses valid-format Ghanaian numbers that may belong to
 real people, and an unguarded rollout would text strangers on every collection.
 
-So A5 is **mitigated in mechanism, not yet in practice**. Lifting the allowlist
+A5 is therefore **mitigated in mechanism, but not yet in practice**. Lifting the allowlist
 requires client numbers that are genuinely the clients', which this project does
 not have. The delivery path is also unverified end to end: no message has been
 confirmed as received on a real handset.
@@ -56,7 +56,7 @@ handset over mobile data, and that configuration was never tested.
 
 **No one has printed a QR card and scanned it with a phone.** TC-QR verifies the
 card renders and the route resolves and authorises correctly. The optical read
-off paper — the actual interaction — is untested.
+off paper (the actual interaction) is untested.
 
 **No load, concurrency, penetration or dependency-vulnerability testing.**
 
@@ -64,11 +64,11 @@ off paper — the actual interaction — is untested.
 
 **Two** debt items remain classified **Critical** (§8.4):
 
-- **TD-14** — no login rate limiting or lockout. Failed attempts are audited, so
-  an attack is visible afterwards; nothing prevents one. Note that the *password
-  reset* endpoint **is** rate-limited and attempt-capped; the gap is the login
-  form specifically.
-- **TD-09** — the audit log is append-only by application convention, not by
+- **TD-14**, no login rate limiting or lockout. Failed attempts are audited, so
+  an attack is visible afterwards; nothing prevents one. The *password reset*
+  endpoint is rate-limited and attempt-capped; the deficiency is specific to the
+  login form.
+- **TD-09**, the audit log is append-only by application convention, not by
   database permission.
 
 **TD-15 has been repaid.** The collector's password no longer survives the
@@ -117,7 +117,7 @@ ES-04 record the consequences.
 **Referencing was retrofitted.** Sources are cited in §19 below, but they were
 assembled at the end rather than recorded as the work drew on them. One
 assumption — AS-01, the 30 LOC per function point used to convert function points
-to size — is flagged in §19.6 as requiring verification before submission,
+to size, is flagged in §19.6 as requiring verification before submission,
 because the specific published table it came from was never recorded.
 
 ---
@@ -138,18 +138,18 @@ https://susubook-fdtbppd7sq-uc.a.run.app.
 |---|---|---|
 | **O1** | Elicit, analyse, prioritise requirements; produce an SRS | **Met** — 40 requirements, MoSCoW-prioritised, traceability matrix, IEEE 830 SRS. Limited by the absence of primary elicitation (§17.1) |
 | **O2** | Estimate effort and use it to define achievable scope | **Met** — FPA → COCOMO → PERT triangulated; the estimate exposed a 23% over-commitment *before* implementation and drove the scope decision |
-| **O3** | Design a maintainable layered architecture with UML | **Met** — four layers, eight UML artefacts, SOLID applied at named sites |
-| **O4** | Implement the prioritised requirements as a deployed application | **Met** — deployed, with authentication, role-based authorisation, validation and an append-only audit trail |
+| **O3** | Design a maintainable layered architecture with UML | **Met**, four layers, eight UML artefacts, SOLID applied at named sites |
+| **O4** | Implement the prioritised requirements as a deployed application | **Met**, deployed, with authentication, role-based authorisation, validation and an append-only audit trail |
 | **O5** | Verify through unit, integration, system and acceptance testing | **Partially met** — 299 tests across three levels; **UAT not conducted** |
 | **O6** | Identify, classify and document technical debt with a repayment plan | **Met** — 18 items, each with cause, impact, priority and resolution; 13 identified before the code carrying them existed |
-| **O7** | Define maintenance and evolution grounded in theory | **Met** — four maintenance categories, Lehman's eight laws applied individually, six-release roadmap |
+| **O7** | Define maintenance and evolution grounded in theory | **Met**, four maintenance categories, Lehman's eight laws applied individually, six-release roadmap |
 
 Six of seven met; O5 partially, and the shortfall is named rather than glossed.
 
 ## 18.3 What the project demonstrates
 
 **Estimation is worth doing even when the number is wrong.** COCOMO put this at
-1,969 person-hours against a 48-hour window — a ratio of no operational use. Its
+1,969 person-hours against a 48-hour window, a ratio of no operational use. Its
 value was not the figure but what the figure forced: an explicit scope decision,
 taken in advance, with a stated basis. The estimate also generated the technical
 debt register, because every quality reduction made to fit the budget became a
@@ -157,7 +157,7 @@ debt entry with a known cause. The two sections that carry the most marks turned
 out to be the same decision documented twice.
 
 **A debt register goes stale unless it is worked.** TD-15's recorded cause was
-the absent SMS gateway. CR-002 delivered that gateway — and a **Critical** item
+the absent SMS gateway. CR-002 delivered that gateway, and a **Critical** item
 became unblocked without anything noticing. It was caught by re-reading the
 register, not by a process. Lehman's second law says structure drifts unless
 work is done explicitly to counter it; that applies to the documentation
@@ -166,16 +166,16 @@ describing a system as much as to the system.
 **Debt taken knowingly behaves differently from debt taken accidentally.** Of 18
 items, 13 were identified before the code carrying them existed. All 13 landed in
 the *acceptable* or *scheduled* bands. All three **Critical** items were
-discovered later — during implementation and testing — and none was a deliberate
-trade-off. The dangerous debt was the debt nobody decided to take on.
+discovered later, during implementation and testing, and none was a deliberate
+trade-off. The items posing the greatest risk were those incurred without a decision.
 
 **Architecture is a scheduling decision.** Keeping the domain layer free of Flask
 and SQLAlchemy reads as purity. It was the reason 156 unit tests run in 0.36
 seconds with no database, and therefore the reason a real test suite was
 affordable at all inside the window.
 
-**Some defects are only reachable by a person.** DEF-06 — a route row marked
-"Paid" above a total still reading GHS 0.00 — was found by clicking through the
+**Some defects are only reachable by a person.** DEF-06, a route row marked
+"Paid" above a total still reading GHS 0.00, was found by clicking through the
 interface, not by any of the automated tests, and could not have been: every test
 asserted the *response* to a request and none asserted the state of the page
 afterwards. DEF-08 was similar in kind, invisible outside a real deployment.
@@ -187,13 +187,13 @@ as not met, with arithmetic. UAT is recorded as not done. Two of the developer's
 own test assumptions were found wrong and corrected rather than adjusted until
 they passed. A flaky security test was fixed and then demonstrated stable over
 five runs rather than assumed. Each of these could have been quietly omitted, and
-the document would have been weaker for it — a claim nobody can check is worth
-less than a limitation anyone can verify.
+the document would have been weaker for it. An unverifiable claim is of less
+value than a limitation that a reader can confirm independently.
 
 ## 18.4 If the work continued
 
 The order is already fixed by §11.6: migrations, rate limiting, forced password
-change, audit enforcement — 8 to 11 hours — before the system touches real client
+change, audit enforcement (8 to 11 hours) before the system touches real client
 money. Then SMS notification, which mitigates the one assumption the value
 proposition depends on.
 
@@ -245,13 +245,13 @@ yet solve it for anyone.
 ## 19.5 Standards and legislation
 
 27. IEEE (1998) *IEEE Std 830-1998: Recommended Practice for Software Requirements Specifications*. New York: Institute of Electrical and Electronics Engineers.
-28. ISO (2019) *ISO 9241-210:2019 Ergonomics of human-system interaction — Part 210: Human-centred design for interactive systems*. Geneva: International Organization for Standardization.
+28. ISO (2019) *ISO 9241-210:2019 Ergonomics of human-system interaction: Part 210: Human-centred design for interactive systems*. Geneva: International Organization for Standardization.
 29. W3C (2018) *Web Content Accessibility Guidelines (WCAG) 2.1*. Available at: https://www.w3.org/TR/WCAG21/
 30. Republic of Ghana (2012) *Data Protection Act, 2012 (Act 843)*. Accra: Ghana Publishing Company.
 
 ## 19.6 Note on assumption AS-01
 
-**This reference is incomplete and must be resolved before submission.**
+**This reference is incomplete, and the gap is stated rather than concealed.**
 
 §4.3.1 converts function points to source size at **30 lines of code per function
 point** for Python with an ORM and server-side templating. That figure was taken
@@ -259,7 +259,7 @@ as a published average for the language class, but **the specific table it came
 from was not recorded at the time**, and it is not cited here because citing a
 source that was not consulted would be worse than admitting the gap.
 
-The figure is not incidental — it drives the KLOC input to COCOMO and therefore
+The figure is not incidental, it drives the KLOC input to COCOMO and therefore
 every effort figure in §4.3. Its unreliability is partly demonstrated by the
 project's own result: measured productivity was **20.7 LOC/FP** (§4.8.1), below
 even the optimistic bound of the sensitivity analysis.

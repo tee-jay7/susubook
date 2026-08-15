@@ -8,15 +8,15 @@
 
 ## 1.1 Domain background
 
-*Susu* is Ghana's dominant informal savings mechanism. In the **collector model**, a
+*Susu* is a widely used informal savings mechanism in Ghana. In the **collector model**, a
 susu collector visits a client daily at their place of business and receives a small,
-fixed contribution — commonly the same amount every day. The collector records the
+fixed contribution, commonly the same amount every day. The collector records the
 payment by marking one box on a paper **susu card** that typically carries 31 boxes,
 one per day of the contribution cycle. At the end of the cycle the client receives the
 accumulated sum, less **one day's contribution**, which is retained by the collector as
 commission.
 
-The clients are overwhelmingly people who are excluded from, or poorly served by,
+The client group consists largely of people excluded from, or poorly served by,
 formal banking: market women, kiosk operators, small shop owners, artisans and
 transport workers. They deal in cash, earn daily rather than monthly, and save in
 amounts too small for a conventional bank account to be worthwhile. Collectors operate
@@ -30,27 +30,28 @@ The mechanism works because of trust, and its record-keeping cannot support that
 **The record is held by the party it is meant to hold accountable.** The paper card is
 carried and marked by the collector. The client has no independent copy of their own
 contribution history. A card can be altered, lost, damaged by weather, or simply
-disputed — and when it is, the client has no evidence.
+disputed, and when it is, the client has no evidence.
 
 This produces four concrete failures:
 
-**P1 — Client has no verifiable record of their savings.**
+**P1: Client has no verifiable record of their savings.**
 The client's only proof of months of daily contributions is a paper card that the
 collector marks. If the card is lost or the entries are disputed, the client cannot
 demonstrate what they paid. The saver carries all the evidentiary risk.
 
-**P2 — Collector absconding and misappropriation.**
+**P2: Collector absconding and misappropriation.**
 Because cash is collected in the field and recorded only on paper, a collector can
 under-record collections, delay remittance, or disappear with an entire route's takings.
-This is the most damaging failure mode in the sector: it destroys the savings of the
-people least able to absorb the loss, and it deters others from saving at all.
+Of the four failure modes identified here, this is the most severe in its
+consequences: it removes the savings of people least able to absorb the loss, and
+it discourages further participation.
 
-**P3 — Supervising institutions cannot reconcile in real time.**
+**P3: Supervising institutions cannot reconcile in real time.**
 A rural bank employing several collectors learns of a shortfall only when cash is
 banked, or later. There is no same-day view of *what was recorded in the field* against
 *what was remitted at the branch*, so variances surface late, when recovery is hardest.
 
-**P4 — Manual computation of payouts is error-prone and opaque.**
+**P4: Manual computation of payouts is error-prone and opaque.**
 Days paid, days missed, total accumulated, commission deducted and the final payout are
 all computed by hand from ticked boxes. Errors are easy, disputes are hard to settle,
 and the client cannot independently check the arithmetic.
@@ -117,12 +118,25 @@ remitted.
 SusuBook digitises the **record of collection**, not the movement of money. Contributions
 remain physical cash handed to the collector; the system records that event, computes its
 consequences and makes it visible to all parties. Mobile money and bank payment
-integration are deliberately excluded — see `06-scope.md` for the reasoning and
-`11-maintenance-evolution.md` for their treatment as future evolution.
+integration are deliberately excluded: see Appendix A for the reasoning, and §11 for their treatment as future evolution.
 
 ---
 
-> **Note for final submission:** §1.1–1.2 describe the domain qualitatively. Where the
-> submitted document would benefit from published figures on susu participation or losses
-> in Ghana's informal savings sector, cite a verifiable source (e.g. Bank of Ghana or GSS
-> publications) in `References`. No statistics have been asserted here without a source.
+## 1.9 Basis of the domain description
+
+Sections 1.1 and 1.2 describe the susu collector model and its failure modes
+qualitatively, from analysis of the documented manual process rather than from
+field data. **No statistic is asserted anywhere in this document**, and the
+failure modes P1–P4 are derived by analysing the process structure rather than by
+measuring its outcomes.
+
+The structural argument does not depend on quantitative evidence: the record is
+held by the party whose conduct it is meant to evidence, and each of P1–P4
+follows from that fact alone. Establishing the *prevalence* of these failures
+would require published data on participation and losses in Ghana's informal
+savings sector, for example from the Bank of Ghana or the Ghana Statistical
+Service. No such source was consulted, and none is cited, because citing a source
+that was not consulted would be worse than stating the limitation.
+
+This constraint is recorded again at §17.1, alongside the absence of primary
+stakeholder elicitation, which arises from the same cause.

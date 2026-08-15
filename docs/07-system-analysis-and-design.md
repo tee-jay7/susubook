@@ -4,7 +4,7 @@ Covers examination document sections 8 (System analysis) and 9 (System design).
 
 ---
 
-# PART A — SYSTEM ANALYSIS
+# PART A: SYSTEM ANALYSIS
 
 ## 7.1 Analysis of the current (manual) system
 
@@ -19,7 +19,7 @@ Covers examination document sections 8 (System analysis) and 9 (System design).
 | **Failure detection** | On dispute, or when a collector disappears |
 
 **Structural weakness.** The party whose conduct requires verification is the sole custodian
-of the evidence. Every failure in `01-problem-definition.md` (P1–P4) descends from that one
+of the evidence. Every failure identified in §1.2 (P1–P4) descends from that one
 fact, so the analysis below treats *separating the record from the collector* as the
 system's defining requirement rather than one feature among many.
 
@@ -50,7 +50,7 @@ flowchart LR
 The arrow from the client **into** the system, independent of the collector's, is the
 structural change. Everything else is bookkeeping around it.
 
-## 7.3 Level 1 data flow — recording a contribution
+## 7.3 Level 1 data flow: recording a contribution
 
 ```mermaid
 flowchart TD
@@ -151,7 +151,7 @@ stateDiagram-v2
 
 ---
 
-# PART B — SYSTEM DESIGN
+# PART B: SYSTEM DESIGN
 
 ## 7.6 Architectural style: layered (N-tier)
 
@@ -159,7 +159,7 @@ Session 5 presents three architectural options. Each was assessed against this p
 
 | Style | Assessment | Decision |
 |---|---|---|
-| **Microservices** | Session 5 lists the preconditions: large teams in parallel, independent scaling, differing stacks, high availability. **None** hold here — one developer, one deployment, free-tier hosting. It would add distributed-tracing and partial-failure complexity for no benefit, and Session 5 explicitly warns it "requires DevOps maturity". | Rejected |
+| **Microservices** | Session 5 lists the preconditions: large teams in parallel, independent scaling, differing stacks, high availability. **None** hold here, one developer, one deployment, free-tier hosting. It would add distributed-tracing and partial-failure complexity for no benefit, and Session 5 explicitly warns it "requires DevOps maturity". | Rejected |
 | **MVC alone** | Accurate for the web tier but says nothing about where business rules live. Applied *within* the presentation layer rather than as the whole architecture. | Partially adopted |
 | **Layered (N-tier)** | Enforces the downward dependency rule, isolates business rules from Flask and the database, and directly enables NFR-07 (domain testable without a database). | **Selected** |
 
@@ -191,15 +191,15 @@ flowchart TD
 ```
 
 **The dependency rule.** Dependencies point downward only. The domain layer depends on
-nothing — not Flask, not SQLAlchemy, not the network. It is plain Python.
+nothing, not Flask, not SQLAlchemy, not the network. It is plain Python.
 
 **Why this matters more than it looks.** It is what makes the 5 marks for testing
 achievable. Business rules can be unit-tested with no database, no HTTP client and no
 fixtures, so the tests run in milliseconds and can be written in the time available. An
 Active-Record design where rules live on ORM models would require a live database for
-every rule test — and under a 48-hour budget those tests simply would not get written.
+every rule test, and under a 48-hour budget those tests simply would not get written.
 
-**The sinkhole risk.** Session 5 warns of the sinkhole anti-pattern — requests passing
+**The sinkhole risk.** Session 5 warns of the sinkhole anti-pattern, requests passing
 through layers that add nothing. Accepted here: simple reads (e.g. listing clients) pass
 through the service layer with little transformation. The cost is a few extra function
 calls; the benefit is one consistent path for authorisation and audit. Recorded as
@@ -245,8 +245,8 @@ tests/
 
 ## 7.8 Technology stack justification
 
-The syllabus lab toolkit lists React, TypeScript, Node and Mongo/MySQL. Flask and HTMX are
-not named, though Python is. Examination Rule 6 requires that frameworks be acknowledged,
+The syllabus lab toolkit [7] lists React, TypeScript, Node and Mongo/MySQL. Flask
+and HTMX are not named, though Python is. Examination Rule 6 requires that frameworks be acknowledged,
 which this section does; the choice is defended on architectural grounds.
 
 | Layer | Choice | Justification |
@@ -265,12 +265,12 @@ which this section does; the choice is defended on architectural grounds.
 
 Considered and rejected, on four grounds:
 
-1. **The architecture would be documented, not demonstrated.** A React SPA plus a JSON API means two deployables, CORS configuration and a build toolchain — none of which express a layered architecture any better than server-rendered MVC does.
+1. **The architecture would be documented, not demonstrated.** A React SPA plus a JSON API means two deployables, CORS configuration and a build toolchain: none of which express a layered architecture any better than server-rendered MVC does.
 2. **Deployment risk.** Two services to deploy instead of one, against examination Rule 8 which requires the deployment to remain accessible for grading.
 3. **Testing cost.** Server-side business logic is far cheaper to test than component trees, and testing carries 5 marks with no lecture deck to lean on.
-4. **The interactivity is not there.** React earns its complexity with substantial client-side state — drag-and-drop, offline-first, realtime collaboration. SusuBook has none of that.
+4. **The interactivity is not there.** React earns its complexity with substantial client-side state: drag-and-drop, offline-first, realtime collaboration. SusuBook has none of that.
 
-**The honest trade-off.** HTMX means a network round trip for interactions React would handle locally. Under NFR-01 (2 s on a 3G-class connection) that is a real cost. It is accepted because the payloads are small HTML fragments, and it is mitigated by keeping the three highest-frequency interactions — the ones on the collector's critical path — as the partial updates HTMX is applied to.
+**The honest trade-off.** HTMX means a network round trip for interactions React would handle locally. Under NFR-01 (2 s on a 3G-class connection) that is a real cost. It is accepted because the payloads are small HTML fragments, and it is mitigated by keeping the three highest-frequency interactions (the ones on the collector's critical path) as the partial updates HTMX is applied to.
 
 ## 7.9 Domain class diagram
 
@@ -365,7 +365,7 @@ classDiagram
     Client ..> Money
 ```
 
-## 7.10 Sequence diagram — UC-03 record contribution
+## 7.10 Sequence diagram: UC-03 record contribution
 
 ```mermaid
 sequenceDiagram
@@ -502,16 +502,16 @@ erDiagram
 
 ### Business invariants enforced in the database
 
-Three rules are enforced **twice** — in the domain layer and again by the schema. This is
+Three rules are enforced **twice**, in the domain layer and again by the schema. This is
 deliberate defence in depth: a bug in the service layer, or a future direct database write,
 cannot corrupt these invariants.
 
 | Rule | Database mechanism |
 |---|---|
-| **BR-R2** — one ACTIVE cycle per client | `CREATE UNIQUE INDEX ux_active_cycle ON contribution_cycles (client_id) WHERE status = 'ACTIVE'` |
-| **BR-R5** — one effective contribution per client per date | `CREATE UNIQUE INDEX ux_contribution_day ON contributions (cycle_id, contribution_date) WHERE reversed_by_id IS NULL AND is_reversal = FALSE` |
-| **BR-R10** — at most one payout per cycle | `UNIQUE (cycle_id)` on `payouts` |
-| **BR-R1** — money is integral | every monetary column is `INTEGER` pesewas; no `FLOAT`, `REAL` or `MONEY` type appears in the schema |
+| **BR-R2**, one ACTIVE cycle per client | `CREATE UNIQUE INDEX ux_active_cycle ON contribution_cycles (client_id) WHERE status = 'ACTIVE'` |
+| **BR-R5**, one effective contribution per client per date | `CREATE UNIQUE INDEX ux_contribution_day ON contributions (cycle_id, contribution_date) WHERE reversed_by_id IS NULL AND is_reversal = FALSE` |
+| **BR-R10**, at most one payout per cycle | `UNIQUE (cycle_id)` on `payouts` |
+| **BR-R1**, money is integral | every monetary column is `INTEGER` pesewas; no `FLOAT`, `REAL` or `MONEY` type appears in the schema |
 
 PostgreSQL's partial unique indexes are the specific reason it was chosen over MySQL: the
 first two rules cannot be expressed as plain unique constraints, because reversed
@@ -523,7 +523,7 @@ contributions must be allowed to coexist with their replacements on the same dat
 |---|---|
 | `clients (public_ref)` unique | QR reference resolution (FR-40) |
 | `clients (collector_id)` | Route sheet (FR-23) |
-| `contribution_cycles (client_id, status)` | Active cycle lookup — the hottest query |
+| `contribution_cycles (client_id, status)` | Active cycle lookup, the hottest query |
 | `contributions (cycle_id)` | Susu card rendering (FR-16) |
 | `contributions (recorded_by_id, recorded_at)` | Daily variance computation (FR-25) |
 | `audit_log (target_type, target_id)` | Audit trail retrieval (FR-34) |
@@ -545,13 +545,13 @@ accidentally.
 
 Session 5's five principles [5], originally set out by Martin [15], each with
 the concrete place it applies. Session 5 also notes
-that SOLID compliance *reduces technical debt* — the connection to §8 is direct.
+that SOLID compliance *reduces technical debt*, the connection to §8 is direct.
 
 **S — Single Responsibility.**
 `domain/rules.py` holds one pure function per computation (`validate_contribution`,
 `compute_cycle_summary`, `compute_payout`, `compute_variance`). Services orchestrate but
 compute nothing. `services/audit.py` does nothing but append audit entries. The bad example
-on the slide — one class handling auth, email and reporting — is avoided by having no class
+on the slide (one class handling auth, email and reporting) is avoided by having no class
 that spans concerns.
 
 **O — Open/Closed.**
@@ -567,7 +567,7 @@ passes against both. That equivalence is the practical proof of substitutability
 
 **I — Interface Segregation.**
 Separate narrow Protocols — `ClientRepository`, `CycleRepository`, `ContributionRepository`,
-`PayoutRepository` — rather than one fat `DataAccess`. `PayoutService` depends only on what
+`PayoutRepository`, rather than one fat `DataAccess`. `PayoutService` depends only on what
 it uses, so a change to contribution queries cannot break it.
 
 **D — Dependency Inversion.**
@@ -581,12 +581,12 @@ architecture rests on.
 | Pattern | Where | Why |
 |---|---|---|
 | **Layered architecture** | Whole application | Separation of concerns, testability (Session 5) |
-| **MVC** | `web/` — blueprints, Jinja templates, models | Session 5's canonical web pattern |
+| **MVC** | `web/`, blueprints, Jinja templates, models | Session 5's canonical web pattern |
 | **Repository** | `infrastructure/repositories.py` | Decouples the business layer from the persistence technology [16][17] |
 | **Service Layer** | `services/` | One place per use case for orchestration, transactions and audit |
 | **Value Object** | `domain/money.py` | Money is compared and combined by value; immutability prevents a whole defect class [17] |
 | **Strategy** | `CommissionPolicy` | Open/closed extension point for FR-36 [18] |
-| **Application Factory** | `app/__init__.py` | Different wiring for production and tests — enables dependency injection |
+| **Application Factory** | `app/__init__.py` | Different wiring for production and tests, enables dependency injection |
 | **Dependency Injection** | Factory-wired repositories | Session 5 names DI as the practical form of the D in SOLID |
 
 ## 7.14 Interface design
@@ -594,7 +594,7 @@ architecture rests on.
 Mobile-first, because the collector is standing in a market and the client is on a low-end
 phone (CO-07, NFR-08).
 
-**Collector — route sheet (primary screen)**
+**Collector: route sheet (primary screen)**
 
 ```
 ┌─────────────────────────────────┐
@@ -612,7 +612,7 @@ phone (CO-07, NFR-08).
 └─────────────────────────────────┘
 ```
 
-**Collector — confirm contribution** (reached by scan or by tapping a row)
+**Collector: confirm contribution** (reached by scan or by tapping a row)
 
 ```
 ┌─────────────────────────────────┐
@@ -635,7 +635,7 @@ phone (CO-07, NFR-08).
 
 Two interactions from scan to recorded, against NFR-02's limit of three.
 
-**Client — my susu card** (the answer to P1)
+**Client: my susu card** (the answer to P1)
 
 ```
 ┌─────────────────────────────────┐
@@ -664,7 +664,7 @@ Two interactions from scan to recorded, against NFR-02's limit of three.
 Every row names the recording collector and the time. That is the independent record the
 paper card cannot provide.
 
-**Supervisor — daily variance (the answer to P3)**
+**Supervisor: daily variance (the answer to P3)**
 
 ```
 ┌───────────────────────────────────────────┐
@@ -683,7 +683,7 @@ paper card cannot provide.
 
 Two design elements carry meaning rather than decoration.
 
-**The mark** is the susu card itself — a card outline containing nine days, the
+**The mark** is the susu card itself, a card outline containing nine days, the
 first five filled and the rest faded. It is the same image the client sees on
 their own card, reduced to nine squares, so the identity states what the product
 does.
@@ -692,7 +692,7 @@ does.
 Africa for centuries, including the Gold Coast, and remain a cultural shorthand
 for money and saving. A digital ledger for a traditional savings practice is
 better placed in that tradition than in the visual language of a retail bank,
-and the users this system is built for — market traders and kiosk owners — are
+and the users this system is built for (market traders and kiosk owners) are
 the people for whom that reference is legible.
 
 Both are drawn as SVG, which is what makes them affordable. The motif is a
@@ -706,8 +706,8 @@ is set by the card rather than the background.
 Interface work follows the user-centred design activities of ISO 9241-210 [28]
 as presented in Session 5 [5].
 
-WCAG 2.1 AA contrast; touch targets ≥ 44×44 px; the susu card grid uses **shape and text,
-not colour alone**, to distinguish paid from missed — colour-blind users and a sun-washed
+WCAG 2.1 [29] AA contrast; touch targets of at least 44×44 px; the susu card grid uses **shape and text,
+not colour alone**, to distinguish paid from missed, colour-blind users and a sun-washed
 screen fail the same way, so the fix serves both. Amounts are rendered large; no
 interaction depends on hover.
 
@@ -718,11 +718,11 @@ interaction depends on hover.
 | Password storage | Argon2id via `argon2-cffi`; no plaintext or reversible storage |
 | Session management | Flask signed session cookies — `Secure`, `HttpOnly`, `SameSite=Lax`; idle timeout (FR-04) |
 | CSRF | Token on every state-changing form (Flask-WTF) |
-| Authorisation | Enforced **server-side in the service layer**, not in templates — hiding a link is not a control |
+| Authorisation | Enforced **server-side in the service layer**, not in templates, hiding a link is not a control |
 | Object-level authorisation | Every client-scoped operation re-checks `client.collector_id == actor.id` (FR-05) |
 | IDOR / enumeration | Opaque UUIDv4 public references in all external URLs (BR-R14) |
 | SQL injection | Parameterised queries only, via SQLAlchemy; no string-built SQL |
-| Data minimisation | Name, phone, business type, location only — no Ghana Card, address or next of kin (NFR-06, Act 843) |
+| Data minimisation | Name, phone, business type, location only, no Ghana Card, address or next of kin (NFR-06, Act 843) |
 | Non-repudiation | Append-only audit log; corrections are reversals, never edits (BR-R11) |
 | Transport | HTTPS enforced in production |
 
@@ -736,10 +736,10 @@ data.
 
 ## 7.16 Technical debt identified during design
 
-Session 5's key takeaway — that SOLID compliance reduces technical debt — is treated
+Session 5's key takeaway (that SOLID compliance reduces technical debt) is treated
 literally here: debt is identified at design time, before any is incurred, rather than
 discovered afterwards. TD-01…TD-06 were created by the scope decision in
-`05-effort-estimation.md` §4.6; TD-07…TD-11 arise from the design choices above.
+§4.6; TD-07…TD-11 arise from the design choices above.
 
 | ID | Debt | Origin | Fowler quadrant | Type |
 |---|---|---|---|---|
@@ -749,18 +749,18 @@ discovered afterwards. TD-01…TD-06 were created by the scope decision in
 | TD-04 | Minimal reversal form | Scope cut | Prudent & deliberate | Code |
 | TD-05 | Static route sheet *(partly mitigated by CR-001)* | Scope cut | Prudent & deliberate | Usability |
 | TD-06 | HTMX applied inconsistently | Scope cut | Prudent & deliberate | Design |
-| **TD-07** | Hand-written mapping between domain dataclasses and ORM models — every schema change must be made in two places | Layered design (§7.6) | Prudent & deliberate | Architecture |
+| **TD-07** | Hand-written mapping between domain dataclasses and ORM models, every schema change must be made in two places | Layered design (§7.6) | Prudent & deliberate | Architecture |
 | **TD-08** | Sinkhole: simple reads pass through the service layer adding little | Layered design (§7.6) | Prudent & deliberate | Architecture |
 | **TD-09** | Audit log is append-only by convention, not enforced by database permissions or a trigger | Time constraint | Prudent & deliberate | Architecture/Security |
 | **TD-10** | Cycle maturity computed on read rather than by a scheduled job; a cycle no one opens is never marked MATURED | No scheduler on free-tier hosting | Prudent & deliberate | Architecture |
 | **TD-11** | Cycle summaries recomputed from all contributions on every render; no caching or denormalised totals | Simplicity over optimisation | Prudent & inadvertent | Performance |
 
-Every item is **prudent** — taken knowingly, for a stated reason — and all but TD-11 are
+Every item is **prudent**, taken knowingly, for a stated reason, and all but TD-11 are
 **deliberate**. TD-11 is classified *inadvertent* because the performance cost was
 recognised only while designing the card view, which is precisely Fowler's "we now know how
 we should have done it" quadrant.
 
-Full cause → impact → priority → resolution analysis follows in `08-technical-debt.md`.
+Full cause → impact → priority → resolution analysis follows in Section 8 (Technical Debt).
 
 ## 7.17 Traceability: design decisions to requirements
 

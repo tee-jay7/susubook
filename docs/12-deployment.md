@@ -1,7 +1,7 @@
 # 12. Deployment
 
 > Examination document §13. The live application, how it is deployed, and how it
-> actually performs — measured, not asserted.
+> actually performs: measured, not asserted.
 
 ---
 
@@ -41,7 +41,7 @@ Credentials for grading are in `Deployment_and_Source_Links.txt`.
 
 **The database has no public address.** It is reachable only from within the
 VPC, and the firewall admits only the subnet Cloud Run draws its addresses from.
-Nothing on the internet — including the developer's own machine — can open a
+Nothing on the internet (including the developer's own machine) can open a
 connection to it.
 
 ## 12.3 Deployment decisions
@@ -50,10 +50,10 @@ connection to it.
 happens on the first request afterwards: a suspended free-tier PaaS instance can
 take around 50 seconds to wake, which an examiner would reasonably read as a
 dead link. Cloud Run's measured cold start here is **3.3 seconds** (§12.6). Under
-examination Rule 8 — the deployment must remain accessible for grading — that
+examination Rule 8, the deployment must remain accessible for grading, that
 difference is the whole argument.
 
-**Direct VPC egress, not a Serverless VPC Access connector.** A connector
+**Direct VPC egress, not a Serverless VPC Access connector** [26]. A connector
 provisions instances that bill continuously, which would defeat a free-tier
 deployment. Direct egress is configuration on the service itself, at no standing
 cost.
@@ -69,7 +69,7 @@ application it maintains.
 
 **Administrative tasks run as Cloud Run Jobs.** Because the database is private,
 schema creation and seeding cannot be run from a developer machine. They execute
-as jobs inside the VPC, using the same image and the same secret — no SSH
+as jobs inside the VPC, using the same image and the same secret, no SSH
 tunnel, no temporary public IP, and the password never leaves Secret Manager.
 
 ## 12.4 Secrets
@@ -146,8 +146,8 @@ Median of seven requests from a residential connection to `us-central1`.
 | Total | 0.619 s | 0.612 s |
 | Payload | 2,340 B | 32 B |
 
-**Reading this honestly.** `/health` returns 32 bytes and `/login` returns 2,340
-— a seventy-fold difference — yet their timings are within 8 ms of each other.
+**Interpretation.** `/health` returns 32 bytes and `/login` returns 2,340
+, a seventy-fold difference, yet their timings are within 8 ms of each other.
 The application is not the constraint. Roughly **0.31 s is consumed before the
 request is even sent**, on TCP and TLS handshakes; that is pure geography, and
 the same code measured 2–12 ms of server work when run locally (§9.6).
@@ -178,8 +178,8 @@ round trip) and the region choice below.
 ## 12.7 Region trade-off
 
 `us-central1` sits roughly 150–200 ms from Ghana, and the measurements above show
-that latency dominating every request. The intended users — market traders in
-Accra on mobile data — are the ones who pay it.
+that latency dominating every request. The intended users, market traders in
+Accra on mobile data: are the ones who pay it.
 
 The region was not chosen for them. It was chosen because Compute Engine's free
 tier covers `us-central1`, `us-west1` and `us-east1` and nothing closer. A
@@ -190,9 +190,9 @@ Recorded here as a deliberate trade-off with a named cause, not an oversight. It
 is the single change that would most improve real-world performance, and it is
 carried in the evolution plan.
 
-## 12.8 An infrastructure defect worth recording
+## 12.8 Infrastructure defect identified during deployment
 
-**DEF-08 — Google Front End intercepts `/healthz` on Cloud Run.**
+**DEF-08: Google Front End intercepts `/healthz` on Cloud Run.**
 
 The health endpoint was originally mounted at `/healthz`, the conventional
 Kubernetes-style path. In production it returned Google's own 404 page while
@@ -204,15 +204,15 @@ it, and the application appears broken. Three observations located the cause:
 1. The **identical image**, pulled from Artifact Registry and run locally,
    returned `200 {"database":"ok","status":"ok"}`.
 2. Requests to `/healthz` **never appeared in Cloud Run's request log at all**,
-   while a request to `/nope` did — so the request was being answered upstream.
+   while a request to `/nope` did, so the request was being answered upstream.
 3. Of **eleven** candidate paths tested against the deployed service, `/healthz`
    was the **only** one intercepted. `/health`, `/livez`, `/readyz`, `/status`,
    `/ping`, `/up` and the rest all reached the application.
 
 Resolved by mounting the endpoint at `/health`.
 
-The general lesson is worth more than the fix: **this class of defect is
-invisible outside a real deployment.** No unit, integration or system test could
+The general observation is more significant than the fix. **This class of defect
+is not detectable outside a real deployment.** No unit, integration or system test could
 have found it, because every one of them runs against the application rather
 than through the infrastructure in front of it. Comparing the same artefact
 across two environments is what isolated it.

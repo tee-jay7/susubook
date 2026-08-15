@@ -10,14 +10,15 @@
 
 Testing was shaped by one architectural decision made in Phase 2: **the domain
 layer imports neither Flask nor SQLAlchemy**. That is what made a real test
-suite affordable inside the examination window — business rules can be tested
+suite affordable inside the examination window, business rules can be tested
 with no database, no fixtures and no HTTP client, so the 186 unit tests run in
-**2.2 seconds** — the increase over earlier figures is Argon2 hashing in the
+**2.2 seconds**, the increase over earlier figures is Argon2 hashing in the
 password tests, which is deliberately slow. An Active-Record design would have required a live database
 for every rule test, and under a 20-hour implementation budget those tests would
 simply not have been written.
 
-Three levels, each covering what the level below cannot:
+The levels are those set out in Session 1 [1]: unit, integration, system and
+acceptance. Each covers what the level below cannot:
 
 | Level | Count | Runtime | Covers | Deliberately excludes |
 |---|---|---|---|---|
@@ -27,7 +28,7 @@ Three levels, each covering what the level below cannot:
 | **Total** | **299** | **20.0 s** | | |
 
 **Why the integration level exists at all.** The design claims three business
-invariants are enforced *twice* — in the domain layer and again by PostgreSQL
+invariants are enforced *twice*, in the domain layer and again by PostgreSQL
 partial unique indexes. A claim about PostgreSQL behaviour cannot be verified by
 a fake. Those tests therefore write **through the ORM, bypassing the service
 layer entirely**, to demonstrate that the guarantee does not depend on
@@ -70,7 +71,7 @@ NFR-07 requires ≥70% on the domain layer. Achieved: **99–100%** on domain,
 Legend: **P** pass · **F** fail. All results are from the run of the committed
 suite; no result is stated from memory.
 
-### TC-AUTH — Authentication (UC-01, FR-01…04)
+### TC-AUTH: Authentication (UC-01, FR-01…04)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -87,7 +88,7 @@ suite; no result is stated from memory.
 > phone from a wrong password would let an attacker enumerate which numbers are
 > registered.
 
-### TC-AUTHZ — Authorisation (FR-05, NFR-03, BR-R15)
+### TC-AUTHZ: Authorisation (FR-05, NFR-03, BR-R15)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -105,7 +106,7 @@ suite; no result is stated from memory.
 > photographable; these cases demonstrate that possession of the reference
 > confers no capability, because the authorisation decision never consults it.
 
-### TC-COL — Recording a contribution (UC-03)
+### TC-COL: Recording a contribution (UC-03)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -123,7 +124,7 @@ suite; no result is stated from memory.
 | TC-COL-12 | **HTMX collect updates the running total out of band** (DEF-06) | Response carries the day's total marked for out-of-band swap, with the new value | `id="recorded-today"`, `hx-swap-oob="true"`, "Recorded GHS 10.00" | **P** |
 | TC-COL-13 | Route sheet total after a collection | GHS 0.00 before, GHS 10.00 after | As expected | **P** |
 
-### TC-ENR — Enrolment (UC-02)
+### TC-ENR: Enrolment (UC-02)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -134,7 +135,7 @@ suite; no result is stated from memory.
 | TC-ENR-05 | Client receives an opaque public reference | UUIDv4, not the row id | 36-char UUID, differs from id | **P** |
 | TC-ENR-06 | Cycle snapshots the daily rate | Cycle rate equals agreed rate | Equal | **P** |
 
-### TC-PAY — Payout (UC-07)
+### TC-PAY: Payout (UC-07)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -151,12 +152,12 @@ suite; no result is stated from memory.
 | TC-PAY-11 | Collector attempts release | 403 | 403 | **P** |
 | TC-PAY-12 | Release is audited | `RELEASE_PAYOUT` with settlement | Row with all three amounts | **P** |
 
-> TC-PAY-08 is exhaustive rather than sampled. BR-R9's edge case — a client whose
-> entire balance is consumed by commission — is exactly where an off-by-one
+> TC-PAY-08 is exhaustive rather than sampled. BR-R9's edge case, a client whose
+> entire balance is consumed by commission, is exactly where an off-by-one
 > produces a *negative payout*, so every completion level from 0 to 31 days is
 > checked for non-negativity and conservation.
 
-### TC-REC — Reconciliation (UC-05, UC-06, FR-24…26)
+### TC-REC: Reconciliation (UC-05, UC-06, FR-24…26)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -174,7 +175,7 @@ suite; no result is stated from memory.
 > must still appear on the variance screen. If idle collectors dropped off the
 > report, the most suspicious case would be the one that became invisible.
 
-### TC-REV — Reversal (UC-09, BR-R11)
+### TC-REV: Reversal (UC-09, BR-R11)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -186,7 +187,7 @@ suite; no result is stated from memory.
 | TC-REV-06 | Reversal is audited with the reason | Reason in audit detail | Present | **P** |
 | TC-REV-07 | **Client still sees both entries** | REVERSED and REVERSAL both visible | Both rendered | **P** |
 
-### TC-CLI — Client self-service (UC-08, FR-28…30)
+### TC-CLI: Client self-service (UC-08, FR-28…30)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -201,7 +202,7 @@ suite; no result is stated from memory.
 > the answer to problem **P1**: the client's record is independent of the
 > collector, and every entry is attributable.
 
-### TC-QR — QR client cards (FR-39, FR-40, CR-001)
+### TC-QR: QR client cards (FR-39, FR-40, CR-001)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -209,7 +210,7 @@ suite; no result is stated from memory.
 | TC-QR-02 | Card discloses no phone number | Phone absent from page | Absent | **P** |
 | TC-QR-03 | Another collector cannot print the card | 403 | 403 | **P** |
 
-### TC-PWD — Credential management (FR-41, FR-42; TD-15 repayment)
+### TC-PWD: Credential management (FR-41, FR-42; TD-15 repayment)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
@@ -232,7 +233,7 @@ suite; no result is stated from memory.
 > contradicting BR-02. This case asserts the collector's password no longer
 > works once the client has chosen their own.
 
-### TC-SMS — Client notification (FR-31, CR-002)
+### TC-SMS: Client notification (FR-31, CR-002)
 
 The negative cases matter most here. The demonstration dataset uses valid-format
 Ghanaian numbers that may belong to real people, so an unguarded send would text
@@ -255,7 +256,7 @@ strangers on every recorded collection.
 > asserts that every number in the seed dataset is refused by a default-configured
 > service, so the safety gate cannot be removed without a test failing.
 
-### TC-DB — Database-enforced invariants (defence in depth)
+### TC-DB: Database-enforced invariants (defence in depth)
 
 Written through the ORM, **bypassing the service layer**, so the guarantee is
 shown not to depend on application code.
@@ -281,16 +282,16 @@ shown not to depend on application code.
 > is *partial* precisely so a reversed entry, its reversal, and the replacement
 > may share a date. A future developer "simplifying" it to a plain
 > `UNIQUE(cycle_id, contribution_date)` would make correction by reversal
-> impossible — and this test is what would stop them.
+> impossible, and this test is what would stop them.
 
-### TC-MON — Money handling (BR-R1, NFR-04)
+### TC-MON: Money handling (BR-R1, NFR-04)
 
 | ID | Test case | Expected | Actual | |
 |---|---|---|---|---|
 | TC-MON-01 | Construct from "2.50" | 250 pesewas | 250 | **P** |
 | TC-MON-02 | **Construct from float 2.50** | `TypeError` | Raised | **P** |
 | TC-MON-03 | Multiply by float | `TypeError` | Raised | **P** |
-| TC-MON-04 | `Money(True)` — bool is an int subclass | `TypeError` | Raised | **P** |
+| TC-MON-04 | `Money(True)`, bool is an int subclass | `TypeError` | Raised | **P** |
 | TC-MON-05 | Fractional pesewa ("2.505") | `ValueError` | Raised | **P** |
 | TC-MON-06 | **Exact accumulation across all cycle lengths 1–31** | Exact at every length | All exact | **P** |
 | TC-MON-07 | Money survives the ORM mapping | 1234 pesewas in and out | Exact, still `int` | **P** |
@@ -312,14 +313,14 @@ shown not to depend on application code.
 **Security findings not covered by a passing test**, carried into the debt
 register rather than presented as satisfied:
 
-- **TD-14** — no rate limiting or lockout. Brute force is possible; failed
+- **TD-14**, no rate limiting or lockout. Brute force is possible; failed
   attempts are audited, so an attack is visible afterwards but nothing stops it.
   Classified **Critical**.
-- **TD-15** — the collector sets the client's initial password and there is no
+- **TD-15**, the collector sets the client's initial password and there is no
   forced change, so the collector can sign in as the client. Classified
   **Critical**, because it undermines the independence the system exists to
   provide.
-- **TD-09** — the audit log is append-only by application convention, not by
+- **TD-09**, the audit log is append-only by application convention, not by
   database permission. Classified **Critical**.
 
 No penetration testing or automated dependency vulnerability scanning was
@@ -337,12 +338,12 @@ seeded data (10 clients, ~170 contributions):
 | Supervisor variances | **3 ms** | 2.3 KB |
 | Client susu card (31 boxes + full history) | **12 ms** | 28.6 KB |
 
-**Interpretation, stated carefully.** These measure *server* time only. NFR-01
+**Interpretation.** These figures measure *server* time only. NFR-01
 specifies 2 seconds end-to-end on a 3G-class connection, which server time does
 not establish: the dominant cost on that connection is network transfer plus the
 render-blocking Tailwind CDN request (**TD-02**), neither of which is measured
-here. The honest reading is that the application's own work leaves the entire
-budget available for transport — and that **TD-02 is currently the largest
+here. The figures indicate that the application's own work leaves the entire
+budget available for transport, and that **TD-02 is currently the largest
 threat to NFR-01**, which is why it is scheduled for repayment.
 
 The 28.6 KB client card is the largest page and grows with contribution count;
@@ -389,44 +390,44 @@ Defects found during development, with corrective action. All are closed.
 
 | ID | Defect | Found by | Severity | Corrective action | Status |
 |---|---|---|---|---|---|
-| **DEF-01** | A unit test and a module docstring both asserted that 31 × GHS 0.10 accumulates to 3.0000000000000004 in floating point. It does not — that sum rounds back to exactly 3.1. The example did not demonstrate the error it claimed. | Unit suite (the test failed) | Low (documentation), High (reasoning) | Verified empirically; corrected to n=29 (2.9000000000000004). Test rewritten to assert exactness across the whole 1–31 range rather than at a single sample, and to record that float error here is *intermittent* — which is worse than consistently wrong, because it survives casual testing. | Closed |
+| **DEF-01** | A unit test and a module docstring both asserted that 31 × GHS 0.10 accumulates to 3.0000000000000004 in floating point. It does not, that sum rounds back to exactly 3.1. The example did not demonstrate the error it claimed. | Unit suite (the test failed) | Low (documentation), High (reasoning) | Verified empirically; corrected to n=29 (2.9000000000000004). Test rewritten to assert exactness across the whole 1–31 range rather than at a single sample, and to record that float error here is *intermittent*, which is worse than consistently wrong, because it survives casual testing. | Closed |
 | **DEF-02** | Boolean and status columns carried Python-side defaults only. A direct SQL insert omitting them failed on NOT NULL *before* the partial unique index was consulted. | Manual SQL probing of the invariants | Medium | Added `server_default`. Surviving direct writes is the entire purpose of those indexes, so a schema that only works when written through the ORM defeated the design. | Closed |
 | **DEF-03** | `Flask(__name__)` looked for templates at the package root; every page returned 500. | Smoke test after first run | High | Pointed `template_folder` at `app/web/templates` to match the layering. | Closed |
-| **DEF-04** | `cycle_days` was registered as a context processor, but Jinja macros do not receive the template context. Every susu card view raised `UndefinedError` — the client card, the collector's client detail, both broken. | Manual page walk | High | Moved to `app.jinja_env.globals`. | Closed |
+| **DEF-04** | `cycle_days` was registered as a context processor, but Jinja macros do not receive the template context. Every susu card view raised `UndefinedError`, the client card, the collector's client detail, both broken. | Manual page walk | High | Moved to `app.jinja_env.globals`. | Closed |
 | **DEF-05** | `_assert_on_route` in the web layer raised `NotAuthorised` **without auditing**, while the service-layer path did audit. A collector presenting a client reference they should not hold was recorded only if they attempted a *write*; a denied GET on a scanned card left no trace. | System suite (TC-AUTHZ-07) | Medium–High | Audit on both paths. The denial arrives on the GET, before any write is attempted, and is exactly the signal a supervisor needs. | Closed |
 | **DEF-06** | On the route sheet, recording a contribution over HTMX swapped the client's row to "Paid" but left the day's running total unchanged until a manual refresh. The row and the total disagreed on the same screen. | **Manual exploratory testing by the project owner** | Medium | `hx-target` swapped only the row; the total sat outside it. Returned the total in the same response as an **out-of-band swap** (`hx-swap-oob`), so one request updates both. Two regression tests added. | Closed |
 | **DEF-07** | The security test asserting that URLs expose opaque references, not sequential ids, was **flaky**: it passed alone and failed roughly one full-suite run in sixteen. | Full-suite run after fixing DEF-06 | Medium | The negative assertion used substring matching — `/collector/client/1` is a substring of `/collector/client/1a2b3c…`, so it failed whenever a random UUID began with the digit 1. Rewritten to match a complete numeric path segment by regex. Verified stable over five consecutive full runs. | Closed |
 
-**Two of my own test assumptions were also wrong** and were corrected rather than
-worked around, which is worth recording because the temptation was to adjust the
-assertion until it passed:
+**Two of the developer's own test assumptions were also incorrect.** Both were
+corrected rather than accommodated by weakening the assertion until it passed:
 
 | | Wrong assumption | Reality | Resolution |
 |---|---|---|---|
 | 1 | Setting `status = 'MATURED'` makes a cycle due for payout | `list_due_for_payout` filters on `end_date < today`, which is what BR-R12 actually describes | Tests now move the cycle genuinely into the past |
-| 2 | `list_for_target(type, None)` returns nothing, since `= NULL` never matches | SQLAlchemy renders `column == None` as `IS NULL`, so it does match | Test rewritten to assert what it actually claimed — that an anonymous actor can be stored |
+| 2 | `list_for_target(type, None)` returns nothing, since `= NULL` never matches | SQLAlchemy renders `column == None` as `IS NULL`, so it does match | Test rewritten to assert what it actually claimed, that an anonymous actor can be stored |
 
 **Defect density:** 7 defects across roughly 1,090 statements. Five (DEF-01,
 DEF-02, DEF-05, DEF-07, and the two corrected assumptions) were found by tests or
 by probing rather than by a user, which is the outcome the test strategy was
 designed to produce.
 
-**DEF-06 is the exception, and the instructive one.** It was found by a person
-clicking through the interface, not by any of the 209 automated tests — and it
+**DEF-06 is the exception.** It was identified by manual interaction with the
+interface rather than by any automated test, and it
 could not have been found by them, because every test asserted the *response* to
 a collect request and none asserted the *state of the page afterwards*. The
-suite verified that the right row came back; only a human noticed that the total
-above it now disagreed. It is the clearest argument in this project for the
-user acceptance testing recorded as outstanding in §9.9: automated tests confirm
-what you thought to check, and a user finds what you did not.
+suite verified that the correct row was returned; the inconsistency in the total
+above it was observable only to a person. This provides direct evidence for the
+value of the user acceptance testing recorded as outstanding at §9.9: automated
+tests confirm the behaviour the developer thought to specify, whereas a user
+encounters behaviour the developer did not anticipate.
 
-**DEF-07 is worth recording for the opposite reason.** A test that fails
-intermittently is worse than no test, because it teaches you to disregard a red
-result — and this one guarded a security property (BR-R14). It was fixed rather
+**DEF-07 illustrates the opposite risk.** An intermittently failing test is more
+damaging than no test, because it conditions a team to disregard a failing
+result, and this one guarded a security property (BR-R14). It was fixed rather
 than retried, and stability was then demonstrated over five consecutive full
 runs rather than assumed.
 
-## 9.9 User acceptance testing — status
+## 9.9 User acceptance testing: status
 
 **Not yet conducted with an independent participant.** This is stated plainly
 rather than substituted for.
@@ -454,7 +455,7 @@ rate, time on task, error rate, and a 10-item System Usability Scale score
 [22]. The nine-scenario protocol uses a small participant group on Nielsen's
 finding that five users surface the large majority of usability problems [24].
 NFR-02's claim that a routine collection takes ≤3 interactions is currently
-established **by design inspection only** — scan plus confirm is two — and needs
+established **by design inspection only**, scan plus confirm is two, and needs
 a measured value from a real participant to be reported as verified.
 
 ## 9.10 Known gaps in testing
@@ -472,6 +473,6 @@ Recorded so the coverage claim is not overstated:
 | No browser-matrix testing | Rendering verified in Chromium only | Single-browser check only |
 | QR scanning not tested on a physical printed card | FR-40 verified as a URL route, not as an optical read | No printer or camera test performed |
 
-The last is worth emphasising: **TC-QR verifies that the card renders and that
-the route resolves and authorises correctly, but nobody has printed a card and
-scanned it with a phone.** That step belongs in UAT-03.
+The final gap is significant. **TC-QR verifies that the card renders and that the
+route resolves and authorises correctly, but no card has been printed and read
+optically with a handset.** That step belongs in UAT-03.

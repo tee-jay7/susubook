@@ -9,7 +9,7 @@
 ## 4.1 Technique selection and justification
 
 Session 6 sets out five families of estimation technique. Each was assessed against this
-project's actual situation — a novel system, no historical project data, a single
+project's actual situation, a novel system, no historical project data, a single
 developer, and a hard 48-hour ceiling.
 
 | Technique | Suitability here | Decision |
@@ -17,13 +17,13 @@ developer, and a hard 48-hour ceiling.
 | **Expert judgement** | No prior susu-system experience to draw on; single estimator means no Delphi panel and no protection against optimism bias. | Rejected as primary |
 | **Estimation by analogy** | Requires similar completed projects with recorded actual effort. None available. | Rejected |
 | **Machine-learning estimation** | Requires a sizeable historical dataset. None available; would also be a black box to the examiner. | Rejected |
-| **Function Point Analysis** | Countable directly from the SRS *before any code exists*, independent of language, and defensible line by line. | **Selected — sizing** |
-| **COCOMO (Basic, organic)** | Converts size into an industry-calibrated effort figure, giving an objective benchmark against the 48-hour budget. | **Selected — effort** |
-| **Three-point / PERT (bottom-up over a WBS)** | Produces the operative schedule for the actual window and expresses uncertainty as a range rather than a false-precision number. | **Selected — planning** |
+| **Function Point Analysis** | Countable directly from the SRS *before any code exists*, independent of language, and defensible line by line. | **Selected: sizing** |
+| **COCOMO (Basic, organic)** | Converts size into an industry-calibrated effort figure, giving an objective benchmark against the 48-hour budget. | **Selected: effort** |
+| **Three-point / PERT (bottom-up over a WBS)** | Produces the operative schedule for the actual window and expresses uncertainty as a range rather than a false-precision number. | **Selected: planning** |
 | **Agile story points** | Relative sizing needs a team velocity baseline to convert to time. A solo developer with no sprint history has none. | Rejected |
 
 **Why three techniques rather than one.** Session 6's stated best practice is
-triangulation — "use multiple techniques and compare" — and the three chosen answer
+triangulation ("use multiple techniques and compare"), and the three chosen answer
 different questions:
 
 - **FPA + COCOMO** answers *"what would this system cost to build properly?"* It is the
@@ -31,7 +31,7 @@ different questions:
   and that is precisely its value: it establishes the size of the gap.
 - **PERT over a WBS** answers *"what can actually be delivered in the hours available?"*
   Session 6 notes bottom-up estimation is "more accurate and defensible" where a detailed
-  task breakdown exists — which the SRS provides.
+  task breakdown exists, which the SRS provides.
 
 Using only COCOMO would produce a number with no operational meaning. Using only PERT
 would let optimism bias set the scope unchallenged. Together, the first exposes the
@@ -57,7 +57,7 @@ count is zero here.
 | Internal Logical File (ILF) | 7 | 10 | 15 |
 | External Interface File (EIF) | 5 | 7 | 10 |
 
-### 4.2.2 Count A — full specified scope (all 38 functional requirements)
+### 4.2.2 Count A: full specified scope (all 38 functional requirements)
 
 **Internal Logical Files**
 
@@ -72,7 +72,7 @@ count is zero here.
 | AuditLogEntry | Simple | 7 |
 | | **Subtotal** | **61** |
 
-**External Interface Files** — none. CO-05 excludes all external system integration. **0**
+**External Interface Files**, none. CO-05 excludes all external system integration. **0**
 
 **External Inputs**
 
@@ -158,13 +158,13 @@ VAF = 0.65 + (0.01 × 45) = 0.65 + 0.45 = 1.10
 AFP = UFP × VAF = 188 × 1.10 = 206.8 ≈ 207 FP
 ```
 
-### 4.2.4 Count B — Must-have scope only (28 functional requirements)
+### 4.2.4 Count B: Must-have scope only (28 functional requirements)
 
 Removing the Should/Could/Won't items from §3.6:
 
 | Component | Removed | Subtotal |
 |---|---|---|
-| ILF | none — all seven files are required by Must requirements | 61 |
+| ILF | none, all seven files are required by Must requirements | 61 |
 | EI | reassign (3), catch-up (6), request withdrawal (3), approve withdrawal (4), resolve variance (3), user admin (4), configure defaults (3) = **−26** | 32 |
 | EO | supervisor dashboard (7), CSV export (5) = **−12** | 36 |
 | EQ | audit trail view (4), user list (3) = **−7** | 14 |
@@ -175,7 +175,7 @@ UFP (Must) = 61 + 32 + 36 + 14 + 0 = 143
 AFP (Must) = 143 × 1.10 = 157.3 ≈ 157 FP
 ```
 
-Cutting ten requirements removes 50 adjusted function points — **24% of the system**.
+Cutting ten requirements removes 50 adjusted function points: **24% of the system**.
 
 ### 4.2.5 Revision under CR-001
 
@@ -256,7 +256,7 @@ Average staffing = 13.0 ÷ 6.6 ≈ 2.0 developers
 ```
 
 Applying instead the simplified division used in the Session 6 worked example, a single
-developer would need **13.0 months** — the schedule equation's 6.6 months assumes roughly
+developer would need **13.0 months**, the schedule equation's 6.6 months assumes roughly
 two people working in parallel.
 
 ### 4.3.4 Sensitivity to the LOC/FP assumption
@@ -284,7 +284,7 @@ For reference, the Phase 1 baseline before CR-001: full scope 207 AFP / 16.3 PM 
 
 ---
 
-## 4.4 The gap, stated honestly
+## 4.4 Interpreting the gap
 
 ```
 COCOMO estimate (Must scope):        1,969 person-hours
@@ -308,7 +308,7 @@ as one. It requires explanation rather than presentation:
    protection were all hand-written. Flask, SQLAlchemy and Jinja supply these as
    configuration. The LOC/FP figure accounts for language, not for framework scaffolding.
 3. **Basic COCOMO ignores team and tool factors entirely.** It has no effort multipliers —
-   that is what COCOMO II's cost drivers exist for. Modern tooling, high developer
+   that is the purpose of COCOMO II's cost drivers [12]. Modern tooling, high developer
    familiarity and mature libraries are invisible to the Basic model.
 4. **It assumes a team, and therefore communication cost.** A solo developer with complete
    domain knowledge incurs no coordination overhead, no handover, and no specification
@@ -321,7 +321,7 @@ with a stated basis. That is the reason it is retained rather than discarded.
 
 ---
 
-## 4.5 Three-point (PERT) bottom-up estimate — the operative plan
+## 4.5 Three-point (PERT) bottom-up estimate: the operative plan
 
 `E = (O + 4M + P) / 6`, in hours, over the implementation WBS.
 
@@ -362,14 +362,14 @@ with a stated basis. That is the reason it is retained rather than discarded.
 incomplete in the **0.5× – 2× band**. Applied to 25.4 h, the honest interval is
 **12.7 – 50.7 hours**. The upper bound consumes the entire examination window on
 implementation alone, leaving nothing for testing, deployment or documentation — 30 of
-the 50 marks. This is the finding that forces the scope decision below.
+the 50 marks. This finding drives the scope decision recorded at §4.6.
 
 ---
 
 ## 4.6 How the estimation influenced the project scope
 
 **The finding.** Bottom-up expected effort for the Must scope was **24.5 hours** against a
-**20-hour** implementation allocation — a 23% over-commitment at the *expected* value,
+**20-hour** implementation allocation, a 23% over-commitment at the *expected* value,
 before any allowance for the upper half of the cone.
 
 **The decision.** Rather than begin and hope, 4.1 hours were removed in advance by
@@ -379,7 +379,7 @@ deliberately reducing implementation quality in areas that do not touch BR-01 or
 | Cut | Hours saved | What is sacrificed | Debt classification |
 |---|---|---|---|
 | Schema created via `create_all()` and a seed script instead of Alembic migrations | 0.7 | No versioned schema history; production schema changes need manual intervention | Infrastructure debt |
-| Tailwind via CDN with minimal custom CSS instead of a built stylesheet | 1.0 | Render-blocking external stylesheet, no purging, larger payload — works against NFR-01 | Design / infrastructure debt |
+| Tailwind via CDN with minimal custom CSS instead of a built stylesheet | 1.0 | Render-blocking external stylesheet, no purging, larger payload, works against NFR-01 | Design / infrastructure debt |
 | Client list as a plain table, no search or pagination | 0.5 | FR-08 only partially satisfied; degrades past ~50 clients | Usability debt |
 | Reversal exposed as a minimal supervisor-only form | 0.6 | Append-only model fully implemented, correction workflow is bare | Code debt |
 | Route sheet as a static list without "not yet collected" filtering | 0.5 | FR-23 met literally; collector efficiency (NFR-02) reduced | Usability debt |
@@ -407,19 +407,19 @@ The overrun is carried openly and tracked against actuals in §4.8.
 
 It is contained by priority rather than by arithmetic. FR-39 and FR-40 are **Should**, so
 if Phase 3 runs behind, task 17 is the first work abandoned and no Must requirement is
-affected. The full decision record is in `CHANGELOG-requirements.md`.
+affected. The full decision record is in Appendix B.
 
 **What was explicitly *not* cut, and why.** The domain layer (2.58 h), contribution
 validation (2.58 h), audit log (1.08 h) and client self-service views (1.08 h) were
-protected in full. These four carry BR-01, BR-02 and BR-05 — the reason the system exists.
+protected in full. These four carry BR-01, BR-02 and BR-05: the reason the system exists.
 Cutting implementation quality elsewhere to protect them is the whole substance of the
 scoping decision.
 
 **The consequence is recorded, not hidden.** Every cut above is a *prudent and deliberate*
-entry on Fowler's technical debt quadrant — taken knowingly, for a stated reason, with an
+entry on Fowler's technical debt quadrant, taken knowingly, for a stated reason, with an
 intended repayment. Each one carries forward into the debt register in
-`08-technical-debt.md` with its cause, impact, priority and proposed resolution, and into
-the repayment plan in `11-maintenance-evolution.md`. The estimation did not merely predict
+Section 8 (Technical Debt) with its cause, impact, priority and proposed resolution, and into
+the repayment plan at §11.6. The estimation did not merely predict
 the work; it generated the debt register.
 
 ---
@@ -431,7 +431,7 @@ the work; it generated the debt register.
 | ID | Assumption |
 |---|---|
 | AS-01 | 30 LOC per function point for Python with ORM and templating (sensitivity tested, §4.3.4). |
-| AS-02 | Organic COCOMO mode applies — small system, familiar technology, no hardware constraints. |
+| AS-02 | Organic COCOMO mode applies, small system, familiar technology, no hardware constraints. |
 | AS-03 | 152 hours per person-month (COCOMO standard). |
 | AS-04 | Requirements remain stable through the window; the change control process of §3.8 governs any deviation. |
 | AS-05 | Development environment, Docker and deployment accounts are working and not counted as project effort. |
@@ -444,18 +444,18 @@ the work; it generated the debt register.
 | ES-01 | No historical project data exists, so no analogy-based or ML validation is possible. |
 | ES-02 | A single estimator means no Delphi convergence and no protection against optimism bias. Session 6 identifies planning fallacy and optimism bias as the dominant risks here; triangulation across three methods is the only available mitigation. |
 | ES-03 | Function point counting was performed once by one person. Independent recounts typically vary by ±10–15%. |
-| ES-04 | The 48-hour window is fixed before estimation, which Session 6 identifies as *external pressure* — a known source of estimate distortion. It is mitigated by fixing the deadline and flexing scope, never the reverse. |
+| ES-04 | The 48-hour window is fixed before estimation, which Session 6 identifies as *external pressure*, a known source of estimate distortion. It is mitigated by fixing the deadline and flexing scope, never the reverse. |
 
 ---
 
 ## 4.8 Estimation accuracy review
 
 Session 6's closing best practice is to record actuals and review accuracy
-afterwards. Two things can be closed out: the **size** estimate, precisely; and
-the **effort** estimate, which cannot — for reasons set out in §4.9, because
+afterwards. Two elements can be closed out: the **size** estimate, precisely, and
+the **effort** estimate, which cannot, for reasons set out in §4.9, because
 knowing when data does not support a conclusion is part of the practice.
 
-### 4.8.1 Size — closed
+### 4.8.1 Size: closed
 
 | | Estimated | Actual | Variance |
 |---|---|---|---|
@@ -469,15 +469,15 @@ MRE = |3.43 − 4.98| / 3.43 = 0.45
 ```
 
 Measured over 3,433 non-blank, non-comment lines of application code
-(`10-implementation.md` §10.2).
+(§10.2).
 
 **Assumption AS-01 was wrong, and in a specific direction.** 30 LOC per function
 point came from published averages for the language class; actual productivity
-was **20.7** — below even the optimistic 25 used in the sensitivity analysis
+was **20.7**, below even the optimistic 25 used in the sensitivity analysis
 (§4.3.4). Two causes are consistent with the delivered code: modern frameworks
 supply as configuration what those averages assume is hand-written (routing,
 sessions, ORM persistence, CSRF, templating), and some function points produce
-very little code — the QR card is 5 adjusted function points and roughly 15
+very little code, the QR card is 5 adjusted function points and roughly 15
 lines, because the library does the work.
 
 The sensitivity analysis anticipated this *class* of error but under-bounded it,
@@ -485,10 +485,10 @@ setting the range at 25–40. Derived from measurement rather than published
 tables, it would have started lower.
 
 **The conclusion of §4.4 is unaffected.** Even at actual size, COCOMO puts the
-system at 8.76 person-months — over 1,300 person-hours against a 48-hour window.
+system at 8.76 person-months: over 1,300 person-hours against a 48-hour window.
 The gap narrows and remains of the same order.
 
-### 4.8.2 Effort — actuals against the 48-hour plan
+### 4.8.2 Effort: actuals against the 48-hour plan
 
 The project is planned in hours within a 48-hour window, so the actuals are
 recorded in the same unit: elapsed time per phase, taken from commit timestamps,
@@ -537,7 +537,7 @@ comparatively minor. The reverse held:
   the eight defects. Two of those were errors in the developer's own
   assumptions rather than in the code.
 
-**This is the most useful thing the estimate produced.** The magnitude comparison
+**This is the most useful output of the estimation process.** The magnitude comparison
 is contaminated (§4.9); the distribution is not, because both figures come from
 the same project. The corrective action for a future estimate is specific: shift
 weight out of implementation and into deployment and testing, and decompose
@@ -546,8 +546,8 @@ deployment into a WBS rather than treating it as a single 4-hour block.
 ### 4.8.4 Per-task actuals
 
 The 17-task breakdown below cannot be completed from the record. Commits do not
-partition along WBS boundaries — a single commit delivers the domain layer, its
-tests and its documentation together — so per-task figures would be invented
+partition along WBS boundaries, a single commit delivers the domain layer, its
+tests and its documentation together, so per-task figures would be invented
 rather than measured.
 
 | Task | Estimated (h) | Actual (h) | Variance | Note |
@@ -583,14 +583,14 @@ Three qualifications, so the figures are not read as more than they are.
 **Elapsed time is not pure effort.** Intervals between commits include
 infrastructure setup, container builds, deploy waits and review. The 2.48 hours
 against Phase 5 covers a period in which much of the work was cloud
-configuration — which AS-05 excludes from project effort by definition. The
+configuration, which AS-05 excludes from project effort by definition. The
 distribution finding in §4.8.3 survives this, because the same measure is applied
 to every phase; the absolute total does not.
 
 **No instrument was in place.** Effort was not tracked as the work happened;
 these figures are reconstructed from commit timestamps afterwards. Session 6's
 practice is to *record* actuals as work occurs, and reconstruction is inference.
-A future project should instrument at the WBS level from the first hour — that
+A future project should instrument at the WBS level from the first hour, that
 is the specific corrective action, and it is what would have made §4.8.4
 completable.
 
@@ -613,13 +613,13 @@ plausible numbers.
 
 **Closing the loop to ES-01.** Constraint ES-01 recorded that no historical
 project data existed to calibrate against. That was true because no earlier
-project recorded actuals. §4.8.2 and §4.8.3 are the beginning of that data — the
+project recorded actuals. §4.8.2 and §4.8.3 are the beginning of that data, the
 first entry in a baseline that Lehman's third law
-(`11-maintenance-evolution.md` §11.4) says is what eventually makes effort
+(§11.4) says is what eventually makes effort
 predictable. Its most useful content is not the total but the finding that
 implementation was over-weighted by a factor of roughly four while deployment was
 under-weighted by nearly five.
 
 Magnitude of Relative Error will be computed as `MRE = |Actual − Estimated| / Actual`,
-and the result — favourable or not — reported as the closure of the estimation process
+and the result (favourable or not) reported as the closure of the estimation process
 described in §4.1.

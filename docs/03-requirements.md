@@ -1,7 +1,8 @@
 # 3. Requirements Analysis
 
-Requirements are classified using the taxonomy from Session 2: business, stakeholder,
-functional, non-functional, and constraints.
+Requirements are classified using the taxonomy set out in Session 2 [2] and in
+Sommerville [8]: business, stakeholder, functional, non-functional, and
+constraints.
 
 ---
 
@@ -39,7 +40,7 @@ functional, non-functional, and constraints.
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-01 | The system shall authenticate users with a phone number or email and a password. | Must |
-| FR-02 | The system shall support four roles — Client, Collector, Supervisor, Administrator — and enforce role-based access on every route. | Must |
+| FR-02 | The system shall support four roles (Client, Collector, Supervisor, Administrator) and enforce role-based access on every route. | Must |
 | FR-03 | The system shall store passwords only as salted one-way hashes. | Must |
 | FR-04 | The system shall terminate a session on logout and after a period of inactivity. | Must |
 | FR-05 | The system shall restrict a Collector to viewing and modifying only clients assigned to them. | Must |
@@ -108,7 +109,7 @@ functional, non-functional, and constraints.
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-35 | An Administrator shall create, suspend and assign roles to user accounts. | Should |
-| FR-36 | An Administrator shall configure institutional defaults — cycle length and commission policy. | Could |
+| FR-36 | An Administrator shall configure institutional defaults, cycle length and commission policy. | Could |
 | FR-37 | The system shall provide a Supervisor dashboard summarising active clients, today's collections and outstanding variances. | Could |
 | FR-38 | The system shall export a collector's cycle report as CSV. | Could |
 
@@ -139,9 +140,9 @@ specification matches the delivered system.
 | NFR-03 | Security | Authorisation shall be enforced server-side on every route; passwords hashed; CSRF protection on all state-changing forms. | Security test cases, forced-browsing attempts |
 | NFR-04 | Data integrity | All monetary values shall be stored and computed as integer pesewas; floating-point arithmetic shall not be used for money. | Unit tests, schema inspection |
 | NFR-05 | Availability | The deployed system shall be available during collection hours (06:00–20:00 GMT). | Deployment verification |
-| NFR-06 | Compliance | Only name, phone, business type and location shall be stored as client personal data, per the Data Protection Act 2012 (Act 843). | Schema review |
+| NFR-06 | Compliance | Only name, phone, business type and location shall be stored as client personal data, per the Data Protection Act 2012 (Act 843) [30]. | Schema review |
 | NFR-07 | Maintainability | The domain layer shall have no dependency on Flask or SQLAlchemy and shall reach at least 70% unit-test coverage. | Coverage report, import inspection |
-| NFR-08 | Accessibility | Interface shall meet WCAG 2.1 AA contrast, use touch targets of at least 44×44 px, and remain legible in outdoor light. | Contrast audit, device check |
+| NFR-08 | Accessibility | Interface shall meet WCAG 2.1 [29] AA contrast, use touch targets of at least 44×44 px, and remain legible in outdoor light. | Contrast audit, device check |
 | NFR-09 | Auditability | Every state change shall be attributable to an authenticated user and a timestamp. | Audit log inspection |
 | NFR-10 | Portability | The application shall run against the same PostgreSQL engine in development and production, configured only by environment variable. | Docker parity, deploy verification |
 
@@ -153,13 +154,13 @@ specification matches the delivered system.
 | CO-02 | The system must be developed by a single developer. | Examination rules (individual assessment) |
 | CO-03 | The application must be deployed and publicly accessible for grading. | Examination rules 8, 9 |
 | CO-04 | Hosting is limited to free-tier services. | Project resources |
-| CO-05 | No integration with mobile money or banking APIs is possible — no merchant credentials are available. | Technical/commercial access |
-| CO-06 | Client personal data must comply with the Data Protection Act 2012 (Act 843). | Ghanaian law |
+| CO-05 | No integration with mobile money or banking APIs is possible, no merchant credentials are available. | Technical/commercial access |
+| CO-06 | Client personal data must comply with the Data Protection Act 2012 (Act 843) [30]. | Ghanaian law |
 | CO-07 | Field users operate on low-end Android phones over mobile data. | Target user context |
 
 ## 3.6 Prioritisation (MoSCoW)
 
-Prioritisation is driven by one test: **does this requirement serve BR-01/BR-02 — the
+Prioritisation is driven by one test: **does this requirement serve BR-01/BR-02, the
 protection and verifiability of client funds?** Anything that does is a *Must*; anything
 that merely improves convenience is deferred.
 
@@ -172,15 +173,15 @@ that merely improves convenience is deferred.
 | **Total** | **42** | FR-01 … FR-42 |
 
 > FR-39 and FR-40 were added after the baseline was set, under change request **CR-001**
-> (`CHANGELOG-requirements.md`). They are **Should**, so that abandoning them under
+> (Appendix B). They are **Should**, so that abandoning them under
 > schedule pressure costs no Must requirement.
 
 **FR-31 was originally *Won't*, and was reinstated under CR-002.** SMS notification is the
-mitigation for assumption A5 — the risk that clients cannot reach a web page — and is
+mitigation for assumption A5, the risk that clients cannot reach a web page, and is
 arguably the single most valuable feature for the real user. It was excluded because it
 required a paid SMS gateway (CO-04) with an account lead time that did not fit CO-01. Once
 a gateway became available that constraint no longer applied, and it was reinstated as
-**Should** through the change control process (`CHANGELOG-requirements.md`, CR-002).
+**Should** through the change control process (Appendix B, CR-002).
 
 ## 3.7 Requirements traceability matrix
 
@@ -196,22 +197,22 @@ a gateway became available that constraint no longer applied, and it was reinsta
 | BR-02 | SR-01, SR-03 | FR-41, FR-42 *(TD-15 repayment)* | TC-PWD-01…13 |
 | BR-02, BR-06 | SR-01 | FR-31 *(CR-002)* | TC-SMS-01…10 |
 
-*Test case identifiers are defined in `09-testing.md`.*
+*Test case identifiers are defined in Section 9 (Testing and Quality Assurance).*
 
 ## 3.8 Change management
 
 Following Session 2's formal change control process, and scaled to a single-developer
 project:
 
-1. **Change request logging** — any scope change during the 48 hours is recorded as a
+1. **Change request logging**, any scope change during the 48 hours is recorded as a
    dated entry in `docs/CHANGELOG-requirements.md` with the reason.
-2. **Impact analysis** — the traceability matrix (§3.7) identifies which business
+2. **Impact analysis**, the traceability matrix (§3.7) identifies which business
    requirements and test cases a change touches.
-3. **Cost/schedule assessment** — the change is re-estimated against the remaining hours
+3. **Cost/schedule assessment**, the change is re-estimated against the remaining hours
    in the window.
-4. **Approval** — with no Change Control Board available, the developer records the
+4. **Approval**, with no Change Control Board available, the developer records the
    decision and its justification explicitly, so it is reviewable.
-5. **Implementation** — design, code, tests and documentation are updated together.
+5. **Implementation**, design, code, tests and documentation are updated together.
 
 Any requirement dropped after this point is recorded there rather than silently removed,
 so that the delivered scope can be compared against the specified scope.
@@ -222,4 +223,4 @@ so that the delivered scope can be compared against the specified scope.
   rules BR-R14 and BR-R15.
 - **CR-002** — SMS notification. Approved, reinstating FR-31 from *Won't* to *Should*.
 
-See `CHANGELOG-requirements.md` for impact analysis, cost and decision record in each case.
+See Appendix B for impact analysis, cost and decision record in each case.

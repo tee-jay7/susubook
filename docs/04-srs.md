@@ -2,7 +2,8 @@
 
 **System:** SusuBook — Digital Susu Collection and Accountability System
 **Version:** 1.0
-**Standard:** Structured after IEEE 830, adapted to the scope of a 48-hour capstone
+**Standard:** Structured after IEEE Std 830-1998 [27], adapted to the scope of a
+48-hour capstone
 
 ---
 
@@ -30,8 +31,7 @@ declaration and variance detection, client self-service access, role-based autho
 and an append-only audit trail.
 
 **Out of scope:** mobile money and bank integration (CO-05), SMS notification (FR-31),
-offline operation, multi-institution tenancy, and native mobile applications. Section
-`06-scope.md` records the reasoning; `11-maintenance-evolution.md` carries them forward.
+offline operation, multi-institution tenancy, and native mobile applications. Appendix A records the reasoning; Section 11 (Maintenance and Future Evolution) carries them forward.
 
 ### 1.3 Definitions
 
@@ -45,7 +45,7 @@ offline operation, multi-institution tenancy, and native mobile applications. Se
 | **Contribution cycle** | A fixed-length savings period, 31 days by default, ending in a payout. |
 | **Contribution** | One recorded payment by a client, allocated to a specific date in a cycle. |
 | **Susu card** | The 31-day grid view of a cycle, showing each day as paid, missed or pending. Digital equivalent of the paper card. |
-| **Commission** | The collector's fee — one day's contribution, retained at payout. |
+| **Commission** | The collector's fee, one day's contribution, retained at payout. |
 | **Payout** | The net amount released to the client at maturity: total collected less commission. |
 | **Remittance declaration** | A collector's statement of cash banked at the branch for a given day. |
 | **Variance** | The difference between contributions recorded in the field and cash declared, for one collector on one day. |
@@ -61,7 +61,7 @@ offline operation, multi-institution tenancy, and native mobile applications. Se
 - CSCD602 Session 5 — Software Design and Architecture
 - CSCD602 Session 6 — Software Effort Estimation
 - Data Protection Act 2012 (Act 843), Republic of Ghana
-- `01-problem-definition.md`, `02-stakeholder-analysis.md`, `03-requirements.md`
+- Section 1 (Problem Definition), Section 2 (Stakeholder Analysis), Section 3 (Requirements Analysis)
 
 ---
 
@@ -69,8 +69,7 @@ offline operation, multi-institution tenancy, and native mobile applications. Se
 
 ### 2.1 Product perspective
 
-SusuBook is a new, self-contained system. It replaces a paper artefact — the susu card —
-rather than an existing software system, so there is no legacy data migration and no
+SusuBook is a new, self-contained system. It replaces a paper artefact, the susu card, rather than an existing software system, so there is no legacy data migration and no
 external interface (hence zero External Interface Files in the function point count,
 §4.2.2 of the estimation).
 
@@ -114,7 +113,7 @@ compliance (CO-06), low-end devices on mobile data (CO-07).
 ### 2.5 Assumptions and dependencies
 
 Carried from §2.5, of which **A5 is critical**: clients are assumed able to reach a mobile
-web page. If false, the system's central value — independent client visibility — requires
+web page. If false, the system's central value (independent client visibility) requires
 an SMS channel instead.
 
 ---
@@ -166,14 +165,14 @@ They are the primary subject of unit testing.
 | BR-R12 | A cycle reaches MATURED when the current date passes its end date, regardless of days paid. |
 | BR-R13 | Variance for a collector on a date = sum of contributions recorded − amount declared. |
 | BR-R14 | Public references exposed in URLs or QR codes are opaque and non-sequential (UUIDv4). Sequential database identifiers never appear in a URL. *(CR-001)* |
-| BR-R15 | A client reference identifies; it does not authorise. Possession confers no permission — authorisation remains the collector–client assignment enforced server-side (FR-05). *(CR-001)* |
+| BR-R15 | A client reference identifies; it does not authorise. Possession confers no permission, authorisation remains the collector–client assignment enforced server-side (FR-05). *(CR-001)* |
 
 > **BR-R14 and BR-R15 together are what make a QR card safe to carry through a public
 > market.** The card must be assumed photographable. BR-R14 prevents an observer deriving
 > other clients' references by incrementing a number; BR-R15 ensures that holding a
 > reference grants nothing, because the authorisation decision never consults it. The QR
-> encodes a URL containing an opaque reference and nothing else — no name, phone, balance
-> or rate — so a photographed card leaks no personal data (NFR-06, Act 843).
+> encodes a URL containing an opaque reference and nothing else, no name, phone, balance
+> or rate, so a photographed card leaks no personal data (NFR-06, Act 843).
 
 > **BR-R9 exists because of a real edge case:** a client who contributes on only one day
 > receives nothing, because the single day's contribution *is* the commission. Stating the
@@ -194,14 +193,14 @@ They are the primary subject of unit testing.
 | UC-09 | Reverse an erroneous contribution | Supervisor | FR-33, FR-32 |
 | UC-10 | Issue a client QR card *(CR-001)* | Collector | FR-39 |
 
-#### UC-03 — Record daily contribution *(core use case)*
+#### UC-03: Record daily contribution *(core use case)*
 
 | | |
 |---|---|
 | **Actor** | Collector |
 | **Precondition** | Collector authenticated; client assigned to this collector; client has an ACTIVE cycle |
 | **Postcondition** | Contribution persisted with a unique reference; audit entry written; client's view updated |
-| **Frequency** | Highest in the system — dozens of times per collector per day |
+| **Frequency** | Highest in the system, dozens of times per collector per day |
 
 **Main flow**
 1. Collector opens today's route sheet.
@@ -215,22 +214,22 @@ They are the primary subject of unit testing.
 9. System returns the updated route sheet with the client marked collected.
 
 **Alternate flows**
-- **3a. Catch-up payment** *(FR-15, Should)* — collector indicates several unpaid days; system allocates the amount across the specific unpaid dates and validates each against BR-R3 and BR-R5.
-- **3b. Entry by QR scan** *(FR-39, FR-40, Should — CR-001)* — instead of steps 1–3, the collector scans the client's QR card with the phone's camera application, which opens the client's contribution URL directly. The system resolves the public reference (BR-R14), verifies the client is assigned to this collector (FR-05, BR-R15), and enters the flow at step 4. Reduces the interaction to **scan and confirm**. If the card is missing or unreadable, the collector falls back to the main flow.
-- **4a. Amount differs from the daily rate** — collector overrides; system validates BR-R7 (whole multiple of the rate) and rejects any other value.
+- **3a. Catch-up payment** *(FR-15, Should)*, collector indicates several unpaid days; system allocates the amount across the specific unpaid dates and validates each against BR-R3 and BR-R5.
+- **3b. Entry by QR scan** *(FR-39, FR-40, Should (CR-001)*) instead of steps 1–3, the collector scans the client's QR card with the phone's camera application, which opens the client's contribution URL directly. The system resolves the public reference (BR-R14), verifies the client is assigned to this collector (FR-05, BR-R15), and enters the flow at step 4. Reduces the interaction to **scan and confirm**. If the card is missing or unreadable, the collector falls back to the main flow.
+- **4a. Amount differs from the daily rate**, collector overrides; system validates BR-R7 (whole multiple of the rate) and rejects any other value.
 
 **Exception flows**
-- **6a. Contribution already exists for this client and date** (BR-R5) — system rejects, states the existing reference, records nothing.
-- **6b. Date is in the future** (BR-R4) — system rejects.
-- **6c. Cycle is MATURED or PAID_OUT** (BR-R6) — system rejects and directs the collector to the payout process.
-- **6d. Client not assigned to this collector** (FR-05) — system denies authorisation and records the attempt in the audit log.
+- **6a. Contribution already exists for this client and date** (BR-R5): system rejects, states the existing reference, records nothing.
+- **6b. Date is in the future** (BR-R4): system rejects.
+- **6c. Cycle is MATURED or PAID_OUT** (BR-R6): system rejects and directs the collector to the payout process.
+- **6d. Client not assigned to this collector** (FR-05): system denies authorisation and records the attempt in the audit log.
 
 > Step 4 pre-fills the amount and step 5 is a single confirmation. That is what satisfies
 > NFR-02's three-interaction limit, and it is the design resolution of conflict C1
-> (collector speed vs. client verifiability) from §2.4 — integrity is added server-side at
+> (collector speed vs. client verifiability) from §2.4, integrity is added server-side at
 > steps 7 and 8, costing the collector nothing.
 
-#### UC-07 — Release matured payout
+#### UC-07: Release matured payout
 
 | | |
 |---|---|
@@ -247,20 +246,20 @@ They are the primary subject of unit testing.
 6. System writes an audit entry and displays a payout advice.
 
 **Exception flows**
-- **4a. Cycle already PAID_OUT** (BR-R10) — rejected; no second payout is possible.
-- **4b. Total collected ≤ daily rate** (BR-R9) — payout of zero is shown explicitly with the reason, and requires confirmation rather than failing silently.
-- **4c. Cycle not yet MATURED** — rejected; directed to early withdrawal (FR-22) instead.
+- **4a. Cycle already PAID_OUT** (BR-R10): rejected; no second payout is possible.
+- **4b. Total collected ≤ daily rate** (BR-R9): payout of zero is shown explicitly with the reason, and requires confirmation rather than failing silently.
+- **4c. Cycle not yet MATURED**, rejected; directed to early withdrawal (FR-22) instead.
 
 #### Remaining use cases in brief
 
-- **UC-01 Log in** — credentials verified against a salted hash; role determines the landing page; failed attempts audited.
-- **UC-02 Enrol client** — collector captures name, phone, business type, location and daily rate; system creates the client, assigns them to this collector and opens their first cycle atomically.
+- **UC-01 Log in**, credentials verified against a salted hash; role determines the landing page; failed attempts audited.
+- **UC-02 Enrol client**, collector captures name, phone, business type, location and daily rate; system creates the client, assigns them to this collector and opens their first cycle atomically.
 - **UC-04 View susu card** — 31-day grid; each day rendered paid, missed or pending; header shows days paid, total collected and projected net payout.
-- **UC-05 Declare remittance** — collector enters cash banked for the day; system stores it and computes the variance.
-- **UC-06 Review variance** — supervisor sees all non-zero variances for the day, by collector, with the underlying contributions.
-- **UC-08 Client history** — client sees every contribution against them with amount, date, time recorded, recording collector and reference; the independent record that answers P1.
-- **UC-09 Reverse contribution** — supervisor records a reversal; original remains visible, linked to the reversal; both appear in the audit trail (BR-R11).
-- **UC-10 Issue QR card** — collector opens a client's printable card page; system renders the client's public reference as a QR code encoding their contribution URL, with the client's name for human identification; collector prints and issues it. Re-issuing a lost card by rotating the reference is deferred to the evolution plan.
+- **UC-05 Declare remittance**, collector enters cash banked for the day; system stores it and computes the variance.
+- **UC-06 Review variance**, supervisor sees all non-zero variances for the day, by collector, with the underlying contributions.
+- **UC-08 Client history**, client sees every contribution against them with amount, date, time recorded, recording collector and reference; the independent record that answers P1.
+- **UC-09 Reverse contribution**, supervisor records a reversal; original remains visible, linked to the reversal; both appear in the audit trail (BR-R11).
+- **UC-10 Issue QR card**, collector opens a client's printable card page; system renders the client's public reference as a QR code encoding their contribution URL, with the client's name for human identification; collector prints and issues it. Re-issuing a lost card by rotating the reference is deferred to the evolution plan.
 
 ### 3.4 User stories
 
@@ -293,15 +292,15 @@ WCAG 2.1 AA contrast, legible in outdoor light (NFR-08). Four role-specific land
 
 ## 5. Non-functional requirements
 
-Specified in full at §3.4 of `03-requirements.md`: NFR-01 performance, NFR-02 usability,
+Specified in full at §3.4: NFR-01 performance, NFR-02 usability,
 NFR-03 security, NFR-04 data integrity, NFR-05 availability, NFR-06 compliance, NFR-07
 maintainability, NFR-08 accessibility, NFR-09 auditability, NFR-10 portability. Each
-carries a verification method, and each is exercised by a test case in `09-testing.md`.
+carries a verification method, and each is exercised by a test case at §9.4.
 
 ---
 
 ## 6. Verification
 
 Every requirement in this specification is traceable to at least one test case through
-the matrix at §3.7 of `03-requirements.md`. Requirements not covered by an executed test
-are listed as such in `09-testing.md` rather than presented as satisfied.
+the matrix at §3.7. Requirements not covered by an executed test
+are listed as such at §9.7 rather than presented as satisfied.

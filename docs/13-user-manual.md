@@ -8,9 +8,9 @@
 
 1. [What SusuBook is](#1-what-susubook-is)
 2. [Signing in](#2-signing-in)
-3. [For clients — checking your savings](#3-for-clients--checking-your-savings)
-4. [For collectors — daily collection](#4-for-collectors--daily-collection)
-5. [For supervisors — oversight and payouts](#5-for-supervisors--oversight-and-payouts)
+3. [For clients, checking your savings](#3-for-clients--checking-your-savings)
+4. [For collectors, daily collection](#4-for-collectors--daily-collection)
+5. [For supervisors, oversight and payouts](#5-for-supervisors--oversight-and-payouts)
 6. [For administrators](#6-for-administrators)
 7. [Messages you may see](#7-messages-you-may-see)
 8. [Common questions](#8-common-questions)
@@ -52,7 +52,7 @@ Everyone signs in the same way, on any phone or computer:
 
 ![Sign in](screenshots/01-login.png)
 
-1. Enter your **phone number** — the one you gave when you registered
+1. Enter your **phone number**, the one you gave when you registered
 2. Enter your **password**
 3. Tap **Sign in**
 
@@ -60,13 +60,13 @@ You will land on the right page for who you are. Clients see their own card;
 collectors see today's route; supervisors see the day's cash position.
 
 **If it does not work:** the message *"Phone number or password is incorrect"*
-appears for both a wrong number and a wrong password. This is deliberate — it
+appears for both a wrong number and a wrong password. This is deliberate, it
 stops a stranger from discovering which phone numbers are registered. Check both,
 and if you still cannot sign in, ask your collector or branch to help.
 
 > **Your first sign-in.** Your collector set your first password, so they know
 > it. The first time you sign in, SusuBook asks you to choose a new one before
-> showing your card. Choose something only you know — after that, nobody else
+> showing your card. Choose something only you know, after that, nobody else
 > can see your record.
 
 ![Set your own password](screenshots/08-first-login.png)
@@ -77,7 +77,7 @@ code and choose a new password. The code lasts 10 minutes and works once.
 
 ---
 
-## 3. For clients — checking your savings
+## 3. For clients: checking your savings
 
 ### Your susu card
 
@@ -98,12 +98,12 @@ sunlight and by anyone who has difficulty telling colours apart.
 
 **Below the grid** you see:
 
-- **Days paid** — how many days you have paid, out of the days so far
-- **Total saved** — everything recorded for you this cycle
-- **Commission** — one day's contribution, kept by the collector. This is the
+- **Days paid**, how many days you have paid, out of the days so far
+- **Total saved**, everything recorded for you this cycle
+- **Commission**, one day's contribution, kept by the collector. This is the
   normal susu arrangement, agreed when you registered
-- **You will receive** — what you get at the end of the cycle
-- **Matures** — the date your cycle ends
+- **You will receive**, what you get at the end of the cycle
+- **Matures**, the date your cycle ends
 
 ### Every payment recorded against you
 
@@ -121,7 +121,7 @@ payment, and it cannot be quietly altered afterwards.
 
 ### If a payment is corrected
 
-Sometimes a collector makes an honest mistake — the wrong client, or the wrong
+Sometimes a collector makes an honest mistake, the wrong client, or the wrong
 day. Corrections do not delete anything. You will see **two** entries, marked
 `REVERSED` and `REVERSAL`, both greyed out. The original stays visible so you can
 see exactly what happened and when.
@@ -138,7 +138,7 @@ Tap **Past cycles** to see your earlier cycles and what you received from each.
 
 ---
 
-## 4. For collectors — daily collection
+## 4. For collectors: daily collection
 
 ### Today's route
 
@@ -148,9 +148,9 @@ Signing in takes you to today's route.
 
 Each client shows their name, business, location and agreed daily amount. Clients
 you have already collected from today show **✓ Paid**. The figure at the top
-right is **your running total for today** — it updates as you collect.
+right is **your running total for today**, it updates as you collect.
 
-### Recording a collection — two ways
+### Recording a collection: two ways
 
 **By scanning the client's card (fastest)**
 
@@ -159,7 +159,7 @@ right is **your running total for today** — it updates as you collect.
 3. Tap the link that appears
 4. Tap **Confirm collection**
 
-Two taps. There is no special scanner to open — your phone's own camera reads the
+Two taps. There is no special scanner to open, your phone's own camera reads the
 code.
 
 ![Confirm collection](screenshots/03-confirm.png)
@@ -176,7 +176,7 @@ sheet and tap **Collect**. The result is identical.
 ### Collecting a different amount
 
 Tap **Change amount** on the confirmation screen. The amount must be a **whole
-multiple of the agreed daily rate** — so for a client saving GHS 10.00 per day you
+multiple of the agreed daily rate**, so for a client saving GHS 10.00 per day you
 may enter 10.00, 20.00 or 30.00, but not 7.50. This prevents typing errors from
 becoming wrong balances.
 
@@ -188,7 +188,7 @@ business and location, then set an initial password for them.
 This creates the client's own login and opens their first 31-day cycle in one
 step. Give them the password and **print their susu card** on the next screen.
 
-Only these details are stored — no Ghana Card number, no address. The system
+Only these details are stored, no Ghana Card number, no address. The system
 keeps the minimum it needs.
 
 ### Printing a susu card
@@ -198,7 +198,7 @@ keeps the minimum it needs.
 After enrolling, or from any client's page, tap **QR card** then **Print card**.
 Give the printed card to the client to keep, like the paper card it replaces.
 
-**The card is safe to carry.** The code contains only a reference — no name, no
+**The card is safe to carry.** The code contains only a reference, no name, no
 phone number, no balance. If it is lost or photographed by a stranger, they
 cannot use it to collect anything: only *you*, signed in, and only for clients on
 *your* route.
@@ -221,7 +221,7 @@ than a declared zero.
 
 ---
 
-## 5. For supervisors — oversight and payouts
+## 5. For supervisors: oversight and payouts
 
 ### The day's cash position
 
@@ -241,7 +241,7 @@ A **✓ GHS 0.00** in green means the two agree. A **⚠ red figure** means they
 not, and the row is highlighted. **NOT DECLARED** means the collector has not yet
 reported their cash.
 
-A positive variance means the collector recorded more than they banked — the case
+A positive variance means the collector recorded more than they banked, the case
 that matters most. Act on it the same day, while the money is still recoverable.
 
 Collectors who recorded nothing still appear, with zeroes. This is deliberate: a
@@ -271,7 +271,7 @@ so they can keep saving without re-registering.
 
 1. Tap **Reverse**
 2. Enter the **contribution reference** (for example `SB-4K2M-7X9P`)
-3. Enter the **reason** — this is required and is stored permanently
+3. Enter the **reason**, this is required and is stored permanently
 4. Tap **Reverse contribution**
 
 Nothing is deleted. The original entry stays on the client's record alongside the
@@ -286,7 +286,7 @@ Only supervisors can reverse. Collectors cannot.
 
 Administrators can see everything supervisors can.
 
-User account management is **not available in this version** — accounts are
+User account management is **not available in this version**, accounts are
 created by a collector at enrolment (clients) or set up directly by the branch
 (collectors and supervisors). A management screen is planned for a future
 release.
@@ -324,7 +324,7 @@ No. Records cannot be edited or deleted. A supervisor can add a *correction*, an
 you will see both the original and the correction on your card, with the reason.
 
 **What if I lose my susu card?**
-Ask your collector — they can collect from you using the route sheet instead, and
+Ask your collector, they can collect from you using the route sheet instead, and
 print you a new card. Nobody who finds your card can use it.
 
 **Why is one day's contribution deducted?**
@@ -379,4 +379,4 @@ that it is fast. This keeps running costs at zero.
 ## Getting help
 
 Contact your branch or supervisor. When reporting a problem with a specific
-payment, quote its **reference** — that identifies it exactly.
+payment, quote its **reference**, that identifies it exactly.
