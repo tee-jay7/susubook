@@ -233,42 +233,45 @@ yet solve it for anyone.
 19. Lehman, M.M. (1980) 'Programs, life cycles, and laws of software evolution', *Proceedings of the IEEE*, 68(9), pp. 1060–1076.
 20. Albrecht, A.J. (1979) 'Measuring application development productivity', *Proceedings of the IBM Applications Development Symposium*, pp. 83–92.
 21. Cunningham, W. (1992) 'The WyCash portfolio management system', *OOPSLA '92 Experience Report*.
-22. Brooke, J. (1996) 'SUS: A quick and dirty usability scale', in Jordan, P.W. et al. (eds) *Usability Evaluation in Industry*. London: Taylor & Francis, pp. 189–194.
+22. Jones, C. (2017) *Software Economics and Function Point Metrics: Thirty Years of IFPUG Progress*, Version 10.0. Namcook Analytics LLC. Table 16, 'Side-by-Side Comparison of Function Points and Lines of Code Metrics'. Available at: https://www.ifpug.org/wp-content/uploads/2017/04/IYSM.-Thirty-years-of-IFPUG.-Software-Economics-and-Function-Point-Metrics-Capers-Jones.pdf
+23. Brooke, J. (1996) 'SUS: A quick and dirty usability scale', in Jordan, P.W. et al. (eds) *Usability Evaluation in Industry*. London: Taylor & Francis, pp. 189–194.
 
 ## 19.4 Online sources
 
-23. Fowler, M. (2009) *TechnicalDebtQuadrant*. Available at: https://martinfowler.com/bliki/TechnicalDebtQuadrant.html
-24. Nielsen, J. (2000) *Why You Only Need to Test with 5 Users*. Nielsen Norman Group. Available at: https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/
-25. Wiggins, A. (2017) *The Twelve-Factor App*. Available at: https://12factor.net/
-26. Google Cloud (2024) *Cloud Run documentation: Connect to a VPC network*. Available at: https://cloud.google.com/run/docs/configuring/vpc-direct-vpc
+24. Fowler, M. (2009) *TechnicalDebtQuadrant*. Available at: https://martinfowler.com/bliki/TechnicalDebtQuadrant.html
+25. Nielsen, J. (2000) *Why You Only Need to Test with 5 Users*. Nielsen Norman Group. Available at: https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/
+26. Wiggins, A. (2017) *The Twelve-Factor App*. Available at: https://12factor.net/
+27. Quantitative Software Management (2024) *Function Point Languages Table*, Version 5.0. Available at: https://www.qsm.com/resources/function-point-languages-table
+28. Google Cloud (2024) *Cloud Run documentation: Connect to a VPC network*. Available at: https://cloud.google.com/run/docs/configuring/vpc-direct-vpc
 
 ## 19.5 Standards and legislation
 
-27. IEEE (1998) *IEEE Std 830-1998: Recommended Practice for Software Requirements Specifications*. New York: Institute of Electrical and Electronics Engineers.
-28. ISO (2019) *ISO 9241-210:2019 Ergonomics of human-system interaction: Part 210: Human-centred design for interactive systems*. Geneva: International Organization for Standardization.
-29. W3C (2018) *Web Content Accessibility Guidelines (WCAG) 2.1*. Available at: https://www.w3.org/TR/WCAG21/
-30. Republic of Ghana (2012) *Data Protection Act, 2012 (Act 843)*. Accra: Ghana Publishing Company.
+29. IEEE (1998) *IEEE Std 830-1998: Recommended Practice for Software Requirements Specifications*. New York: Institute of Electrical and Electronics Engineers.
+30. ISO (2019) *ISO 9241-210:2019 Ergonomics of human-system interaction: Part 210: Human-centred design for interactive systems*. Geneva: International Organization for Standardization.
+31. W3C (2018) *Web Content Accessibility Guidelines (WCAG) 2.1*. Available at: https://www.w3.org/TR/WCAG21/
+32. Republic of Ghana (2012) *Data Protection Act, 2012 (Act 843)*. Accra: Ghana Publishing Company.
 
 ## 19.6 Note on assumption AS-01
 
-**This reference is incomplete, and the gap is stated rather than concealed.**
-
 §4.3.1 converts function points to source size at **30 lines of code per function
-point** for Python with an ORM and server-side templating. That figure was taken
-as a published average for the language class, but **the specific table it came
-from was not recorded at the time**, and it is not cited here because citing a
-source that was not consulted would be worse than admitting the gap.
+point**. That figure was adopted at estimation time without a recorded source. Both
+standard gearing-factor tables were consulted subsequently, and both are now cited:
 
-The figure is not incidental, it drives the KLOC input to COCOMO and therefore
-every effort figure in §4.3. Its unreliability is partly demonstrated by the
-project's own result: measured productivity was **20.7 LOC/FP** (§4.8.1), below
-even the optimistic bound of the sensitivity analysis.
+- **Jones [22]**, Table 16, lists Python at **53.33 LOC per function point**.
+- **QSM [27]**, Version 5.0, drawn from 2,192 completed projects across 37 languages,
+  **does not include Python**. Its nearest analogue, Perl, is 24 average and 15 median.
 
-**Action required:** consult a published language-productivity table — Jones's
-language levels or the QSM function point languages table are the usual sources —
-and either cite it here or restate AS-01 as an unsourced estimate. The
-sensitivity analysis in §4.3.4 already shows the conclusion holds across
-25–40 LOC/FP, so the argument does not depend on the resolution.
+The published range for this language class is therefore approximately **15 to 53 LOC
+per function point**, and the value adopted sits inside it without having been derived
+from it. §4.3.4 now presents the sensitivity analysis across the sourced range rather
+than an arbitrary band, and records that the effort estimate varies by a factor of 3.8
+across it while the conclusion at §4.4 holds at every point.
+
+**The measured value for this project was 20.7 LOC per function point** (§4.8.1), below
+both published figures. Two explanations are consistent with the delivered code: modern
+frameworks supply as configuration what the datasets underlying these tables counted as
+hand-written code, and Python is absent from the larger of the two datasets entirely,
+so the class is represented only by proxy.
 
 ## 19.7 Software and libraries acknowledged
 

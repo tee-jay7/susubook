@@ -2,7 +2,7 @@
 
 **System:** SusuBook — Digital Susu Collection and Accountability System
 **Version:** 1.0
-**Standard:** Structured after IEEE Std 830-1998 [27], adapted to the scope of a
+**Standard:** Structured after IEEE Std 830-1998 [29], adapted to the scope of a
 48-hour capstone
 
 ---

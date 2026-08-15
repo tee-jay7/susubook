@@ -53,7 +53,7 @@ dead link. Cloud Run's measured cold start here is **3.3 seconds** (§12.6). Und
 examination Rule 8, the deployment must remain accessible for grading, that
 difference is the whole argument.
 
-**Direct VPC egress, not a Serverless VPC Access connector** [26]. A connector
+**Direct VPC egress, not a Serverless VPC Access connector** [28]. A connector
 provisions instances that bill continuously, which would defeat a free-tier
 deployment. Direct egress is configuration on the service itself, at no standing
 cost.
@@ -75,7 +75,7 @@ tunnel, no temporary public IP, and the password never leaves Secret Manager.
 ## 12.4 Secrets
 
 Configuration is supplied through the environment, following the twelve-factor
-approach [25]. Only the database **password** is secret. Host, port, database name and role are
+approach [26]. Only the database **password** is secret. Host, port, database name and role are
 ordinary configuration passed as environment variables, so Secret Manager holds
 exactly one value that needs protecting and everything else stays legible in the
 service definition where an operator can read it.

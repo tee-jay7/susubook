@@ -703,10 +703,10 @@ is set by the card rather than the background.
 
 ### Accessibility (NFR-08)
 
-Interface work follows the user-centred design activities of ISO 9241-210 [28]
+Interface work follows the user-centred design activities of ISO 9241-210 [30]
 as presented in Session 5 [5].
 
-WCAG 2.1 [29] AA contrast; touch targets of at least 44×44 px; the susu card grid uses **shape and text,
+WCAG 2.1 [31] AA contrast; touch targets of at least 44×44 px; the susu card grid uses **shape and text,
 not colour alone**, to distinguish paid from missed, colour-blind users and a sun-washed
 screen fail the same way, so the fix serves both. Amounts are rendered large; no
 interaction depends on hover.

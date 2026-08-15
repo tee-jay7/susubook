@@ -209,11 +209,21 @@ presented in Session 6 [6].
 
 Function points are converted to KLOC using a language productivity figure.
 
-> **Assumption AS-01:** 30 source lines of code per function point for Python with an
-> ORM and server-side templating. This is a published-average figure for the language
-> class; a sensitivity analysis at 25 and 40 LOC/FP is given in §4.3.4 because the choice
-> materially affects the result. *The specific productivity table used must be cited in
-> `References` in the final document.*
+> **Assumption AS-01:** 30 source lines of code per function point, for Python with an
+> ORM and server-side templating. The figure was adopted at estimation time as a
+> plausible value for the language class, **without a specific published source**. The
+> two standard gearing-factor tables were consulted afterwards, and §4.3.4 records what
+> they give and how far apart they are.
+
+**The published figures for this language class disagree substantially.** Jones's
+side-by-side table [22] lists Python at **53.33 LOC per function point**. The QSM
+Function Point Languages Table [27], drawn from 2,192 completed projects, **does not
+include Python at all**; its nearest analogue, Perl, is 24 average and 15 median. The
+class therefore spans roughly **15 to 53 LOC per function point, a factor of 3.6**,
+depending on which source is consulted.
+
+The value adopted, 30, falls inside that span but was not derived from it. That is
+recorded as a weakness of the estimate rather than defended.
 
 ```
 KLOC (Must scope, post-CR-001) = 166 FP × 30 LOC/FP ÷ 1000 = 4.98 KLOC
@@ -261,14 +271,31 @@ two people working in parallel.
 
 ### 4.3.4 Sensitivity to the LOC/FP assumption
 
-| LOC/FP | KLOC | Effort (PM) | Person-hours |
-|---|---|---|---|
-| 25 (optimistic) | 4.15 | 10.7 | 1,626 |
-| **30 (adopted)** | **4.98** | **13.0** | **1,969** |
-| 40 (pessimistic) | 6.64 | 17.5 | 2,663 |
+Rather than an arbitrary band, the range below is taken from the published sources
+themselves, with the value this project actually measured included for comparison.
 
-The estimate is **not** sensitive enough for the conclusion to change: across the entire
-range the requirement is over 1,600 person-hours against a 48-hour budget.
+| Basis | Source | LOC/FP | KLOC | Effort (PM) | Person-hours |
+|---|---|---|---|---|---|
+| Perl, median | QSM 5.0 [27] | 15.00 | 2.49 | 6.25 | 951 |
+| **Measured, this project** | §4.8.1 | **20.70** | **3.44** | **8.77** | **1,333** |
+| Perl, average | QSM 5.0 [27] | 24.00 | 3.98 | 10.25 | 1,557 |
+| **Adopted (AS-01)** | none recorded | **30.00** | **4.98** | **12.95** | **1,969** |
+| Perl | Jones 2017 [22] | 35.56 | 5.90 | 15.48 | 2,353 |
+| Python | Jones 2017 [22] | 53.33 | 8.85 | 23.69 | 3,602 |
+
+Two observations follow.
+
+**The conclusion of §4.4 is robust across the whole published range.** Even at the
+lowest figure any source supports, the estimate is 951 person-hours against a 48-hour
+window. The gap is of the same order at every point in the table, so the scope decision
+at §4.6 does not depend on resolving which source is right.
+
+**The individual number is not robust at all.** Between the lowest and highest published
+basis the effort estimate varies by a factor of 3.8, from 6.25 to 23.69 person-months.
+Any single figure quoted from this method carries that uncertainty whether or not it is
+stated. This is the strongest practical argument in this document for the triangulation
+recommended in Session 6 [6]: the PERT estimate at §4.5 does not depend on a gearing
+factor at all, which is why it, and not COCOMO, was used to set the plan.
 
 ### 4.3.5 Full-scope comparison
 
@@ -471,10 +498,10 @@ MRE = |3.43 − 4.98| / 3.43 = 0.45
 Measured over 3,433 non-blank, non-comment lines of application code
 (§10.2).
 
-**Assumption AS-01 was wrong, and in a specific direction.** 30 LOC per function
-point came from published averages for the language class; actual productivity
-was **20.7**, below even the optimistic 25 used in the sensitivity analysis
-(§4.3.4). Two causes are consistent with the delivered code: modern frameworks
+**Assumption AS-01 was wrong, and in a specific direction.** The adopted figure of
+30 LOC per function point had no recorded source; actual productivity was **20.7**.
+Measured against the sources consulted afterwards (§4.3.4), the actual sits below
+QSM's Perl average of 24 [27] and far below Jones's Python figure of 53.33 [22]. Two causes are consistent with the delivered code: modern frameworks
 supply as configuration what those averages assume is hand-written (routing,
 sessions, ORM persistence, CSRF, templating), and some function points produce
 very little code, the QR card is 5 adjusted function points and roughly 15

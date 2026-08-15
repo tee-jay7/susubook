@@ -140,9 +140,9 @@ specification matches the delivered system.
 | NFR-03 | Security | Authorisation shall be enforced server-side on every route; passwords hashed; CSRF protection on all state-changing forms. | Security test cases, forced-browsing attempts |
 | NFR-04 | Data integrity | All monetary values shall be stored and computed as integer pesewas; floating-point arithmetic shall not be used for money. | Unit tests, schema inspection |
 | NFR-05 | Availability | The deployed system shall be available during collection hours (06:00–20:00 GMT). | Deployment verification |
-| NFR-06 | Compliance | Only name, phone, business type and location shall be stored as client personal data, per the Data Protection Act 2012 (Act 843) [30]. | Schema review |
+| NFR-06 | Compliance | Only name, phone, business type and location shall be stored as client personal data, per the Data Protection Act 2012 (Act 843) [32]. | Schema review |
 | NFR-07 | Maintainability | The domain layer shall have no dependency on Flask or SQLAlchemy and shall reach at least 70% unit-test coverage. | Coverage report, import inspection |
-| NFR-08 | Accessibility | Interface shall meet WCAG 2.1 [29] AA contrast, use touch targets of at least 44×44 px, and remain legible in outdoor light. | Contrast audit, device check |
+| NFR-08 | Accessibility | Interface shall meet WCAG 2.1 [31] AA contrast, use touch targets of at least 44×44 px, and remain legible in outdoor light. | Contrast audit, device check |
 | NFR-09 | Auditability | Every state change shall be attributable to an authenticated user and a timestamp. | Audit log inspection |
 | NFR-10 | Portability | The application shall run against the same PostgreSQL engine in development and production, configured only by environment variable. | Docker parity, deploy verification |
 
@@ -155,7 +155,7 @@ specification matches the delivered system.
 | CO-03 | The application must be deployed and publicly accessible for grading. | Examination rules 8, 9 |
 | CO-04 | Hosting is limited to free-tier services. | Project resources |
 | CO-05 | No integration with mobile money or banking APIs is possible, no merchant credentials are available. | Technical/commercial access |
-| CO-06 | Client personal data must comply with the Data Protection Act 2012 (Act 843) [30]. | Ghanaian law |
+| CO-06 | Client personal data must comply with the Data Protection Act 2012 (Act 843) [32]. | Ghanaian law |
 | CO-07 | Field users operate on low-end Android phones over mobile data. | Target user context |
 
 ## 3.6 Prioritisation (MoSCoW)

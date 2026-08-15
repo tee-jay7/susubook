@@ -452,8 +452,8 @@ The prepared UAT protocol, for execution with a participant:
 
 **Usability measures to be captured alongside** (Session 5 [5]): task completion
 rate, time on task, error rate, and a 10-item System Usability Scale score
-[22]. The nine-scenario protocol uses a small participant group on Nielsen's
-finding that five users surface the large majority of usability problems [24].
+[23]. The nine-scenario protocol uses a small participant group on Nielsen's
+finding that five users surface the large majority of usability problems [25].
 NFR-02's claim that a routine collection takes ≤3 interactions is currently
 established **by design inspection only**, scan plus confirm is two, and needs
 a measured value from a real participant to be reported as verified.

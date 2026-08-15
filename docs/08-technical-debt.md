@@ -10,7 +10,7 @@
 ## 8.1 Definition and framing
 
 The metaphor originates with Cunningham [21]; the four-way classification used
-throughout this section is Fowler's quadrant [23].
+throughout this section is Fowler's quadrant [24].
 
 Session 3 [3] defines technical debt as *the long-term cost incurred when developers
 take shortcuts or implement suboptimal solutions in order to achieve short-term
