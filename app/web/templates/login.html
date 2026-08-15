@@ -40,5 +40,10 @@
             class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold
                    hover:bg-[#173d4b]">Sign in</button>
   </form>
+
+  <p class="text-center mt-4">
+    <a href="{{ url_for('auth.forgot_password') }}"
+       class="text-sm text-slate-600 hover:underline">Forgotten your password?</a>
+  </p>
 </div>
 {% endblock %}

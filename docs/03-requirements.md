@@ -112,6 +112,17 @@ functional, non-functional, and constraints.
 | FR-37 | The system shall provide a Supervisor dashboard summarising active clients, today's collections and outstanding variances. | Could |
 | FR-38 | The system shall export a collector's cycle report as CSV. | Could |
 
+### Credential management *(added while repaying TD-15)*
+
+These describe capability the system now has. They arose from repaying a
+documented debt rather than from a change request, and are recorded here so the
+specification matches the delivered system.
+
+| ID | Requirement | Priority |
+|---|---|---|
+| FR-41 | The system shall require a client to replace the password set for them at enrolment before displaying any of their record. | Must |
+| FR-42 | The system shall allow a user to reset a forgotten password by a single-use code sent to their registered phone number, expiring after 10 minutes. | Should |
+
 ### Client identification *(added by CR-001)*
 
 | ID | Requirement | Priority |
@@ -154,11 +165,11 @@ that merely improves convenience is deferred.
 
 | Priority | Count | Requirements |
 |---|---|---|
-| **Must** | 28 | FR-01…08, FR-10…14, FR-16…21, FR-23…26, FR-28…30, FR-32, FR-33 |
-| **Should** | 8 | FR-09, FR-15, FR-22, FR-31, FR-34, FR-35, FR-39, FR-40 |
+| **Must** | 29 | FR-01…08, FR-10…14, FR-16…21, FR-23…26, FR-28…30, FR-32, FR-33, FR-41 |
+| **Should** | 9 | FR-09, FR-15, FR-22, FR-31, FR-34, FR-35, FR-39, FR-40, FR-42 |
 | **Could** | 4 | FR-27, FR-36, FR-37, FR-38 |
 | **Won't** | 0 | — |
-| **Total** | **40** | FR-01 … FR-40 |
+| **Total** | **42** | FR-01 … FR-42 |
 
 > FR-39 and FR-40 were added after the baseline was set, under change request **CR-001**
 > (`CHANGELOG-requirements.md`). They are **Should**, so that abandoning them under
@@ -182,6 +193,8 @@ a gateway became available that constraint no longer applied, and it was reinsta
 | BR-05 | SR-03, SR-11 | FR-32, FR-33, FR-34, FR-05 | TC-AUD-01…03 |
 | BR-06 | SR-01, SR-03 | FR-28, FR-32, FR-33 | UAT-01…03 |
 | BR-01, BR-06 | SR-04 | FR-39, FR-40 *(CR-001)* | TC-QR-01…03 |
+| BR-02 | SR-01, SR-03 | FR-41, FR-42 *(TD-15 repayment)* | TC-PWD-01…13 |
+| BR-02, BR-06 | SR-01 | FR-31 *(CR-002)* | TC-SMS-01…10 |
 
 *Test case identifiers are defined in `09-testing.md`.*
 

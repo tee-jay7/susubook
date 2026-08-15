@@ -13,7 +13,8 @@
 # Usage:
 #   ./deploy/deploy.sh setup      # one-time: APIs, registry, signing key, IAM
 #   ./deploy/deploy.sh deploy     # build image and deploy the service
-#   ./deploy/deploy.sh db-init    # create the schema
+#   ./deploy/deploy.sh db-init    # create the schema (first deploy)
+#   ./deploy/deploy.sh db-upgrade # apply manual DDL create_all cannot (TD-01)
 #   ./deploy/deploy.sh seed       # load demo accounts and data
 #   ./deploy/deploy.sh url        # print the live URL
 
@@ -190,11 +191,12 @@ case "${1:-deploy}" in
   build)   build ;;
   deploy)  build; deploy_service ;;
   db-init) run_job susubook-db-init db-init ;;
+  db-upgrade) run_job susubook-db-upgrade db-upgrade ;;
   seed)    run_job susubook-seed seed ;;
   url)     gcloud run services describe "$SERVICE" --region "$REGION" \
              --project "$PROJECT_ID" --format='value(status.url)' ;;
   logs)    gcloud run services logs read "$SERVICE" --region "$REGION" \
              --project "$PROJECT_ID" --limit 50 ;;
-  *)       echo "Usage: PROJECT_ID=... $0 {setup|build|deploy|db-init|seed|url|logs}" >&2
+  *)       echo "Usage: PROJECT_ID=... $0 {setup|build|deploy|db-init|db-upgrade|seed|url|logs}" >&2
            exit 1 ;;
 esac

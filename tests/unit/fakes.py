@@ -44,6 +44,7 @@ class FakeUserRepository:
     def __init__(self) -> None:
         self._rows: dict[int, User] = {}
         self._hashes: dict[int, str] = {}
+        self._must_change: set[int] = set()
         self._ids = itertools.count(1)
 
     def get_by_id(self, user_id: int) -> User | None:
@@ -60,6 +61,18 @@ class FakeUserRepository:
         self._rows[user.id] = user
         self._hashes[user.id] = password_hash
         return user
+
+    def set_password(self, user_id: int, password_hash: str) -> None:
+        self._hashes[user_id] = password_hash
+
+    def must_change_password(self, user_id: int) -> bool:
+        return user_id in self._must_change
+
+    def require_password_change(self, user_id: int) -> None:
+        self._must_change.add(user_id)
+
+    def clear_password_change_flag(self, user_id: int) -> None:
+        self._must_change.discard(user_id)
 
     def list_collectors(self) -> list[User]:
         return [u for u in self._rows.values() if u.role is UserRole.COLLECTOR]
@@ -207,6 +220,48 @@ class FakeRemittanceRepository:
 
     def variances_for(self, on: date) -> list[DailyVariance]:
         return []
+
+
+class FakePasswordResetRepository:
+    def __init__(self) -> None:
+        self._rows: dict[int, dict] = {}
+        self._ids = itertools.count(1)
+
+    def add(self, *, user_id, code_hash, expires_at):
+        from app.services.protocols import ResetCode
+
+        rid = next(self._ids)
+        self._rows[rid] = {
+            "id": rid, "user_id": user_id, "code_hash": code_hash,
+            "expires_at": expires_at, "attempts": 0, "used_at": None,
+            "requested_at": expires_at,
+        }
+        r = self._rows[rid]
+        return ResetCode(rid, user_id, code_hash, expires_at, 0)
+
+    def outstanding_for(self, user_id, *, at):
+        from app.services.protocols import ResetCode
+
+        for r in sorted(self._rows.values(), key=lambda x: -x["id"]):
+            if r["user_id"] == user_id and r["used_at"] is None and r["expires_at"] > at:
+                return ResetCode(r["id"], user_id, r["code_hash"], r["expires_at"], r["attempts"])
+        return None
+
+    def invalidate_outstanding(self, user_id, *, at):
+        for r in self._rows.values():
+            if r["user_id"] == user_id and r["used_at"] is None:
+                r["used_at"] = at
+
+    def record_attempt(self, code_id):
+        if code_id in self._rows:
+            self._rows[code_id]["attempts"] += 1
+
+    def mark_used(self, code_id, *, at):
+        if code_id in self._rows:
+            self._rows[code_id]["used_at"] = at
+
+    def recent_request_count(self, user_id, *, since):
+        return sum(1 for r in self._rows.values() if r["user_id"] == user_id)
 
 
 class FakeAuditRepository:

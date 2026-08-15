@@ -12,7 +12,8 @@ database.
 
 from __future__ import annotations
 
-from datetime import date
+from dataclasses import dataclass
+from datetime import date, datetime
 from typing import Protocol
 from uuid import UUID
 
@@ -28,8 +29,23 @@ from app.domain.entities import (
 from app.domain.money import Money
 
 
+@dataclass(frozen=True)
+class ResetCode:
+    """A pending password reset code. The plaintext never leaves the SMS."""
+
+    id: int
+    user_id: int
+    code_hash: str
+    expires_at: datetime
+    attempts: int
+
+
 class UserRepository(Protocol):
     def get_by_id(self, user_id: int) -> User | None: ...
+    def set_password(self, user_id: int, password_hash: str) -> None: ...
+    def must_change_password(self, user_id: int) -> bool: ...
+    def clear_password_change_flag(self, user_id: int) -> None: ...
+    def require_password_change(self, user_id: int) -> None: ...
     def find_credentials(self, phone: str) -> tuple[User, str] | None:
         """Return (user, password_hash) or None.
 
@@ -79,6 +95,15 @@ class RemittanceRepository(Protocol):
     def get(self, collector_id: int, on: date) -> RemittanceDeclaration | None: ...
     def save(self, declaration: RemittanceDeclaration) -> RemittanceDeclaration: ...
     def variances_for(self, on: date) -> list[DailyVariance]: ...
+
+
+class PasswordResetRepository(Protocol):
+    def add(self, *, user_id: int, code_hash: str, expires_at: datetime) -> ResetCode: ...
+    def outstanding_for(self, user_id: int, *, at: datetime) -> ResetCode | None: ...
+    def invalidate_outstanding(self, user_id: int, *, at: datetime) -> None: ...
+    def record_attempt(self, code_id: int) -> None: ...
+    def mark_used(self, code_id: int, *, at: datetime) -> None: ...
+    def recent_request_count(self, user_id: int, *, since: datetime) -> int: ...
 
 
 class AuditRepository(Protocol):

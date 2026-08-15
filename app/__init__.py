@@ -15,7 +15,12 @@ from flask_wtf.csrf import CSRFProtect
 
 from app.config import Config
 from app.domain.errors import DomainError, NotAuthorised
-from app.infrastructure.db import init_schema, make_engine, make_session_factory
+from app.infrastructure.db import (
+    apply_manual_migrations,
+    init_schema,
+    make_engine,
+    make_session_factory,
+)
 from app.services.container import build_services
 
 csrf = CSRFProtect()
@@ -80,6 +85,27 @@ def create_app(
         from app.web.security import load_current_user
 
         load_current_user()
+
+    @app.before_request
+    def _require_password_change() -> None:
+        """TD-15 — nothing is shown until a forced password change is made.
+
+        Enforced here rather than per-route: a guard that must be remembered on
+        every new route is a guard that will eventually be forgotten.
+        """
+        from flask import redirect, url_for
+
+        from app.web.security import current_user
+
+        user = current_user()
+        if user is None:
+            return None
+        allowed = {"auth.change_password", "auth.logout", "static", "health"}
+        if request.endpoint in allowed:
+            return None
+        if g.services.users.must_change_password(user.id):
+            return redirect(url_for("auth.change_password"))
+        return None
 
     @app.teardown_request
     def _close_unit_of_work(exception: BaseException | None) -> None:
@@ -184,6 +210,17 @@ def create_app(
         """Create the schema (TD-01: no versioned migrations)."""
         init_schema(engine)
         print("Schema created.")
+
+    @app.cli.command("db-upgrade")
+    def db_upgrade() -> None:
+        """Apply schema changes create_all() cannot (TD-01).
+
+        Needed because there are no versioned migrations: adding a column to a
+        populated table is manual DDL. Run before deploying a release that
+        changes the schema.
+        """
+        apply_manual_migrations(engine)
+        print("Schema upgrade complete.")
 
     @app.cli.command("seed")
     def seed_command() -> None:

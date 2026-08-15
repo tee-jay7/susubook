@@ -11,8 +11,9 @@
 Testing was shaped by one architectural decision made in Phase 2: **the domain
 layer imports neither Flask nor SQLAlchemy**. That is what made a real test
 suite affordable inside the examination window — business rules can be tested
-with no database, no fixtures and no HTTP client, so the 156 unit tests run in
-**0.36 seconds**. An Active-Record design would have required a live database
+with no database, no fixtures and no HTTP client, so the 186 unit tests run in
+**2.2 seconds** — the increase over earlier figures is Argon2 hashing in the
+password tests, which is deliberately slow. An Active-Record design would have required a live database
 for every rule test, and under a 20-hour implementation budget those tests would
 simply not have been written.
 
@@ -20,10 +21,10 @@ Three levels, each covering what the level below cannot:
 
 | Level | Count | Runtime | Covers | Deliberately excludes |
 |---|---|---|---|---|
-| **Unit** | 156 | 0.36 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
+| **Unit** | 186 | 2.2 s | Business rules BR-R1…R15, `Money`, service orchestration, authorisation logic, audit writes | Anything requiring SQL |
 | **Integration** | 42 | 3.3 s | Repositories, entity/record mapping, and above all the **database-enforced invariants** | HTTP, sessions, templates |
-| **System** | 58 | 10.6 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
-| **Total** | **256** | **15.0 s** | | |
+| **System** | 71 | 13.6 s | Routing, authentication, role authorisation, CSRF, template rendering, HTMX error path, complete user journeys | Real browsers, real devices |
+| **Total** | **299** | **20.0 s** | | |
 
 **Why the integration level exists at all.** The design claims three business
 invariants are enforced *twice* — in the domain layer and again by PostgreSQL
@@ -208,6 +209,29 @@ suite; no result is stated from memory.
 | TC-QR-02 | Card discloses no phone number | Phone absent from page | Absent | **P** |
 | TC-QR-03 | Another collector cannot print the card | 403 | 403 | **P** |
 
+### TC-PWD — Credential management (FR-41, FR-42; TD-15 repayment)
+
+| ID | Test case | Expected | Actual | |
+|---|---|---|---|---|
+| TC-PWD-01 | Flagged user is redirected from every page | All redirect to `/password` | `/my/`, `/my/history`, `/` all 302 | **P** |
+| TC-PWD-02 | The change page itself remains reachable | 200 | 200 | **P** |
+| TC-PWD-03 | Logout permitted while blocked | 302 | 302 | **P** |
+| TC-PWD-04 | Changing lifts the block | Record accessible afterwards | 200 | **P** |
+| TC-PWD-05 | **The collector's password stops working** | Old refused, new accepted | 401 then 302 | **P** |
+| TC-PWD-06 | Unflagged user is not obstructed | 200 | 200 | **P** |
+| TC-PWD-07 | Forced change does not demand the old password | Accepted | Accepted | **P** |
+| TC-PWD-08 | Voluntary change requires the current password | Refused | "not correct" | **P** |
+| TC-PWD-09 | Weak password refused | 422 | 422 | **P** |
+| TC-PWD-10 | Reset code stored only as a hash | Plaintext absent | `$argon2…`, plaintext absent | **P** |
+| TC-PWD-11 | Unknown number gives an identical response | Indistinguishable | Same status and message | **P** |
+| TC-PWD-12 | End-to-end reset by code | New password works | 302 on subsequent login | **P** |
+| TC-PWD-13 | Code single-use, expiring, attempt-capped, rate-limited | All four refuse | All refuse | **P** |
+
+> TC-PWD-05 is the test that matters. TD-15 was Critical because the collector
+> knew the client's password, making the client's record dependent on them and
+> contradicting BR-02. This case asserts the collector's password no longer
+> works once the client has chosen their own.
+
 ### TC-SMS — Client notification (FR-31, CR-002)
 
 The negative cases matter most here. The demonstration dataset uses valid-format
@@ -344,6 +368,8 @@ connection or a real low-end Android device. Named as gaps in §9.10.
 | FR-32, FR-33 audit and reversal | ✅ Satisfied | TC-REV, audit assertions |
 | FR-39, FR-40 QR cards | ✅ Satisfied | TC-QR |
 | **FR-31 SMS notification** | ⚠️ **Partial** | TC-SMS passes; **restricted to an allowlist and never verified on a real handset** |
+| FR-41 forced password change | ✅ Satisfied | TC-PWD-01…09 |
+| **FR-42 password reset** | ⚠️ **Partial** | TC-PWD-10…13 pass; delivery depends on FR-31, so a client outside the allowlist cannot self-serve |
 | NFR-01 performance | ⚠️ **Partial** | Server time measured; end-to-end on 3G not measured |
 | NFR-02 usability (≤3 interactions) | ⚠️ **Unverified** | Design achieves 2 by inspection; **not measured with a participant** |
 | NFR-03 security | ⚠️ **Partial** | TC-SEC passes; TD-09, TD-14, TD-15 outstanding |

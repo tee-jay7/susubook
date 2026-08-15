@@ -595,6 +595,128 @@ class TestSecurityControls:
         assert client.get("/collector/nonexistent").status_code == 404
 
 
+class TestPasswordChange:
+    """TC-PWD — TD-15 repayment, through the full stack."""
+
+    def _force(self, db, phone):
+        from app.infrastructure.models import UserModel
+
+        u = db.query(UserModel).filter_by(phone=phone).one()
+        u.must_change_password = True
+        db.commit()
+
+    def test_a_flagged_user_is_redirected_from_every_page(self, client, world, db):
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        for path in ("/my/", "/my/history", "/"):
+            response = client.get(path)
+            assert response.status_code == 302, path
+            assert "/password" in response.headers["Location"], path
+
+    def test_the_change_page_itself_is_reachable(self, client, world, db):
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        response = client.get("/password")
+        assert response.status_code == 200
+        assert b"Set your own password" in response.data
+
+    def test_changing_lifts_the_block(self, client, world, db):
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        assert client.post("/password", data={"new_password": "mynewpass"}).status_code == 302
+        assert client.get("/my/").status_code == 200
+
+    def test_the_collectors_password_stops_working(self, client, world, db):
+        """The property TD-15 exists to restore."""
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        client.post("/password", data={"new_password": "mynewpass"})
+        client.post("/logout")
+
+        assert client.post(
+            "/login", data={"phone": "0201000202", "password": PASSWORD}
+        ).status_code == 401
+        assert client.post(
+            "/login", data={"phone": "0201000202", "password": "mynewpass"}
+        ).status_code == 302
+
+    def test_an_unflagged_user_is_not_obstructed(self, client, world):
+        login(client, "0201000202")
+        assert client.get("/my/").status_code == 200
+
+    def test_logout_is_permitted_while_blocked(self, client, world, db):
+        """Otherwise a user who does not want to change is trapped."""
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        assert client.post("/logout").status_code == 302
+
+    def test_weak_password_is_refused(self, client, world, db):
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        assert client.post("/password", data={"new_password": "abc"}).status_code == 422
+
+    def test_change_is_audited(self, client, world, db):
+        from app.infrastructure.models import AuditLogModel
+
+        self._force(db, "0201000202")
+        login(client, "0201000202")
+        client.post("/password", data={"new_password": "mynewpass"})
+        db.expire_all()
+        assert "PASSWORD_CHANGED" in [a.action for a in db.query(AuditLogModel).all()]
+
+
+class TestPasswordReset:
+    """TC-PWD reset path — became possible only once CR-002 landed."""
+
+    def test_forgot_and_reset_pages_render(self, client, world):
+        assert client.get("/forgot").status_code == 200
+        assert client.get("/reset").status_code == 200
+
+    def test_login_page_links_to_reset(self, client, world):
+        assert b"Forgotten your password?" in client.get("/login").data
+
+    def test_unknown_number_gives_the_same_response(self, client, world):
+        """No enumeration: a registered and an unregistered number look alike."""
+        known = client.post("/forgot", data={"phone": "0201000202"}, follow_redirects=True)
+        unknown = client.post("/forgot", data={"phone": "0209999999"}, follow_redirects=True)
+        assert known.status_code == unknown.status_code == 200
+        assert b"If that number is registered" in known.data
+        assert b"If that number is registered" in unknown.data
+
+    def test_end_to_end_reset(self, client, world, db, app):
+        from app.services.notifications import normalise_msisdn
+
+        service = app.extensions["notifications"]
+        saved = (service._allowlist, service._synchronous)
+        service._allowlist = frozenset({normalise_msisdn("0201000202")})
+        service._synchronous = True
+        service._gateway.sent.clear()
+        try:
+            client.post("/forgot", data={"phone": "0201000202"})
+            code = service._gateway.sent[-1][1].split("code is ")[1].split(".")[0]
+
+            response = client.post(
+                "/reset",
+                data={"phone": "0201000202", "code": code, "new_password": "resetpass"},
+            )
+            assert response.status_code == 302
+
+            assert client.post(
+                "/login", data={"phone": "0201000202", "password": "resetpass"}
+            ).status_code == 302
+        finally:
+            service._allowlist, service._synchronous = saved
+            service._gateway.sent.clear()
+
+    def test_wrong_code_is_refused(self, client, world):
+        client.post("/forgot", data={"phone": "0201000202"})
+        response = client.post(
+            "/reset",
+            data={"phone": "0201000202", "code": "000000", "new_password": "resetpass"},
+        )
+        assert response.status_code == 422
+
+
 class TestNotification:
     """TC-SMS — FR-31 via CR-002, exercised through the full stack."""
 

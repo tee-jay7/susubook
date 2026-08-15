@@ -50,6 +50,37 @@ def init_schema(engine: Engine) -> None:
     Base.metadata.create_all(engine)
 
 
+# Hand-rolled, idempotent DDL for changes that create_all() cannot apply.
+#
+# This list is precisely the cost TD-01 records. `create_all` adds missing
+# tables but never alters an existing one, so a new column on a populated table
+# has to be applied by hand, in order, with no history and no down-path. With
+# Alembic this file would not exist.
+MANUAL_MIGRATIONS: list[tuple[str, str]] = [
+    (
+        "users.must_change_password (TD-15)",
+        "ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password "
+        "BOOLEAN NOT NULL DEFAULT FALSE",
+    ),
+]
+
+
+def apply_manual_migrations(engine: Engine) -> None:
+    """Apply the statements above, then create any missing tables.
+
+    Every statement is written to be safe to re-run, because without a
+    migration history there is nothing else to stop it being applied twice.
+    """
+    from sqlalchemy import text
+
+    with engine.begin() as conn:
+        for label, statement in MANUAL_MIGRATIONS:
+            conn.execute(text(statement))
+            print(f"  applied: {label}")
+    Base.metadata.create_all(engine)
+    print("  created any missing tables")
+
+
 def drop_schema(engine: Engine) -> None:
     """Test and development convenience only."""
     Base.metadata.drop_all(engine)

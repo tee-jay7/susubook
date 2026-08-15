@@ -80,16 +80,17 @@ that works but is wrong, `HACK` for a knowingly poor mechanism.
 
 ---
 
-**TD-15 · The collector sets and therefore knows the client's password**
-`app/web/auth.py:52` · Code · Prudent & Inadvertent
+**TD-15 · The collector sets the client's first password** — ✅ **REPAID**
+`app/services/passwords.py` · Code · Prudent & Inadvertent
 
 | | |
 |---|---|
-| **Debt** | At enrolment the collector types the client's initial password. There is no forced change at first login and no password reset flow at all. |
-| **Cause** | An out-of-band credential channel (SMS one-time code) requires the SMS gateway excluded by CO-04 and FR-31. Enrolment had to produce a usable client login somehow. |
-| **Impact** | **This one attacks the system's own premise.** SusuBook exists so the client holds a record independent of the collector (BR-02). If the collector knows the client's password, the collector can sign in as the client — and the independence is nominal rather than real. A client who forgets the password also has no recovery route and is locked out permanently. |
-| **Priority** | **Critical.** Not for convenience — because it undermines the property the system is built to provide. |
-| **Resolution** | Force a password change on first login, before any record is displayed. Add reset via SMS one-time code when FR-31's gateway lands. Interim mitigation: display a prominent banner until the client changes it, and audit every client-role login so an impersonation is at least visible. Estimated 3–4 hours. |
+| **Debt** | At enrolment the collector typed the client's initial password. There was no forced change at first login and no reset flow at all. |
+| **Why it was Critical** | It attacked the system's own premise. SusuBook exists so the client holds a record independent of the collector (BR-02). A collector who knows the client's password can sign in as them, making that independence nominal. |
+| **Resolution as implemented** | **Both halves closed.** A `must_change_password` flag is set on every account created at enrolment, and an application-wide guard redirects the user to the change page and permits nothing else until they replace it — so the collector's password stops working before any record is displayed. Self-service reset by SMS one-time code was added alongside: six digits, stored only as an Argon2 hash, ten-minute expiry, single use, five verification attempts, three requests per hour. |
+| **What unblocked it** | The debt register named the absent SMS gateway as the cause. **CR-002 delivered that gateway**, and the blocker ceased to exist — so the register was stale within the same working session. That is the staleness Session 3 warns about, caught by re-reading the register rather than by anything systematic. |
+| **Residual** | The reset path depends on SMS, which is itself allowlist-restricted (CR-002), so a real client outside the allowlist still cannot self-serve. That limit belongs to FR-31's rollout, not to this item. |
+| **Verified by** | 30 unit tests, 13 system tests (TC-PWD) |
 
 ---
 
@@ -119,6 +120,7 @@ that works but is wrong, `HACK` for a knowingly poor mechanism.
 | **Cause** | Cut deliberately in the scope decision to recover 0.7 hours (`05-effort-estimation.md` §4.6). |
 | **Impact** | Any schema change in production requires hand-written DDL against live data, with no review artefact and no rollback. Blocks TD-09's resolution. Risk grows the moment real data exists, because `create_all` cannot alter an existing table. |
 | **Priority** | **Scheduled — first item.** It is a prerequisite for several others. |
+| **Interest paid, observed** | Repaying TD-15 required a new column on a populated table. `create_all()` cannot alter an existing table, so the change had to be hand-written as idempotent DDL in `MANUAL_MIGRATIONS` with a bespoke `flask db-upgrade` command and a Cloud Run job to run it. That file and that command exist **only** because this debt is unpaid; with Alembic neither would. This is the first time the cost was actually incurred rather than predicted. |
 | **Resolution** | Introduce Alembic; autogenerate an initial revision matching the current schema; make it a deployment step. Estimated 2 hours. |
 
 ---
@@ -267,13 +269,23 @@ FR-36 (configurable institutional defaults) was deferred as *Could*. Cycles snap
 
 | Classification | Count | Items |
 |---|---|---|
-| **Critical — immediate attention** | 3 | TD-09, TD-14, TD-15 |
+| **Critical — immediate attention** | 2 | TD-09, TD-14 |
+| **Repaid** | 1 | ~~TD-15~~ — closed during Phase 6, both halves |
 | **Scheduled for future resolution** | 7 | TD-01, TD-02, TD-10, TD-12, TD-16, TD-17, TD-18 |
 | **Acceptable temporarily** | 8 | TD-03, TD-04, TD-05, TD-06, TD-07, TD-08, TD-11, TD-13 |
-| **Total** | **18** | |
+| **Total** | **18** | of which 1 repaid |
 
-> **All three critical items are security items, and none of them was a
-> deliberate scope cut.** TD-09 follows from a scope cut (no migrations), TD-14
+> **All three critical items were security items, and none was a deliberate
+> scope cut.** One (TD-15) has since been repaid — see below.
+
+> **On TD-15's repayment.** Its recorded cause was the absent SMS gateway.
+> CR-002 delivered that gateway, which meant a **Critical** item silently became
+> unblocked and the register did not notice. It was caught by re-reading the
+> register, not by any process. That is a small, concrete instance of Lehman's
+> second law: a register left alone drifts out of step with the system it
+> describes, and keeping it current is work that has to be done deliberately.
+
+> **The original observation still stands for the rest.** TD-09 follows from a scope cut (no migrations), TD-14
 > from a platform constraint, TD-15 from an excluded requirement. The time-boxed
 > trade-offs that *were* chosen deliberately all landed in the acceptable band.
 > That is the reassuring reading. The uncomfortable one is that the most

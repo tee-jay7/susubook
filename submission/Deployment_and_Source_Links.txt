@@ -59,11 +59,17 @@ ALL DEMONSTRATION ACCOUNTS
   Client          0201000206    Kojo Nkrumah          /my/
   Client          0201000207    Adwoa Yeboah          /my/
   Client          0201000208    Kwaku Addo            /my/
-  Client          0201000209    Mavis Quaye           /my/
+  Client          0201000209    Mavis Quaye           /password  (see note)
   Client          0201000210    Grace Amoah           /my/
 
   All seven role types above were verified against the live deployment before
   submission: each signs in successfully and reaches the expected page.
+
+  NOTE - Mavis Quaye (0201000209) is deliberately seeded with the "must change
+  password" flag set, so that the forced first-login flow can be demonstrated.
+  Signing in as her lands on the password page and nothing else is reachable
+  until a new password is chosen. Every other account signs straight through.
+  After changing it, susu1234 will no longer work for that account.
 
 
 --------------------------------------------------------------------------------
@@ -96,7 +102,17 @@ SUGGESTED WALKTHROUGH FOR THE EXAMINER
    attempt is written to the audit log. Possession of a client's QR reference
    confers no capability.
 
-4. SUPERVISOR VIEW - oversight
+4. FIRST SIGN-IN AND PASSWORD RESET
+   Sign in as 0201000209 (Mavis Quaye). Every page redirects to the password
+   screen until a new password is set - the collector typed the first one and
+   therefore knows it, so the client's record is not private until they replace
+   it.
+   The reset flow is at /forgot. A six-digit code is sent by SMS, expires after
+   10 minutes, works once, and is capped at five attempts and three requests per
+   hour. SMS delivery is restricted to a configured allowlist, so on the
+   demonstration deployment no message is actually sent.
+
+5. SUPERVISOR VIEW - oversight
    Sign in as 0244000100 (Mariama Adjei).
    The variance screen compares what each collector recorded in the field
    against the cash they declared at the branch.
@@ -108,6 +124,12 @@ SUGGESTED WALKTHROUGH FOR THE EXAMINER
 --------------------------------------------------------------------------------
 NOTES ON THE DEPLOYMENT
 --------------------------------------------------------------------------------
+
+SMS NOTIFICATION IS DISABLED BY DEFAULT
+  The demonstration data uses valid-format Ghanaian phone numbers which may
+  belong to real people. Sending is therefore restricted to an explicit
+  allowlist, which is empty unless configured. No message is sent to any seeded
+  number.
 
 FIRST REQUEST MAY TAKE A FEW SECONDS
   The service scales to zero when idle, so the first request after a quiet

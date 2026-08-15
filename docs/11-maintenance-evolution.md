@@ -228,7 +228,7 @@ outstanding UAT (§9.9).
 
 | Release | Contents | Rationale |
 |---|---|---|
-| **v1.1 — Security** | TD-01 migrations, TD-14 rate limiting, TD-15 forced password change, TD-09 audit enforcement | Everything blocking real client money. Nothing else ships first. |
+| **v1.1 — Security** | TD-01 migrations, TD-14 rate limiting, TD-09 audit enforcement. ~~TD-15~~ **already repaid** | Everything blocking real client money. Nothing else ships first. Two Critical items remain. |
 | **v1.2 — Reach** | ~~FR-31 SMS notification~~ **delivered under CR-002**; remaining: lift the recipient allowlist, TD-18 delivery tracking | FR-31 shipped in this release. The mechanism mitigating **A5** now exists, but recipients are still restricted to an allowlist, so the mitigation is not yet realised for real clients. |
 | **v1.3 — Field efficiency** | FR-15 catch-up payments, TD-05 route ordering, TD-03 search, TD-16 N+1 | The collector's daily experience. Domain rules already accept `days_covered`, so FR-15 needs no change to the business rules. |
 | **v1.4 — Oversight** | FR-34 audit viewer, FR-37 dashboard, FR-27 variance resolution, FR-35 user admin | Supervisor and administrator capability |
@@ -243,7 +243,7 @@ outstanding UAT (§9.9).
 |---|---|---|---|
 | 1 | **TD-01** migrations | 2 h | Compounds and gates: TD-09 cannot be repaid without it |
 | 2 | **TD-14** rate limiting | 2–3 h | Highest severity; independent of everything else |
-| 3 | **TD-15** forced password change | 3–4 h | Restores the client independence the system exists to provide |
+| ~~3~~ | ~~**TD-15** forced password change~~ | ~~3–4 h~~ | **Repaid.** Both halves closed: forced change on first login, and self-service reset by SMS code |
 | 4 | **TD-09** audit log enforcement | 1–2 h | Requires TD-01 |
 | 5 | **TD-12** pin dependencies | 0.5 h | Cheap; makes everything after it reproducible |
 | 6 | **TD-16** N+1 queries | 1–2 h | Before client counts make it visible |
@@ -252,8 +252,8 @@ outstanding UAT (§9.9).
 | 9 | **TD-03…06** convenience features | ~4 h | User-facing polish, no correctness risk |
 | | **Total** | **19–24 h** | |
 
-**Items 1–4 — 8 to 11 hours — must complete before the system handles real client
-money.** They are not improvements; they are the difference between a system that
+**Items 1, 2 and 4 — around 5 to 7 hours — must complete before the system
+handles real client money.** TD-15 is already closed. They are not improvements; they are the difference between a system that
 demonstrates the idea and one that can be trusted with savings.
 
 Items TD-07, TD-08, TD-10, TD-11 and TD-13 are classified *acceptable

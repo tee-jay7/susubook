@@ -64,9 +64,16 @@ appears for both a wrong number and a wrong password. This is deliberate — it
 stops a stranger from discovering which phone numbers are registered. Check both,
 and if you still cannot sign in, ask your collector or branch to help.
 
-> **Clients: change your password.** Your collector set your first password, so
-> they know it. Ask your branch to change it to something only you know. Until
-> then, your record is not fully private to you.
+> **Your first sign-in.** Your collector set your first password, so they know
+> it. The first time you sign in, SusuBook asks you to choose a new one before
+> showing your card. Choose something only you know — after that, nobody else
+> can see your record.
+
+![Set your own password](screenshots/08-first-login.png)
+
+**Forgotten your password?** Tap *Forgotten your password?* on the sign-in page
+and enter your phone number. A six-digit code is sent to you by text. Enter the
+code and choose a new password. The code lasts 10 minutes and works once.
 
 ---
 
@@ -307,6 +314,11 @@ release.
 
 ## 8. Common questions
 
+**Does my collector know my password?**
+Only the first one, which they typed when they registered you. SusuBook makes
+you replace it before it shows your card, so after your first sign-in your
+password is yours alone.
+
 **Can my collector change what I have already paid?**
 No. Records cannot be edited or deleted. A supervisor can add a *correction*, and
 you will see both the original and the correction on your card, with the reason.
@@ -359,6 +371,7 @@ that it is fast. This keeps running costs at zero.
 | **Remittance** | Cash a collector banks at the branch |
 | **Variance** | The difference between what was recorded and what was banked |
 | **Reversal** | A correction that cancels an earlier contribution without deleting it |
+| **Reset code** | A six-digit number sent by text, used once to set a new password |
 | **Maturity** | The date a cycle ends and payout becomes due |
 
 ---

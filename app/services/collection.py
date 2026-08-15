@@ -153,6 +153,9 @@ class EnrolmentService:
             ),
             password_hash,
         )
+        # TD-15: the collector typed this password, so the client must replace
+        # it before their record is shown to them.
+        self._users.require_password_change(user.id)
 
         client = self._clients.add(
             Client(

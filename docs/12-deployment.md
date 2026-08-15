@@ -102,7 +102,8 @@ deployment script.
 ```bash
 ./deploy/deploy.sh setup      # once: APIs, registry, signing key, secret IAM
 ./deploy/deploy.sh deploy     # Cloud Build → Artifact Registry → Cloud Run
-./deploy/deploy.sh db-init    # schema, as a job inside the VPC
+./deploy/deploy.sh db-init    # schema, as a job inside the VPC (first deploy)
+./deploy/deploy.sh db-upgrade # manual DDL create_all cannot apply (TD-01)
 ./deploy/deploy.sh seed       # demo data, as a job inside the VPC
 ./deploy/deploy.sh url
 ```
@@ -206,6 +207,6 @@ across two environments is what isolated it.
 |---|---|
 | **Rollback** | `gcloud run services update-traffic susubook --to-revisions=REVISION=100`. Previous revisions are retained, so rollback is immediate and does not require a rebuild. |
 | **Logs** | `./deploy/deploy.sh logs`, or Cloud Logging. Structured logging, error aggregation and alerting remain outstanding (**TD-17**). |
-| **Schema changes** | Manual DDL, because there are no migrations (**TD-01**). This is the first debt scheduled for repayment. |
+| **Schema changes** | Manual DDL, because there are no migrations (**TD-01**). `flask db-upgrade` applies an ordered list of idempotent statements in `app/infrastructure/db.py`, run as a Cloud Run job. That command exists **only** because TD-01 is unpaid: adding `users.must_change_password` while repaying TD-15 could not be done by `create_all()`, which adds missing tables but never alters an existing one. With Alembic neither the list nor the command would exist. |
 | **Scaling** | 0 to 4 instances, 80 concurrent requests each. Capped at 4 deliberately: several instances each holding a connection pool against one small database would exhaust its connection limit, and the failure mode is being locked out of the database. |
 | **Availability for grading** | Cloud Run services do not expire and the VM does not pause. The service should remain reachable without intervention; `/health` confirms both the application and its database in one request. |

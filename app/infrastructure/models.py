@@ -61,6 +61,13 @@ class UserModel(Base):
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default=text("true")
     )
+    # TD-15. A client's first password is typed by their collector, who
+    # therefore knows it — which makes the client's record dependent on the
+    # collector, contradicting BR-02. This flag forces the client to replace it
+    # before any record is shown.
+    must_change_password: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -222,6 +229,37 @@ class RemittanceDeclarationModel(Base):
         CheckConstraint(
             "amount_declared_pesewas >= 0", name="ck_declaration_not_negative"
         ),
+    )
+
+
+class PasswordResetCodeModel(Base):
+    """One-time codes for self-service password reset (TD-15).
+
+    The code is stored only as a hash: a database leak must not hand an attacker
+    a working reset token. Rows are retained after use rather than deleted, so
+    the audit trail can show that a reset happened.
+    """
+
+    __tablename__ = "password_reset_codes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    code_hash: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False
+    )
+    attempts: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default=text("0")
+    )
+    used_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    requested_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("ix_reset_user_requested", "user_id", "requested_at"),
     )
 
 

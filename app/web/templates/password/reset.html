@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Reset password &middot; SusuBook{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto">
+  <h1 class="text-2xl font-semibold mb-1">Enter your code</h1>
+  <p class="text-sm text-slate-600 mb-5">
+    Type the code from the text message, then choose a new password.
+    The code expires after 10 minutes.
+  </p>
+
+  <form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label for="phone" class="block text-sm font-medium mb-1">Phone number</label>
+      <input id="phone" name="phone" type="tel" inputmode="numeric" required value="{{ phone }}"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+    <div>
+      <label for="code" class="block text-sm font-medium mb-1">Code</label>
+      <input id="code" name="code" inputmode="numeric" required maxlength="6" pattern="[0-9]{6}"
+             class="tap w-full border border-slate-300 rounded px-3 tracking-[0.4em] text-center font-mono text-lg">
+    </div>
+    <div>
+      <label for="new_password" class="block text-sm font-medium mb-1">New password</label>
+      <input id="new_password" name="new_password" type="password" required minlength="6"
+             autocomplete="new-password"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+    <button class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+      Reset password
+    </button>
+  </form>
+
+  <p class="text-center mt-4">
+    <a href="{{ url_for('auth.forgot_password') }}" class="text-sm text-slate-600 hover:underline">Send a new code</a>
+  </p>
+</div>
+{% endblock %}

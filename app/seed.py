@@ -50,13 +50,16 @@ CLIENTS = [
 ]
 
 
-def _user(session: Session, name: str, phone: str, role: str) -> UserModel:
+def _user(
+    session: Session, name: str, phone: str, role: str, *, must_change: bool = False
+) -> UserModel:
     m = UserModel(
         public_ref=uuid.uuid4(),
         full_name=name,
         phone=phone,
         password_hash=hash_password(DEMO_PASSWORD),
         role=role,
+        must_change_password=must_change,
     )
     session.add(m)
     session.flush()
@@ -79,7 +82,12 @@ def seed(session: Session, *, today: date | None = None) -> None:
 
     for name, phone, business, location, rate, ci, days_paid in CLIENTS:
         collector = collectors[ci]
-        client_user = _user(session, name, phone, "CLIENT")
+        # One client is left with the forced-change flag set, so the TD-15
+        # first-login flow is demonstrable without enrolling a new client.
+        # Everyone else signs in straight through, keeping grading unobstructed.
+        client_user = _user(
+            session, name, phone, "CLIENT", must_change=(phone == "0201000209")
+        )
 
         client = ClientModel(
             public_ref=uuid.uuid4(),
@@ -184,3 +192,4 @@ def seed(session: Session, *, today: date | None = None) -> None:
         f"{len(CLIENTS) + 1} clients, 1 matured cycle awaiting payout."
     )
     print(f"All accounts use the password: {DEMO_PASSWORD}")
+    print("Mavis Quaye (0201000209) must set her own password at first login.")

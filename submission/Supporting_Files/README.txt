@@ -24,6 +24,7 @@ screenshots/    Captured against the running application at mobile viewport
                 05-client-card        Client's own susu card
                 06-variances          Supervisor daily variance report
                 07-payouts            Matured cycles awaiting release
+                08-first-login        Forced password change at first sign-in
 
 CHANGELOG-requirements.md   Formal change control record (CR-001)
 Project_Scope.md            Scope definition derived from the effort estimate

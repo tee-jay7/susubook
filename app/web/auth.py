@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from flask import Blueprint, flash, g, redirect, render_template, request, url_for
 
-from .security import current_user, home_for, log_in, log_out
+from .security import current_user, home_for, log_in, log_out, login_required
 
 bp = Blueprint("auth", __name__)
 
@@ -43,11 +43,73 @@ def login():
     return render_template("login.html", phone="")
 
 
-# TODO(TD-15): there is no password reset and no forced change at first login.
-#   The collector sets the client's initial password at enrolment and therefore
-#   knows it — which undercuts the independence of the client's record, the
-#   property this whole system exists to establish. Ranked Critical alongside
-#   TD-14 in docs/08-technical-debt.md for that reason, not for convenience.
+@bp.route("/password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    """TD-15 — forced first change, and voluntary change thereafter.
+
+    The collector types a client's first password at enrolment and therefore
+    knows it. Until the client replaces it, their record is not independent of
+    the collector, which contradicts BR-02 — the property the system exists to
+    provide. The guard in the application factory redirects here and permits
+    nothing else until the change is made.
+    """
+    user = current_user()
+    forced = g.services.users.must_change_password(user.id)
+
+    if request.method == "POST":
+        g.services.passwords.change_password(
+            user=user,
+            current_password=None if forced else request.form.get("current", ""),
+            new_password=request.form.get("new_password", ""),
+        )
+        flash("Your password has been changed.", "success")
+        return redirect(url_for(home_for(user)))
+
+    return render_template("password/change.html", forced=forced)
+
+
+@bp.route("/forgot", methods=["GET", "POST"])
+def forgot_password():
+    """Request a reset code by SMS (TD-15).
+
+    Became possible only once CR-002 delivered an SMS channel — the debt
+    register named the absent gateway as the blocker.
+    """
+    if current_user() is not None:
+        return redirect(url_for("auth.change_password"))
+
+    if request.method == "POST":
+        phone = request.form.get("phone", "").strip()
+        g.services.passwords.request_reset(phone=phone)
+        # Always the same response. Confirming whether an account exists would
+        # let anyone enumerate registered numbers.
+        flash(
+            "If that number is registered, a reset code has been sent to it.",
+            "info",
+        )
+        return redirect(url_for("auth.reset_password", phone=phone))
+
+    return render_template("password/forgot.html")
+
+
+@bp.route("/reset", methods=["GET", "POST"])
+def reset_password():
+    if current_user() is not None:
+        return redirect(url_for("auth.change_password"))
+
+    if request.method == "POST":
+        g.services.passwords.complete_reset(
+            phone=request.form.get("phone", "").strip(),
+            code=request.form.get("code", ""),
+            new_password=request.form.get("new_password", ""),
+        )
+        flash("Your password has been reset. Please sign in.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template(
+        "password/reset.html", phone=request.args.get("phone", "")
+    )
 
 
 @bp.route("/logout", methods=["POST"])

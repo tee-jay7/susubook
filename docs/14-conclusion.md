@@ -62,18 +62,22 @@ off paper — the actual interaction — is untested.
 
 ## 17.3 Security
 
-Three debt items are classified **Critical** and remain open (§8.4):
+**Two** debt items remain classified **Critical** (§8.4):
 
 - **TD-14** — no login rate limiting or lockout. Failed attempts are audited, so
-  an attack is visible afterwards; nothing prevents one.
-- **TD-15** — the collector sets the client's initial password and there is no
-  forced change, so a collector can sign in as their client. This weakens the
-  independence the system is built to provide.
+  an attack is visible afterwards; nothing prevents one. Note that the *password
+  reset* endpoint **is** rate-limited and attempt-capped; the gap is the login
+  form specifically.
 - **TD-09** — the audit log is append-only by application convention, not by
   database permission.
 
-**The system is not fit to hold real client money until these are closed.** That
-is a statement about this release, not a hypothetical.
+**TD-15 has been repaid.** The collector's password no longer survives the
+client's first sign-in, and a forgotten password can be reset by SMS code rather
+than becoming permanent lockout. That closes the item which most directly
+contradicted BR-02.
+
+**The system is still not fit to hold real client money until the remaining two
+are closed.** That is a statement about this release, not a hypothetical.
 
 ## 17.4 Scope
 
@@ -125,7 +129,7 @@ because the specific published table it came from was never recorded.
 A functional, deployed web application that replaces the paper susu card with a
 record both the client and the collector can see and neither can silently alter.
 Thirty functional requirements across four roles, 3,433 lines of application
-code, 256 automated tests at 97% coverage, live at
+code, 299 automated tests at 97% coverage, live at
 https://susubook-fdtbppd7sq-uc.a.run.app.
 
 ## 18.2 Against the objectives
@@ -136,7 +140,7 @@ https://susubook-fdtbppd7sq-uc.a.run.app.
 | **O2** | Estimate effort and use it to define achievable scope | **Met** — FPA → COCOMO → PERT triangulated; the estimate exposed a 23% over-commitment *before* implementation and drove the scope decision |
 | **O3** | Design a maintainable layered architecture with UML | **Met** — four layers, eight UML artefacts, SOLID applied at named sites |
 | **O4** | Implement the prioritised requirements as a deployed application | **Met** — deployed, with authentication, role-based authorisation, validation and an append-only audit trail |
-| **O5** | Verify through unit, integration, system and acceptance testing | **Partially met** — 256 tests across three levels; **UAT not conducted** |
+| **O5** | Verify through unit, integration, system and acceptance testing | **Partially met** — 299 tests across three levels; **UAT not conducted** |
 | **O6** | Identify, classify and document technical debt with a repayment plan | **Met** — 18 items, each with cause, impact, priority and resolution; 13 identified before the code carrying them existed |
 | **O7** | Define maintenance and evolution grounded in theory | **Met** — four maintenance categories, Lehman's eight laws applied individually, six-release roadmap |
 
@@ -151,6 +155,13 @@ taken in advance, with a stated basis. The estimate also generated the technical
 debt register, because every quality reduction made to fit the budget became a
 debt entry with a known cause. The two sections that carry the most marks turned
 out to be the same decision documented twice.
+
+**A debt register goes stale unless it is worked.** TD-15's recorded cause was
+the absent SMS gateway. CR-002 delivered that gateway — and a **Critical** item
+became unblocked without anything noticing. It was caught by re-reading the
+register, not by a process. Lehman's second law says structure drifts unless
+work is done explicitly to counter it; that applies to the documentation
+describing a system as much as to the system.
 
 **Debt taken knowingly behaves differently from debt taken accidentally.** Of 18
 items, 13 were identified before the code carrying them existed. All 13 landed in

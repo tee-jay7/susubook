@@ -19,6 +19,7 @@ from app.infrastructure.repositories import (
     SqlClientRepository,
     SqlContributionRepository,
     SqlCycleRepository,
+    SqlPasswordResetRepository,
     SqlPayoutRepository,
     SqlRemittanceRepository,
     SqlUserRepository,
@@ -26,6 +27,7 @@ from app.infrastructure.repositories import (
 
 from .collection import CollectionService, CycleService, EnrolmentService
 from .notifications import NotificationService, NullSmsGateway, SmsGateway
+from .passwords import PasswordService
 from .payout import PayoutService
 from .reconciliation import ReconciliationService
 from .security import AuthService
@@ -34,6 +36,7 @@ from .security import AuthService
 @dataclass
 class Services:
     auth: AuthService
+    passwords: PasswordService
     notifications: NotificationService
     enrolment: EnrolmentService
     collection: CollectionService
@@ -59,6 +62,7 @@ def build_services(
     contributions = SqlContributionRepository(session)
     payouts = SqlPayoutRepository(session)
     remittances = SqlRemittanceRepository(session)
+    resets = SqlPasswordResetRepository(session)
     audit = SqlAuditRepository(session)
     uow = SqlAlchemyUnitOfWork(session)
 
@@ -69,6 +73,13 @@ def build_services(
 
     return Services(
         auth=AuthService(users, audit),
+        passwords=PasswordService(
+            users=users,
+            resets=resets,
+            audit=audit,
+            uow=uow,
+            notifications=notifier,
+        ),
         notifications=notifier,
         enrolment=EnrolmentService(
             users=users,

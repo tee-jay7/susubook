@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Forgotten password &middot; SusuBook{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto">
+  <h1 class="text-2xl font-semibold mb-1">Forgotten password</h1>
+  <p class="text-sm text-slate-600 mb-5">
+    Enter your phone number and we will send you a code by text message.
+  </p>
+
+  <form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label for="phone" class="block text-sm font-medium mb-1">Phone number</label>
+      <input id="phone" name="phone" type="tel" inputmode="numeric" required
+             autocomplete="username"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+    <button class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+      Send code
+    </button>
+  </form>
+
+  <p class="text-center mt-4">
+    <a href="{{ url_for('auth.login') }}" class="text-sm text-slate-600 hover:underline">Back to sign in</a>
+  </p>
+</div>
+{% endblock %}

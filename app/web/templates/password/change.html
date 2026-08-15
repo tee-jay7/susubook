@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Change password &middot; SusuBook{% endblock %}
+{% block content %}
+<div class="max-w-sm mx-auto">
+  <h1 class="text-2xl font-semibold mb-1">
+    {% if forced %}Set your own password{% else %}Change password{% endif %}
+  </h1>
+
+  {% if forced %}
+    <div class="my-4 border-l-4 border-amber-500 bg-amber-50 text-amber-900 px-4 py-3 rounded-r text-sm">
+      <strong class="font-semibold">Please choose a new password.</strong>
+      The password you were given was set by someone else, so they know it.
+      Choose one only you know, so your record is private to you.
+    </div>
+  {% else %}
+    <p class="text-sm text-slate-600 mb-5">Choose a password only you know.</p>
+  {% endif %}
+
+  <form method="post" class="bg-white rounded-lg shadow-sm p-5 space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    {% if not forced %}
+    <div>
+      <label for="current" class="block text-sm font-medium mb-1">Current password</label>
+      <input id="current" name="current" type="password" required autocomplete="current-password"
+             class="tap w-full border border-slate-300 rounded px-3">
+    </div>
+    {% endif %}
+
+    <div>
+      <label for="new_password" class="block text-sm font-medium mb-1">New password</label>
+      <input id="new_password" name="new_password" type="password" required minlength="6"
+             autocomplete="new-password"
+             class="tap w-full border border-slate-300 rounded px-3">
+      <p class="text-xs text-slate-500 mt-1">At least 6 characters.</p>
+    </div>
+
+    <button class="tap w-full bg-[#1f4e5f] text-white rounded font-semibold hover:bg-[#173d4b]">
+      {% if forced %}Save and continue{% else %}Change password{% endif %}
+    </button>
+  </form>
+
+  {% if forced %}
+  <form method="post" action="{{ url_for('auth.logout') }}" class="mt-4 text-center">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="text-sm text-slate-500 hover:underline">Sign out instead</button>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

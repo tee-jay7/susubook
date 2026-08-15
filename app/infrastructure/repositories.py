@@ -14,7 +14,7 @@ TODO(TD-07): the _to_* mapping functions below are hand-written, so every
 from __future__ import annotations
 
 import secrets
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -33,11 +33,14 @@ from app.domain.entities import (
 )
 from app.domain.money import Money
 
+from app.services.protocols import ResetCode
+
 from .models import (
     AuditLogModel,
     ClientModel,
     ContributionCycleModel,
     ContributionModel,
+    PasswordResetCodeModel,
     PayoutModel,
     RemittanceDeclarationModel,
     UserModel,
@@ -167,6 +170,28 @@ class SqlUserRepository:
         self._s.add(m)
         self._s.flush()
         return _to_user(m)
+
+    def set_password(self, user_id: int, password_hash: str) -> None:
+        m = self._s.get(UserModel, user_id)
+        if m is not None:
+            m.password_hash = password_hash
+            self._s.flush()
+
+    def must_change_password(self, user_id: int) -> bool:
+        m = self._s.get(UserModel, user_id)
+        return bool(m and m.must_change_password)
+
+    def clear_password_change_flag(self, user_id: int) -> None:
+        m = self._s.get(UserModel, user_id)
+        if m is not None:
+            m.must_change_password = False
+            self._s.flush()
+
+    def require_password_change(self, user_id: int) -> None:
+        m = self._s.get(UserModel, user_id)
+        if m is not None:
+            m.must_change_password = True
+            self._s.flush()
 
     def list_collectors(self) -> list[User]:
         rows = self._s.scalars(
@@ -454,6 +479,75 @@ class SqlRemittanceRepository:
             )
             for cid, name, total, declared in rows
         ]
+
+
+def _to_reset_code(m: PasswordResetCodeModel) -> ResetCode:
+    return ResetCode(
+        id=m.id,
+        user_id=m.user_id,
+        code_hash=m.code_hash,
+        expires_at=m.expires_at,
+        attempts=m.attempts,
+    )
+
+
+class SqlPasswordResetRepository:
+    def __init__(self, session: Session) -> None:
+        self._s = session
+
+    def add(self, *, user_id: int, code_hash: str, expires_at: datetime) -> ResetCode:
+        m = PasswordResetCodeModel(
+            user_id=user_id, code_hash=code_hash, expires_at=expires_at
+        )
+        self._s.add(m)
+        self._s.flush()
+        return _to_reset_code(m)
+
+    def outstanding_for(self, user_id: int, *, at: datetime) -> ResetCode | None:
+        m = self._s.scalar(
+            select(PasswordResetCodeModel)
+            .where(
+                PasswordResetCodeModel.user_id == user_id,
+                PasswordResetCodeModel.used_at.is_(None),
+                PasswordResetCodeModel.expires_at > at,
+            )
+            .order_by(PasswordResetCodeModel.requested_at.desc())
+        )
+        return _to_reset_code(m) if m else None
+
+    def invalidate_outstanding(self, user_id: int, *, at: datetime) -> None:
+        rows = self._s.scalars(
+            select(PasswordResetCodeModel).where(
+                PasswordResetCodeModel.user_id == user_id,
+                PasswordResetCodeModel.used_at.is_(None),
+            )
+        ).all()
+        for row in rows:
+            row.used_at = at
+        self._s.flush()
+
+    def record_attempt(self, code_id: int) -> None:
+        m = self._s.get(PasswordResetCodeModel, code_id)
+        if m is not None:
+            m.attempts += 1
+            self._s.flush()
+
+    def mark_used(self, code_id: int, *, at: datetime) -> None:
+        m = self._s.get(PasswordResetCodeModel, code_id)
+        if m is not None:
+            m.used_at = at
+            self._s.flush()
+
+    def recent_request_count(self, user_id: int, *, since: datetime) -> int:
+        return int(
+            self._s.scalar(
+                select(func.count(PasswordResetCodeModel.id)).where(
+                    PasswordResetCodeModel.user_id == user_id,
+                    PasswordResetCodeModel.requested_at >= since,
+                )
+            )
+            or 0
+        )
 
 
 class SqlAuditRepository:
