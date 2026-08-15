@@ -88,7 +88,8 @@ matters whenever a card is lost, damaged or left at home.
 
 Not deferred — outside what this system is:
 
-- **Mobile money / bank integration** — no merchant credentials obtainable (CO-05). SusuBook records cash movement; it does not effect it.
+- **Mobile money / bank integration** — no merchant credentials obtainable (CO-05). SusuBook records cash movement; it does not effect it. Note that this is not merely a missing integration: client self-payment would remove the collector the entire system is built around, and is analysed as a strategic question in `11-maintenance-evolution.md` §11.8.1 rather than carried as a backlog item.
+- **Variable contribution amounts** — the fixed daily rate is what makes the susu card, days-paid and the one-day commission coherent. Relaxing it replaces a card of days with a ledger of amounts (§11.8.2).
 - **Offline operation** — a genuine field requirement given mobile-data coverage, but a service worker and conflict-resolved sync is a project in itself.
 - **Multi-institution tenancy** — the data model assumes one institution.
 - **Native mobile applications** — a responsive web application meets CO-07 at a fraction of the cost.

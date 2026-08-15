@@ -106,10 +106,16 @@ card will return to the card — the fallback is always available and costs
 nothing.
 
 **Response.** The deferred requirements are not a wish list, they are the change
-pipeline: FR-31 (SMS), FR-15 (catch-up payments), FR-22 (early withdrawal). The
-architecture was left open where change is most likely — `CommissionPolicy` is a
-Strategy interface precisely because commission policy is the term most likely to
-be renegotiated (FR-36).
+pipeline: FR-15 (catch-up payments), FR-22 (early withdrawal). FR-31 (SMS) has
+already been delivered under CR-002. The architecture was left open where change
+is most likely — `CommissionPolicy` is a Strategy interface precisely because
+commission policy is the term most likely to be renegotiated (FR-36).
+
+**Where this law bites hardest.** Mobile money is the change most likely to make
+this system less useful, and not by competing with it: client self-payment would
+remove the collector the entire product is built around. That is analysed at
+§11.8.1, because responding to it is a product decision rather than a
+development task.
 
 ### 2. Increasing complexity
 
@@ -233,7 +239,7 @@ outstanding UAT (§9.9).
 | **v1.3 — Field efficiency** | FR-15 catch-up payments, TD-05 route ordering, TD-03 search, TD-16 N+1 | The collector's daily experience. Domain rules already accept `days_covered`, so FR-15 needs no change to the business rules. |
 | **v1.4 — Oversight** | FR-34 audit viewer, FR-37 dashboard, FR-27 variance resolution, FR-35 user admin | Supervisor and administrator capability |
 | **v1.5 — Performance** | TD-02 stylesheet build, region relocation, TD-11 denormalised totals | Directly targets NFR-01, which is currently not met |
-| **v2.0 — Scale** | Multi-institution tenancy, mobile money integration, offline capability | Each changes the data model or the product's scope, not merely its features |
+| **v2.0 — Reshaping** | Multi-institution tenancy, offline capability, **client self-payment** and **variable contribution amounts** | Each changes the data model or the product's scope, not merely its features. The last two are analysed in §11.8: one removes the collector the system is built around, the other replaces the card of days with a ledger of amounts. Neither is additive. |
 
 ## 11.6 Technical debt repayment plan
 
@@ -270,4 +276,119 @@ fixing only if cycle length ever exceeds a month.
 | Quality erodes without anyone noticing | 7 | Re-measure §12.6 baseline each release; NFR-01 already recorded as not met |
 | Maintainer changes, context lost | 2 | SATD markers name their register entry; every rule traces to the SRS |
 | Feedback loops not closed | 8 | UAT completed and repeated; audit log reviewed weekly |
-| MoMo displaces cash collection | 1 | Monitored as a domain shift, not a feature request |
+| MoMo displaces cash collection | 1 | Monitored as a domain shift, not a feature request. Analysed at §11.8.1: self-payment partially obsoletes the product rather than extending it |
+| Strategic changes implemented incrementally by accident | 2, 5 | §11.8 records self-payment and variable amounts as questions requiring a product decision, so they cannot be absorbed one endpoint at a time |
+
+## 11.8 Two proposed changes, analysed
+
+Both were raised as candidates for future scope. Both are recorded here rather
+than in the roadmap above, because neither is a feature: one threatens the
+product's reason to exist, and the other changes its data model. Treating them
+as ordinary backlog items would misrepresent what they are.
+
+### 11.8.1 Client self-payment
+
+**The proposal.** Let a client pay their contribution directly — by mobile
+money, standing order or a payment link — without the collector visiting.
+
+**What it removes.** Not a step. The collector.
+
+The collector is not incidental to SusuBook; the collector is the reason it
+exists. Every core mechanism assumes one:
+
+| Mechanism | What it assumes | Under self-payment |
+|---|---|---|
+| **BR-01** — prevent under-recording | A collector who receives cash and might record less | No collector, no under-recording to prevent |
+| **Variance report** (FR-25) | Cash a collector holds and must bank | Nothing to reconcile; the money never enters a collector's hands |
+| **QR card** (FR-39, FR-40) | A collector scanning a client's card | The client is not being visited |
+| **Commission** (BR-R8) | A fee for the daily visit | Nobody visited. Who earns it? |
+| **FR-05** authorisation | A collector–client assignment | The client is acting on their own behalf |
+| **Audit trail** (BR-05) | Attribution *to a collector* | The actor is the client |
+| **Problem P1** — no independent record | A paper card held by the collector | Mobile money already issues the client a receipt |
+
+**The uncomfortable reading.** Self-payment does not extend SusuBook. It
+**partially obsoletes it**. If clients pay digitally, the payment rail already
+produces the timestamped, attributable, non-repudiable record that this system
+was built to supply. The problem in `01-problem-definition.md` is a problem
+*because* collection is cash-in-hand and the record is a paper card.
+
+This is **Lehman's first law with a specific name on it** (§11.4). The adaptive
+maintenance table already lists "mobile money displacing cash collection" as an
+environmental change; self-payment is what that change looks like when it
+arrives.
+
+**Three possible responses, and they are strategic, not technical.**
+
+1. **Become the ledger the payment rail does not provide.** Mobile money records
+   a transfer; it does not record a *susu cycle* — days paid, maturity,
+   commission, payout, or the relationship with a collector who still services
+   the client. SusuBook would move from being the record of collection to being
+   the record of the savings agreement. The commission model would have to be
+   renegotiated, because it currently prices a visit.
+2. **Hybrid, and accept the complexity.** Some clients pay in cash to a
+   collector, some pay themselves, some do both within one cycle. This is
+   probably what would actually happen, and it is the hardest option: the
+   variance report becomes meaningful only for the cash portion, and the audit
+   trail needs a second kind of actor.
+3. **Decline, and stay a cash-collection system.** Defensible while cash
+   dominates, and Lehman's first law says the system becomes progressively less
+   useful as that ceases to be true.
+
+**Recommendation.** Not v1.x. It requires answering *what SusuBook is for* once
+the collector is optional, and that is a product decision rather than a backlog
+item. Recorded here so that the question is asked deliberately rather than
+answered by accident, one feature at a time.
+
+### 11.8.2 Variable contribution amounts
+
+**The proposal.** Allow a client to contribute different amounts on different
+days, rather than a fixed daily rate.
+
+**What breaks.** Not a validation rule — the model.
+
+BR-R7 requires a contribution to be a whole multiple of the agreed daily rate.
+That rule is not arbitrary bookkeeping; it is what makes the rest of the domain
+coherent:
+
+- **The susu card** (FR-16) shows 31 boxes as paid, missed or pending. A box
+  means "one day's agreed amount". If amounts vary, a filled box no longer says
+  how much — the card becomes a calendar, not a record.
+- **Days paid** (FR-17) stops being a measure of savings. A client who paid
+  GHS 1 on thirty days would show as more complete than one who paid GHS 50 on
+  ten.
+- **Commission** (BR-R8) is "one day's contribution". With no fixed daily
+  amount, that phrase has no referent. It would have to become a percentage, a
+  flat fee, or something negotiated — a change to the commercial arrangement,
+  not the software.
+- **The projected payout** shown to the client throughout the cycle depends on
+  knowing what a complete cycle is worth.
+
+**What the design already accommodates.** Some flexibility exists and is not the
+same thing: each client has their *own* rate, rates are snapshotted per cycle so
+they can be renegotiated between cycles, and `validate_contribution` already
+takes a `days_covered` parameter so a catch-up payment of N × rate (FR-15) needs
+no change to the rule. What is fixed is the rate *within* a cycle.
+
+**The real change.** Moving from a **card of days** to a **ledger of amounts**.
+That is a different product: the client saves toward a target or simply
+accumulates, days become irrelevant, and the card metaphor — the thing this
+system deliberately preserved because clients already understand it — is
+discarded.
+
+**Recommendation.** v2.0 alongside self-payment, and probably the same decision:
+both are consequences of the same shift away from a collector arriving daily for
+a fixed amount. If either is adopted, the domain model in
+`07-system-analysis-and-design.md` §7.9 is rewritten, not extended.
+
+### 11.8.3 Why these are recorded and not scheduled
+
+Session 3 warns that a debt register becomes archaeology if it is not worked.
+The same is true of a roadmap. Listing "self-payment" and "variable amounts" as
+v1.x items would imply they are additive, and a future maintainer reading that
+list would begin implementing them one endpoint at a time — discovering only
+part-way through that the commission model no longer makes sense and the variance
+report has quietly become meaningless for half the payments.
+
+Recording them as analysed strategic questions costs nothing now and prevents
+that. It is also the honest position: the project team can see what these changes
+would do, and has not decided.
