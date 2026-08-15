@@ -109,7 +109,23 @@ deployment script.
 ```
 
 Images are tagged with the short git SHA, so every deployed revision is
-traceable to a commit. The live revision `susubook-00002-g86` runs image tag
+traceable to a commit. The admin jobs build the image on demand if the current
+commit has not been built, so `db-upgrade` works immediately after a commit
+rather than failing with an "image not found" that reads like a registry fault
+when it is really an ordering one.
+
+**Release order matters when the schema changes**, and only because TD-01 leaves
+us without migrations:
+
+```bash
+./deploy/deploy.sh db-upgrade   # additive DDL; the running revision is unaffected
+./deploy/deploy.sh deploy       # then ship the code that needs it
+```
+
+Reversing these deploys code that queries a column which does not yet exist, and
+every request fails until the upgrade lands. A migration tool would sequence this
+as part of the release; here it is a rule a human has to remember, which is
+itself a form of the interest TD-01 charges. The live revision `susubook-00002-g86` runs image tag
 `4fb6382`.
 
 Builds run in **Cloud Build** rather than pushing from the developer machine.

@@ -13,8 +13,18 @@
 # Usage:
 #   ./deploy/deploy.sh setup      # one-time: APIs, registry, signing key, IAM
 #   ./deploy/deploy.sh deploy     # build image and deploy the service
-#   ./deploy/deploy.sh db-init    # create the schema (first deploy)
+#   ./deploy/deploy.sh db-init    # create the schema (first deploy only)
 #   ./deploy/deploy.sh db-upgrade # apply manual DDL create_all cannot (TD-01)
+#
+# Release order matters when a release changes the schema. Because there are no
+# migrations (TD-01), run db-upgrade BEFORE deploy:
+#
+#   ./deploy/deploy.sh db-upgrade   # adds the column; additive, so the running
+#                                   # revision keeps working
+#   ./deploy/deploy.sh deploy       # then ship the code that needs it
+#
+# Doing it the other way round deploys code that queries a column which does not
+# exist yet, and every request fails until the upgrade lands.
 #   ./deploy/deploy.sh seed       # load demo accounts and data
 #   ./deploy/deploy.sh url        # print the live URL
 
@@ -130,6 +140,20 @@ build() {
     --project "$PROJECT_ID" >/dev/null 2>&1 || true
 }
 
+# The admin jobs run the image for the current commit, which will not exist in
+# the registry unless something has already built it. Building on demand here
+# means `db-upgrade` works straight after a commit, rather than failing with an
+# "image not found" that looks like a registry problem rather than an ordering
+# one.
+require_image() {
+  if gcloud artifacts docker images describe "${IMAGE}:${TAG}" \
+       --project "$PROJECT_ID" >/dev/null 2>&1; then
+    return 0
+  fi
+  green "  image ${TAG} is not in the registry yet — building it first"
+  build
+}
+
 deploy_service() {
   step "Deploying Cloud Run service"
   gcloud run deploy "$SERVICE" \
@@ -182,6 +206,7 @@ upsert_job() {
 run_job() {
   local name="$1"; shift
   step "Running job: ${name} (${*})"
+  require_image
   upsert_job "$name" "$@"
   gcloud run jobs execute "$name" --region "$REGION" --wait --project "$PROJECT_ID"
 }
